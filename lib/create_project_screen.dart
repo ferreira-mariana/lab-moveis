@@ -20,7 +20,7 @@ class _AddNewProjectScreenState extends State<AddNewProjectScreen> {
   String _description = '';
   File _image;
 
-  Future getImage() async {
+  Future _getImage() async {
     var image = await ImagePicker.pickImage(source: ImageSource.gallery);
 
     setState(() {
@@ -28,11 +28,11 @@ class _AddNewProjectScreenState extends State<AddNewProjectScreen> {
     });
   }
 
-  void setName(String text) {
+  void _setName(String text) {
     _name = text;
   }
 
-  void setDescription(String text) {
+  void _setDescription(String text) {
     _description = text;
   }
 
@@ -64,20 +64,50 @@ class _AddNewProjectScreenState extends State<AddNewProjectScreen> {
       appBar: AppBar(
         title: Text('Criação de Projeto'),
         leading: FlatButton(
-            color: Colors.deepPurpleAccent,
+            color: Theme.of(context).accentColor,
             onPressed: () {
               Navigator.of(context).pop();
             },
             child: Icon(Icons.keyboard_arrow_left)),
       ),
       body: ListView(
-        reverse: true,
         children: <Widget>[
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: <Widget>[
+              _image == null
+                  ? Icon(Icons.image, size: 80)
+                  : Image.file(_image, width: 100, height: 100),
+              FlatButton(
+                child: Container(
+                  color: Theme.of(context).accentColor.withOpacity(0.2),
+                  child: Row(
+                    children: <Widget>[
+                      Icon(Icons.attach_file),
+                      Text('Escolha uma Foto')
+                    ],
+                  ),
+                ),
+                onPressed: _getImage,
+              )
+            ],
+          ),
+          CustomTextField(
+            lines: 1,
+            length: 30,
+            name: 'Nome',
+            function: _setName,
+          ),
+          CustomTextField(
+            lines: 10,
+            length: 300,
+            name: 'Descrição',
+            function: _setDescription,
+          ),
           Container(
             padding: EdgeInsets.symmetric(horizontal: 120, vertical: 30),
             child: RaisedButton(
-              color: Colors.deepPurpleAccent[100],
-              colorBrightness: Brightness.light,
+              color: Theme.of(context).accentColor,
               child: Text("Enviar"),
               onPressed: () {
                 if (_name != '' && _description != '') {
@@ -89,38 +119,6 @@ class _AddNewProjectScreenState extends State<AddNewProjectScreen> {
                 }
               },
             ),
-          ),
-          CustomTextField(
-            lines: 10,
-            length: 300,
-            name: 'Descrição',
-            function: setDescription,
-          ),
-          CustomTextField(
-            lines: 1,
-            length: 30,
-            name: 'Nome',
-            function: setName,
-          ),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: <Widget>[
-              _image == null
-                  ? Icon(Icons.image, size: 80)
-                  : Image.file(_image, width: 100, height: 100),
-              FlatButton(
-                child: Container(
-                  color: Colors.deepPurple[50],
-                  child: Row(
-                    children: <Widget>[
-                      Icon(Icons.attach_file),
-                      Text('Escolha uma Foto')
-                    ],
-                  ),
-                ),
-                onPressed: getImage,
-              )
-            ],
           ),
         ],
       ),
@@ -154,14 +152,13 @@ class _CustomTextFieldState extends State<CustomTextField> {
       child: Container(
         decoration: BoxDecoration(border: Border.all()),
         padding: EdgeInsets.symmetric(horizontal: 20),
-        //color: Colors.white70,
         child: Center(
           child: TextField(
             controller: _controller,
             onChanged: updateText,
             maxLines: widget.lines,
             maxLength: widget.length,
-            decoration: InputDecoration(labelText: widget.name),
+            decoration: InputDecoration(labelText: widget.name, alignLabelWithHint: true),
           ),
         ),
       ),

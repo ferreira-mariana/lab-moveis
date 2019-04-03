@@ -58,7 +58,7 @@ class ProjectDetail extends StatelessWidget {
       appBar: AppBar(
         title: Text("Descrição do Projeto"),
         leading: FlatButton(
-          color: Colors.deepPurpleAccent,
+          color: Theme.of(context).accentColor,
           onPressed: () {
             Navigator.of(context).pop();
           },
@@ -78,11 +78,10 @@ class ProjectDetail extends StatelessWidget {
                     Icons.image,
                     size: 240,
                   )
-                : Container(height: 240,child: Image.file(
-                    _image,
-                    fit:BoxFit.contain
-
-                  ),),
+                : Container(
+                    height: 240,
+                    child: Image.file(_image, fit: BoxFit.contain),
+                  ),
           ),
           Center(
             child: Container(

@@ -10,7 +10,10 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      theme: ThemeData(primarySwatch: Colors.deepPurple),
+      theme: ThemeData(
+        primaryColor: Colors.deepPurple,
+        accentColor: Colors.deepPurpleAccent,
+      ),
       home: HomeScreen(),
     );
   }
@@ -62,26 +65,31 @@ class _HomeScreenState extends State<HomeScreen>
           ],
         ),
       ),
-      body: TabBarView(controller: _tabController, children: [
-        Center(
-          child: ListView(),
-        ),
-        Scaffold(
-          floatingActionButton: FloatingActionButton(
+      body: TabBarView(
+        controller: _tabController,
+        children: [
+          Center(
+            child: ListView(),
+          ),
+          Scaffold(
+            floatingActionButton: FloatingActionButton(
               onPressed: () {
                 Navigator.push(
                   context,
                   MaterialPageRoute(
-                      builder: (context) =>
-                          AddNewProjectScreen(projList, updateList)),
+                    builder: (context) => AddNewProjectScreen(
+                          projList,
+                          updateList,
+                        ),
+                  ),
                 );
               },
-              child: Icon(Icons.add)),
-          body: ListView(
-            children: projList,
+              child: Icon(Icons.add),
+            ),
+            body: ListView(children: projList),
           ),
-        ),
-      ]),
+        ],
+      ),
     );
   }
 }
