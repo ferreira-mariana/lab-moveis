@@ -78,11 +78,11 @@ class ProjectDetail extends StatelessWidget {
                     Icons.image,
                     size: 240,
                   )
-                : Image.file(
+                : Container(height: 240,child: Image.file(
                     _image,
-                    height: 240,
-                    fit: BoxFit.fitHeight,
-                  ),
+                    fit:BoxFit.contain
+
+                  ),),
           ),
           Center(
             child: Container(
