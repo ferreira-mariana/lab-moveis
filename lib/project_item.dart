@@ -3,11 +3,23 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 
 class ProjectItem extends StatelessWidget {
-  String _name;
-  String _detail;
-  File _image;
+  final String _name;
+  final String _detail;
+  final String _state;
+  final String _city;
+  final File _image;
 
-  ProjectItem(this._name, this._detail, this._image);
+  ProjectItem(this._name, this._detail, this._image, this._state, this._city);
+
+  String get name => _name;
+
+  String get detail => _detail;
+
+  File get image => _image;
+
+  String get city => _city;
+
+  String get state => _state;
 
   @override
   Widget build(BuildContext context) {
@@ -27,16 +39,19 @@ class ProjectItem extends StatelessWidget {
               _image == null
                   ? Icon(Icons.image, size: 80)
                   : Image.file(
-                      _image,
-                      width: 80,
-                      height: 80,
-                    ),
+                _image,
+                width: 80,
+                height: 80,
+              ),
               Padding(
                 padding: EdgeInsets.symmetric(horizontal: 5),
               ),
-              Text(
-                _name,
-                style: TextStyle(fontSize: 24),
+              Column(
+                children: <Widget>[
+                  Text("Nome: " + _name),
+                  Text("Cidade: " + _city),
+                  Text("Estado: " + _state),
+                ],
               ),
             ],
           ),
@@ -47,8 +62,8 @@ class ProjectItem extends StatelessWidget {
 }
 
 class ProjectDetail extends StatelessWidget {
-  String _detail;
-  File _image;
+  final String _detail;
+  final File _image;
 
   ProjectDetail(this._detail, this._image);
 
@@ -58,7 +73,7 @@ class ProjectDetail extends StatelessWidget {
       appBar: AppBar(
         title: Text("Descrição do Projeto"),
         leading: FlatButton(
-          color: Theme.of(context).accentColor,
+          color: Colors.deepPurpleAccent,
           onPressed: () {
             Navigator.of(context).pop();
           },
@@ -75,13 +90,14 @@ class ProjectDetail extends StatelessWidget {
             ),
             child: _image == null
                 ? Icon(
-                    Icons.image,
-                    size: 240,
-                  )
-                : Container(
-                    height: 240,
-                    child: Image.file(_image, fit: BoxFit.contain),
-                  ),
+              Icons.image,
+              size: 240,
+            )
+                : Image.file(
+              _image,
+              height: 240,
+              fit: BoxFit.fitHeight,
+            ),
           ),
           Center(
             child: Container(

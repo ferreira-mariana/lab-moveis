@@ -6,8 +6,8 @@ import 'package:image_picker/image_picker.dart';
 import 'project_item.dart';
 
 class AddNewProjectScreen extends StatefulWidget {
-  List<Widget> projList;
-  Function updateParent;
+  final List<ProjectItem> projList;
+  final Function updateParent;
 
   AddNewProjectScreen(this.projList, this.updateParent);
 
@@ -16,11 +16,13 @@ class AddNewProjectScreen extends StatefulWidget {
 }
 
 class _AddNewProjectScreenState extends State<AddNewProjectScreen> {
-  String _name = '';
-  String _description = '';
+  String _nameText = '';
+  String _descriptionText = '';
+  String _cityText = '';
+  String _stateText = '';
   File _image;
 
-  Future _getImage() async {
+  Future getImage() async {
     var image = await ImagePicker.pickImage(source: ImageSource.gallery);
 
     setState(() {
@@ -28,12 +30,20 @@ class _AddNewProjectScreenState extends State<AddNewProjectScreen> {
     });
   }
 
-  void _setName(String text) {
-    _name = text;
+  void setNameText(String text) {
+    _nameText = text;
   }
 
-  void _setDescription(String text) {
-    _description = text;
+  void setDescriptionText(String text) {
+    _descriptionText = text;
+  }
+
+  void setCityText(String text){
+    _cityText = text;
+  }
+
+  void setStateText(String text){
+    _stateText = text;
   }
 
   void _showDialog() {
@@ -64,7 +74,7 @@ class _AddNewProjectScreenState extends State<AddNewProjectScreen> {
       appBar: AppBar(
         title: Text('Criação de Projeto'),
         leading: FlatButton(
-            color: Theme.of(context).accentColor,
+            color: Colors.deepPurpleAccent,
             onPressed: () {
               Navigator.of(context).pop();
             },
@@ -80,7 +90,7 @@ class _AddNewProjectScreenState extends State<AddNewProjectScreen> {
                   : Image.file(_image, width: 100, height: 100),
               FlatButton(
                 child: Container(
-                  color: Theme.of(context).accentColor.withOpacity(0.2),
+                  color: Colors.deepPurple[50],
                   child: Row(
                     children: <Widget>[
                       Icon(Icons.attach_file),
@@ -88,7 +98,7 @@ class _AddNewProjectScreenState extends State<AddNewProjectScreen> {
                     ],
                   ),
                 ),
-                onPressed: _getImage,
+                onPressed: getImage,
               )
             ],
           ),
@@ -96,22 +106,35 @@ class _AddNewProjectScreenState extends State<AddNewProjectScreen> {
             lines: 1,
             length: 30,
             name: 'Nome',
-            function: _setName,
+            function: setNameText,
           ),
           CustomTextField(
             lines: 10,
             length: 300,
             name: 'Descrição',
-            function: _setDescription,
+            function: setDescriptionText,
+          ),
+          CustomTextField(
+            lines: 1,
+            length: 30,
+            name: 'Cidade',
+            function: setCityText,
+          ),
+          CustomTextField(
+            lines: 1,
+            length: 30,
+            name: 'Estado',
+            function: setStateText,
           ),
           Container(
             padding: EdgeInsets.symmetric(horizontal: 120, vertical: 30),
             child: RaisedButton(
-              color: Theme.of(context).accentColor,
+              color: Colors.deepPurpleAccent[100],
+              colorBrightness: Brightness.light,
               child: Text("Enviar"),
               onPressed: () {
-                if (_name != '' && _description != '') {
-                  var temp = new ProjectItem(_name, _description, _image);
+                if (_nameText != '' && _descriptionText != '') {
+                  var temp = new ProjectItem(_nameText, _descriptionText, _image, _stateText, _cityText);
                   widget.updateParent(temp);
                   Navigator.of(context).pop();
                 } else {
@@ -127,10 +150,10 @@ class _AddNewProjectScreenState extends State<AddNewProjectScreen> {
 }
 
 class CustomTextField extends StatefulWidget {
-  int lines;
-  int length;
-  String name;
-  Function function;
+  final int lines;
+  final int length;
+  final String name;
+  final Function function;
 
   CustomTextField({this.lines, this.length, this.name, this.function});
 
@@ -152,13 +175,14 @@ class _CustomTextFieldState extends State<CustomTextField> {
       child: Container(
         decoration: BoxDecoration(border: Border.all()),
         padding: EdgeInsets.symmetric(horizontal: 20),
+        //color: Colors.white70,
         child: Center(
           child: TextField(
             controller: _controller,
             onChanged: updateText,
             maxLines: widget.lines,
             maxLength: widget.length,
-            decoration: InputDecoration(labelText: widget.name, alignLabelWithHint: true),
+            decoration: InputDecoration(labelText: widget.name),
           ),
         ),
       ),

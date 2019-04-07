@@ -10,10 +10,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      theme: ThemeData(
-        primaryColor: Colors.deepPurple,
-        accentColor: Colors.deepPurpleAccent,
-      ),
+      theme: ThemeData(primarySwatch: Colors.deepPurple),
       home: HomeScreen(),
     );
   }
@@ -26,14 +23,68 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen>
     with SingleTickerProviderStateMixin {
-  List<Widget> projList = new List<Widget>();
+  List<ProjectItem> projList = new List<ProjectItem>();
+  List<DropdownMenuItem<String>> _dropDownMenuItems = new List();
   TabController _tabController;
   Text _title;
+  List _dropDownItems = ['Nome', 'Cidade', 'Estado'];
+  String _currentDropDownItem;
+
+  @override
+  void initState() {
+    //TEMP
+    projList.add(ProjectItem('B', 'Nada', null, 'B', 'A'));
+    projList.add(ProjectItem('D', 'Nada', null, 'A', 'D'));
+    projList.add(ProjectItem('A', 'Nada', null, 'D', 'B'));
+    projList.add(ProjectItem('E', 'Nada', null, 'C', 'E'));
+    projList.add(ProjectItem('C', 'Nada', null, 'E', 'C'));
+    //TEMP
+
+    super.initState();
+    _tabController = TabController(vsync: this, length: 2);
+    _tabController.addListener(updateTitle);
+    _dropDownMenuItems = getDropDownMenuItems();
+    _currentDropDownItem = _dropDownMenuItems[0].value;
+    updateTitle();
+  }
+
+  List<DropdownMenuItem<String>> getDropDownMenuItems() {
+    List<DropdownMenuItem<String>> items = new List();
+    for (String city in _dropDownItems) {
+      items.add(new DropdownMenuItem(
+        value: city,
+        child: new Text(city),
+      ));
+    }
+    return items;
+  }
 
   updateList(ProjectItem item) {
     setState(() {
-      projList = List.from(projList)..add(item);
+      projList.add(item);
+      sortList();
+      projList = List.from(projList);
     });
+  }
+
+  sortList() {
+    switch (_currentDropDownItem) {
+      case "Nome":
+        projList.sort((a, b) {
+          return a.name.toLowerCase().compareTo(b.name.toLowerCase());
+        });
+        break;
+      case "Cidade":
+        projList.sort((a, b) {
+          return a.city.toLowerCase().compareTo(b.city.toLowerCase());
+        });
+        break;
+      case "Estado":
+        projList.sort((a, b) {
+          return a.state.toLowerCase().compareTo(b.state.toLowerCase());
+        });
+        break;
+    }
   }
 
   updateTitle() {
@@ -44,18 +95,33 @@ class _HomeScreenState extends State<HomeScreen>
     });
   }
 
-  @override
-  void initState() {
-    super.initState();
-    _tabController = TabController(vsync: this, length: 2);
-    _tabController.addListener(updateTitle);
-    updateTitle();
+  void changedDropDownItem(String selected) {
+    setState(() {
+      _currentDropDownItem = selected;
+      sortList();
+      projList = List.from(projList);
+      print(_currentDropDownItem);
+    });
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        actions: <Widget>[
+          Container(
+            child: Theme(
+              data: Theme.of(context).copyWith(brightness: Brightness.dark),
+              child: DropdownButtonHideUnderline(
+                child: DropdownButton(
+                  value: _currentDropDownItem,
+                  items: _dropDownMenuItems,
+                  onChanged: changedDropDownItem,
+                ),
+              ),
+            ),
+          ),
+        ],
         title: _title,
         bottom: TabBar(
           controller: _tabController,
@@ -65,31 +131,26 @@ class _HomeScreenState extends State<HomeScreen>
           ],
         ),
       ),
-      body: TabBarView(
-        controller: _tabController,
-        children: [
-          Center(
-            child: ListView(),
-          ),
-          Scaffold(
-            floatingActionButton: FloatingActionButton(
+      body: TabBarView(controller: _tabController, children: [
+        Center(
+          child: ListView(),
+        ),
+        Scaffold(
+          floatingActionButton: FloatingActionButton(
               onPressed: () {
                 Navigator.push(
                   context,
                   MaterialPageRoute(
-                    builder: (context) => AddNewProjectScreen(
-                          projList,
-                          updateList,
-                        ),
-                  ),
+                      builder: (context) =>
+                          AddNewProjectScreen(projList, updateList)),
                 );
               },
-              child: Icon(Icons.add),
-            ),
-            body: ListView(children: projList),
+              child: Icon(Icons.add)),
+          body: ListView(
+            children: projList,
           ),
-        ],
-      ),
+        ),
+      ]),
     );
   }
 }
