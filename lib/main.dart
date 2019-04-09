@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-
+import 'drawer.dart';
 import 'create_project_screen.dart';
 import 'project_item.dart';
 
@@ -130,7 +130,9 @@ class _HomeScreenState extends State<HomeScreen>
             Tab(icon: Icon(Icons.list)),
           ],
         ),
+
       ),
+      drawer: SideMenu(),
       body: TabBarView(controller: _tabController, children: [
         Center(
           child: ListView(),
