@@ -1,15 +1,16 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_list_drag_and_drop/my_draggable.dart';
 
-class ProjectItem extends StatelessWidget {
+class ProjectItem extends StatefulWidget {
   final String _name;
   final String _detail;
   final String _state;
   final String _city;
   final File _image;
 
-  ProjectItem(this._name, this._detail, this._image, this._state, this._city);
+  ProjectItem(this._name, this._detail, this._state, this._city, this._image);
 
   String get name => _name;
 
@@ -22,38 +23,49 @@ class ProjectItem extends StatelessWidget {
   String get state => _state;
 
   @override
+  State<StatefulWidget> createState() => _ProjectItemState();
+}
+
+class _ProjectItemState extends State<ProjectItem> {
+  Color _color;
+
+  @override
   Widget build(BuildContext context) {
     return Container(
-      child: FlatButton(
-        onPressed: () {
-          Navigator.push(
-            context,
-            MaterialPageRoute(
-                builder: (context) => ProjectDetail(_detail, _image)),
-          );
-        },
-        child: Padding(
-          padding: EdgeInsets.symmetric(horizontal: 10),
-          child: Row(
-            children: <Widget>[
-              _image == null
-                  ? Icon(Icons.image, size: 80)
-                  : Image.file(
-                _image,
-                width: 80,
-                height: 80,
-              ),
-              Padding(
-                padding: EdgeInsets.symmetric(horizontal: 5),
-              ),
-              Column(
-                children: <Widget>[
-                  Text("Nome: " + _name),
-                  Text("Cidade: " + _city),
-                  Text("Estado: " + _state),
-                ],
-              ),
-            ],
+      child: Card(
+        child: FlatButton(
+          color: _color,
+          onPressed: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                  builder: (context) =>
+                      ProjectDetail(widget._detail, widget._image)),
+            );
+          },
+          child: Padding(
+            padding: EdgeInsets.symmetric(horizontal: 10),
+            child: Row(
+              children: <Widget>[
+                widget._image == null
+                    ? Icon(Icons.image, size: 80)
+                    : Image.file(
+                        widget._image,
+                        width: 80,
+                        height: 80,
+                      ),
+                Padding(
+                  padding: EdgeInsets.symmetric(horizontal: 5),
+                ),
+                Column(
+                  children: <Widget>[
+                    Text("Nome: " + widget._name),
+                    Text("Cidade: " + widget._city),
+                    Text("Estado: " + widget._state),
+                  ],
+                ),
+              ],
+            ),
           ),
         ),
       ),
@@ -73,7 +85,7 @@ class ProjectDetail extends StatelessWidget {
       appBar: AppBar(
         title: Text("Descrição do Projeto"),
         leading: FlatButton(
-          color: Colors.deepPurpleAccent,
+          color: Theme.of(context).buttonColor,
           onPressed: () {
             Navigator.of(context).pop();
           },
@@ -90,14 +102,14 @@ class ProjectDetail extends StatelessWidget {
             ),
             child: _image == null
                 ? Icon(
-              Icons.image,
-              size: 240,
-            )
+                    Icons.image,
+                    size: 240,
+                  )
                 : Image.file(
-              _image,
-              height: 240,
-              fit: BoxFit.fitHeight,
-            ),
+                    _image,
+                    height: 240,
+                    fit: BoxFit.fitHeight,
+                  ),
           ),
           Center(
             child: Container(

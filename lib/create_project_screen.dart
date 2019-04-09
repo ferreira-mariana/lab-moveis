@@ -53,11 +53,11 @@ class _AddNewProjectScreenState extends State<AddNewProjectScreen> {
         // return object of type Dialog
         return AlertDialog(
           title: new Text("Alerta"),
-          content: new Text("Nome e Descrição não podem estar vazios"),
+          content: new Text("Preencha todos os campos obrigatórios"),
           actions: <Widget>[
             // usually buttons at the bottom of the dialog
             new FlatButton(
-              child: new Text("Close"),
+              child: new Text("Fechar"),
               onPressed: () {
                 Navigator.of(context).pop();
               },
@@ -105,36 +105,35 @@ class _AddNewProjectScreenState extends State<AddNewProjectScreen> {
           CustomTextField(
             lines: 1,
             length: 30,
-            name: 'Nome',
+            name: 'Nome (Obrigatório)',
             function: setNameText,
           ),
           CustomTextField(
             lines: 10,
             length: 300,
-            name: 'Descrição',
+            name: 'Descrição (Obrigatório)',
             function: setDescriptionText,
           ),
           CustomTextField(
             lines: 1,
             length: 30,
-            name: 'Cidade',
+            name: 'Cidade (Obrigatório)',
             function: setCityText,
           ),
           CustomTextField(
             lines: 1,
             length: 30,
-            name: 'Estado',
+            name: 'Estado (Obrigatório)',
             function: setStateText,
           ),
           Container(
             padding: EdgeInsets.symmetric(horizontal: 120, vertical: 30),
             child: RaisedButton(
-              color: Colors.deepPurpleAccent[100],
-              colorBrightness: Brightness.light,
+              color: Theme.of(context).buttonColor,
               child: Text("Enviar"),
               onPressed: () {
-                if (_nameText != '' && _descriptionText != '') {
-                  var temp = new ProjectItem(_nameText, _descriptionText, _image, _stateText, _cityText);
+                if (_nameText != '' && _descriptionText != '' && _stateText != '' && _cityText != '') {
+                  var temp = new ProjectItem(_nameText, _descriptionText, _stateText, _cityText, _image);
                   widget.updateParent(temp);
                   Navigator.of(context).pop();
                 } else {
@@ -175,7 +174,6 @@ class _CustomTextFieldState extends State<CustomTextField> {
       child: Container(
         decoration: BoxDecoration(border: Border.all()),
         padding: EdgeInsets.symmetric(horizontal: 20),
-        //color: Colors.white70,
         child: Center(
           child: TextField(
             controller: _controller,

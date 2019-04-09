@@ -2,21 +2,53 @@ import 'package:flutter/material.dart';
 
 import 'create_project_screen.dart';
 import 'project_item.dart';
+import 'package:flutter_list_drag_and_drop/drag_and_drop_list.dart';
+import 'settings_screen.dart';
 
 void main() => runApp(MyApp());
 
-class MyApp extends StatelessWidget {
-  // This widget is the root of your application.
+class MyApp extends StatefulWidget {
+  @override
+  State<StatefulWidget> createState() => _MyAppState();
+}
+
+class _MyAppState extends State<MyApp>{
+  Color primaryColor = Colors.deepPurple;
+  Color buttonColor = Colors.deepPurpleAccent;
+
+  void changeTheme(String theme){
+    setState(() {
+      switch (theme) {
+        case "light":
+          primaryColor = Colors.deepPurple;
+          buttonColor = Colors.deepPurpleAccent;
+          return;
+        case "dark":
+          primaryColor = Colors.black;
+          buttonColor = Colors.black38;
+          return;
+      }
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      theme: ThemeData(primarySwatch: Colors.deepPurple),
-      home: HomeScreen(),
+      theme: ThemeData(
+        primaryColor: primaryColor,
+        buttonColor: buttonColor,
+      ),
+      home: HomeScreen(changeTheme),
     );
   }
+
 }
 
 class HomeScreen extends StatefulWidget {
+  final Function changeThemeFunction;
+
+  HomeScreen(this.changeThemeFunction);
+
   @override
   State<StatefulWidget> createState() => _HomeScreenState();
 }
@@ -24,23 +56,22 @@ class HomeScreen extends StatefulWidget {
 class _HomeScreenState extends State<HomeScreen>
     with SingleTickerProviderStateMixin {
   List<ProjectItem> projList = new List<ProjectItem>();
-  List<DropdownMenuItem<String>> _dropDownMenuItems = new List();
+  List<DropdownMenuItem<String>> _dropDownMenuItems;
   TabController _tabController;
   Text _title;
-  List _dropDownItems = ['Nome', 'Cidade', 'Estado'];
+  List _dropDownItems = ['Nome', 'Cidade', 'Estado', 'Custom'];
   String _currentDropDownItem;
 
   @override
   void initState() {
-    //TEMP
-    projList.add(ProjectItem('B', 'Nada', null, 'B', 'A'));
-    projList.add(ProjectItem('D', 'Nada', null, 'A', 'D'));
-    projList.add(ProjectItem('A', 'Nada', null, 'D', 'B'));
-    projList.add(ProjectItem('E', 'Nada', null, 'C', 'E'));
-    projList.add(ProjectItem('C', 'Nada', null, 'E', 'C'));
-    //TEMP
-
     super.initState();
+    //TEMP
+    projList.add(ProjectItem('B', 'Nada', 'B', 'A', null));
+    projList.add(ProjectItem('D', 'Nada', 'A', 'D', null));
+    projList.add(ProjectItem('A', 'Nada', 'D', 'B', null));
+    projList.add(ProjectItem('E', 'Nada', 'C', 'E', null));
+    projList.add(ProjectItem('C', 'Nada', 'E', 'C', null));
+    //TEMP
     _tabController = TabController(vsync: this, length: 2);
     _tabController.addListener(updateTitle);
     _dropDownMenuItems = getDropDownMenuItems();
@@ -100,13 +131,15 @@ class _HomeScreenState extends State<HomeScreen>
       _currentDropDownItem = selected;
       sortList();
       projList = List.from(projList);
-      print(_currentDropDownItem);
     });
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      drawer: Drawer(
+        child: SettingsScreen(widget.changeThemeFunction),
+      ),
       appBar: AppBar(
         actions: <Widget>[
           Container(
@@ -131,12 +164,15 @@ class _HomeScreenState extends State<HomeScreen>
           ],
         ),
       ),
-      body: TabBarView(controller: _tabController, children: [
-        Center(
-          child: ListView(),
-        ),
-        Scaffold(
-          floatingActionButton: FloatingActionButton(
+      body: TabBarView(
+        controller: _tabController,
+        children: [
+          Center(
+            child: ListView(),
+          ),
+          Scaffold(
+            floatingActionButton: FloatingActionButton(
+              backgroundColor: Theme.of(context).buttonColor,
               onPressed: () {
                 Navigator.push(
                   context,
@@ -145,12 +181,30 @@ class _HomeScreenState extends State<HomeScreen>
                           AddNewProjectScreen(projList, updateList)),
                 );
               },
-              child: Icon(Icons.add)),
-          body: ListView(
-            children: projList,
+              child: Icon(Icons.add),
+            ),
+            body: _currentDropDownItem == 'Custom'
+                ? DragAndDropList<ProjectItem>(
+                    projList,
+                    itemBuilder: (BuildContext context, item) {
+                      return new SizedBox(
+                        child: item,
+                      );
+                    },
+                    onDragFinish: (before, after) {
+                      ProjectItem data = projList[before];
+                      projList.removeAt(before);
+                      projList.insert(after, data);
+                    },
+                    dragElevation: 8.0,
+                    canBeDraggedTo: (one, two) => true,
+                  )
+                : ListView(
+                    children: projList,
+                  ),
           ),
-        ),
-      ]),
+        ],
+      ),
     );
   }
 }
