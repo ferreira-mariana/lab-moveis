@@ -9,8 +9,12 @@ class ProjectItem extends StatefulWidget {
   final String _state;
   final String _city;
   final File _image;
+  bool checked = false;
+  bool canDelete = false;
 
   ProjectItem(this._name, this._detail, this._state, this._city, this._image);
+
+  bool isChecked() => checked;
 
   String get name => _name;
 
@@ -27,46 +31,57 @@ class ProjectItem extends StatefulWidget {
 }
 
 class _ProjectItemState extends State<ProjectItem> {
-  Color _color;
 
   @override
   Widget build(BuildContext context) {
     return Container(
       child: Card(
-        child: FlatButton(
-          color: _color,
-          onPressed: () {
-            Navigator.push(
-              context,
-              MaterialPageRoute(
-                  builder: (context) =>
-                      ProjectDetail(widget._detail, widget._image)),
-            );
-          },
-          child: Padding(
-            padding: EdgeInsets.symmetric(horizontal: 10),
-            child: Row(
-              children: <Widget>[
-                widget._image == null
-                    ? Icon(Icons.image, size: 80)
-                    : Image.file(
-                        widget._image,
-                        width: 80,
-                        height: 80,
+        child: Row(
+          children: <Widget>[
+            Flexible(
+              child: FlatButton(
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) =>
+                            ProjectDetail(widget._detail, widget._image)),
+                  );
+                },
+                child: //Padding(
+                  Row(
+                    children: <Widget>[
+                      widget._image == null
+                          ? Icon(Icons.image, size: 80)
+                          : Image.file(
+                              widget._image,
+                              width: 80,
+                              height: 80,
+                            ),
+                      Padding(
+                        padding: EdgeInsets.symmetric(horizontal: 5),
                       ),
-                Padding(
-                  padding: EdgeInsets.symmetric(horizontal: 5),
-                ),
-                Column(
-                  children: <Widget>[
-                    Text("Nome: " + widget._name),
-                    Text("Cidade: " + widget._city),
-                    Text("Estado: " + widget._state),
-                  ],
-                ),
-              ],
+                      Column(
+                        children: <Widget>[
+                          Text("Nome: " + widget._name),
+                          Text("Cidade: " + widget._city),
+                          Text("Estado: " + widget._state),
+                        ],
+                      ),
+                    ],
+                  ),
+                //),
+              ),
             ),
-          ),
+            /*Checkbox(
+              value: widget.checked,
+              onChanged: (bool change) {
+                _checkBoxChange(change);
+              },
+              checkColor: Colors.white,
+              activeColor: Theme.of(context).buttonColor,
+            ),*/
+          ],
         ),
       ),
     );
@@ -91,7 +106,6 @@ class ProjectDetail extends StatelessWidget {
           },
           child: Icon(Icons.keyboard_arrow_left),
         ),
-        //child: Icon(Icons.keyboard_arrow_left)),
       ),
       body: ListView(
         children: <Widget>[
@@ -108,7 +122,7 @@ class ProjectDetail extends StatelessWidget {
                 : Image.file(
                     _image,
                     height: 240,
-                    fit: BoxFit.fitHeight,
+                    fit: BoxFit.fitWidth,
                   ),
           ),
           Center(

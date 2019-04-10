@@ -4,6 +4,7 @@ import 'create_project_screen.dart';
 import 'project_item.dart';
 import 'package:flutter_list_drag_and_drop/drag_and_drop_list.dart';
 import 'settings_screen.dart';
+import 'delete_projects_screen.dart';
 
 void main() => runApp(MyApp());
 
@@ -12,11 +13,11 @@ class MyApp extends StatefulWidget {
   State<StatefulWidget> createState() => _MyAppState();
 }
 
-class _MyAppState extends State<MyApp>{
+class _MyAppState extends State<MyApp> {
   Color primaryColor = Colors.deepPurple;
   Color buttonColor = Colors.deepPurpleAccent;
 
-  void changeTheme(String theme){
+  void changeTheme(String theme) {
     setState(() {
       switch (theme) {
         case "light":
@@ -34,6 +35,7 @@ class _MyAppState extends State<MyApp>{
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+      debugShowCheckedModeBanner: false,
       theme: ThemeData(
         primaryColor: primaryColor,
         buttonColor: buttonColor,
@@ -41,7 +43,6 @@ class _MyAppState extends State<MyApp>{
       home: HomeScreen(changeTheme),
     );
   }
-
 }
 
 class HomeScreen extends StatefulWidget {
@@ -90,12 +91,16 @@ class _HomeScreenState extends State<HomeScreen>
     return items;
   }
 
-  updateList(ProjectItem item) {
+  addToList(ProjectItem item) {
     setState(() {
       projList.add(item);
       sortList();
-      projList = List.from(projList);
+      updateList();
     });
+  }
+
+  updateList() {
+    projList = List.from(projList);
   }
 
   sortList() {
@@ -142,6 +147,17 @@ class _HomeScreenState extends State<HomeScreen>
       ),
       appBar: AppBar(
         actions: <Widget>[
+          FlatButton(
+            child: Icon(Icons.delete),
+            onPressed: () {
+              Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) =>
+                        DeleteProjectsScreen(projList, updateList),
+                  ));
+            },
+          ),
           Container(
             child: Theme(
               data: Theme.of(context).copyWith(brightness: Brightness.dark),
@@ -178,7 +194,7 @@ class _HomeScreenState extends State<HomeScreen>
                   context,
                   MaterialPageRoute(
                       builder: (context) =>
-                          AddNewProjectScreen(projList, updateList)),
+                          AddNewProjectScreen(projList, addToList)),
                 );
               },
               child: Icon(Icons.add),

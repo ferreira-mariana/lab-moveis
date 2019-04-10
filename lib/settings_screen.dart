@@ -18,9 +18,9 @@ class _SettingsScreenState extends State<SettingsScreen>{
       padding: EdgeInsets.zero,
       children: <Widget>[
         DrawerHeader(
-          child: Text('Drawer Header'),
+          child: Text('Nada aqui'),
           decoration: BoxDecoration(
-            color: Colors.blue,
+            color: Theme.of(context).primaryColor,
           ),
         ),
         ListTile(
