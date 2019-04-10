@@ -72,14 +72,6 @@ class ProjectDetail extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         title: Text("Descrição do Projeto"),
-        leading: FlatButton(
-          color: Colors.deepPurpleAccent,
-          onPressed: () {
-            Navigator.of(context).pop();
-          },
-          child: Icon(Icons.keyboard_arrow_left),
-        ),
-        //child: Icon(Icons.keyboard_arrow_left)),
       ),
       body: ListView(
         children: <Widget>[

@@ -100,7 +100,6 @@ class _HomeScreenState extends State<HomeScreen>
       _currentDropDownItem = selected;
       sortList();
       projList = List.from(projList);
-      print(_currentDropDownItem);
     });
   }
 
@@ -130,7 +129,6 @@ class _HomeScreenState extends State<HomeScreen>
             Tab(icon: Icon(Icons.list)),
           ],
         ),
-
       ),
       drawer: SideMenu(),
       body: TabBarView(controller: _tabController, children: [
