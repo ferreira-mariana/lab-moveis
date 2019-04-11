@@ -50,12 +50,10 @@ class _AddNewProjectScreenState extends State<AddNewProjectScreen> {
     showDialog(
       context: context,
       builder: (BuildContext context) {
-        // return object of type Dialog
         return AlertDialog(
           title: new Text("Alerta"),
           content: new Text("Preencha todos os campos obrigatórios"),
           actions: <Widget>[
-            // usually buttons at the bottom of the dialog
             new FlatButton(
               child: new Text("Fechar"),
               onPressed: () {
@@ -73,12 +71,6 @@ class _AddNewProjectScreenState extends State<AddNewProjectScreen> {
     return Scaffold(
       appBar: AppBar(
         title: Text('Criação de Projeto'),
-        leading: FlatButton(
-            color: Colors.deepPurpleAccent,
-            onPressed: () {
-              Navigator.of(context).pop();
-            },
-            child: Icon(Icons.keyboard_arrow_left)),
       ),
       body: ListView(
         children: <Widget>[
@@ -127,7 +119,7 @@ class _AddNewProjectScreenState extends State<AddNewProjectScreen> {
             function: setStateText,
           ),
           Container(
-            padding: EdgeInsets.symmetric(horizontal: 120, vertical: 30),
+            padding: EdgeInsets.symmetric(horizontal: 120, vertical: 10),
             child: RaisedButton(
               color: Theme.of(context).buttonColor,
               child: Text("Enviar"),
@@ -176,11 +168,11 @@ class _CustomTextFieldState extends State<CustomTextField> {
         padding: EdgeInsets.symmetric(horizontal: 20),
         child: Center(
           child: TextField(
-            controller: _controller,
-            onChanged: updateText,
-            maxLines: widget.lines,
-            maxLength: widget.length,
-            decoration: InputDecoration(labelText: widget.name),
+          controller: _controller,
+          onChanged: updateText,
+          maxLines: widget.lines,
+          maxLength: widget.length,
+          decoration: InputDecoration(labelText: widget.name),
           ),
         ),
       ),

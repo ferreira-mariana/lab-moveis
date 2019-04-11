@@ -10,7 +10,6 @@ class ProjectItem extends StatefulWidget {
   final String _city;
   final File _image;
   bool checked = false;
-  bool canDelete = false;
 
   ProjectItem(this._name, this._detail, this._state, this._city, this._image);
 
@@ -31,7 +30,6 @@ class ProjectItem extends StatefulWidget {
 }
 
 class _ProjectItemState extends State<ProjectItem> {
-
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -49,38 +47,29 @@ class _ProjectItemState extends State<ProjectItem> {
                   );
                 },
                 child: //Padding(
-                  Row(
-                    children: <Widget>[
-                      widget._image == null
-                          ? Icon(Icons.image, size: 80)
-                          : Image.file(
-                              widget._image,
-                              width: 80,
-                              height: 80,
-                            ),
-                      Padding(
-                        padding: EdgeInsets.symmetric(horizontal: 5),
-                      ),
-                      Column(
-                        children: <Widget>[
-                          Text("Nome: " + widget._name),
-                          Text("Cidade: " + widget._city),
-                          Text("Estado: " + widget._state),
-                        ],
-                      ),
-                    ],
-                  ),
-                //),
+                    Row(
+                  children: <Widget>[
+                    widget._image == null
+                        ? Icon(Icons.image, size: 80)
+                        : Image.file(
+                            widget._image,
+                            width: 80,
+                            height: 80,
+                          ),
+                    Padding(
+                      padding: EdgeInsets.symmetric(horizontal: 5),
+                    ),
+                    Column(
+                      children: <Widget>[
+                        Text("Nome: " + widget._name),
+                        Text("Cidade: " + widget._city),
+                        Text("Estado: " + widget._state),
+                      ],
+                    ),
+                  ],
+                ),
               ),
             ),
-            /*Checkbox(
-              value: widget.checked,
-              onChanged: (bool change) {
-                _checkBoxChange(change);
-              },
-              checkColor: Colors.white,
-              activeColor: Theme.of(context).buttonColor,
-            ),*/
           ],
         ),
       ),
@@ -99,13 +88,6 @@ class ProjectDetail extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         title: Text("Descrição do Projeto"),
-        leading: FlatButton(
-          color: Theme.of(context).buttonColor,
-          onPressed: () {
-            Navigator.of(context).pop();
-          },
-          child: Icon(Icons.keyboard_arrow_left),
-        ),
       ),
       body: ListView(
         children: <Widget>[

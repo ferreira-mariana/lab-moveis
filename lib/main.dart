@@ -92,15 +92,15 @@ class _HomeScreenState extends State<HomeScreen>
   }
 
   addToList(ProjectItem item) {
-    setState(() {
-      projList.add(item);
-      sortList();
-      updateList();
-    });
+    projList.add(item);
+    sortList();
+    updateList();
   }
 
   updateList() {
-    projList = List.from(projList);
+    setState(() {
+      projList = List.from(projList);
+    });
   }
 
   sortList() {
@@ -148,7 +148,7 @@ class _HomeScreenState extends State<HomeScreen>
       appBar: AppBar(
         actions: <Widget>[
           FlatButton(
-            child: Icon(Icons.delete),
+            child: Icon(Icons.delete, color: Colors.white,),
             onPressed: () {
               Navigator.push(
                   context,

@@ -12,7 +12,6 @@ class SettingsScreen extends StatefulWidget{
 class _SettingsScreenState extends State<SettingsScreen>{
   @override
   Widget build(BuildContext context) {
-    // TODO: implement build
     return ListView(
       // Important: Remove any padding from the ListView.
       padding: EdgeInsets.zero,
