@@ -20,6 +20,7 @@ dependencies:
   image_picker: ^0.5.0+9
   flutter:
     sdk: flutter
+  scoped_model: ^1.0.0
 
 
   # The following adds the Cupertino Icons font to your application.

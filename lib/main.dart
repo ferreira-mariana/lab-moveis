@@ -2,21 +2,56 @@ import 'package:flutter/material.dart';
 import 'drawer.dart';
 import 'create_project_screen.dart';
 import 'project_item.dart';
+import 'package:scoped_model/scoped_model.dart';
 
-void main() => runApp(MyApp());
+void main(){
+  ConfigModel config = ConfigModel(Brightness.light);
 
-class MyApp extends StatelessWidget {
+  runApp(
+    ScopedModel<ConfigModel>(
+      model: config,
+      child: MyApp(),
+      )
+  );
+
+}
+
+class ConfigModel extends Model{
+  Brightness _bright;
+  ConfigModel(Brightness _bright);
+  changeBrightness(){
+    _bright == Brightness.light
+    ? _bright = Brightness.dark
+    : _bright = Brightness.light;
+
+    notifyListeners();
+  } 
+}
+
+class MyApp extends StatefulWidget{
+  State<StatefulWidget> createState() => _MyApp();
+}
+
+class _MyApp extends State<MyApp> {
   // This widget is the root of your application.
+  
+
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      theme: ThemeData(primarySwatch: Colors.deepPurple),
+    return ScopedModelDescendant<ConfigModel>(
+      builder: (context, child, config) => MaterialApp(
+      theme: ThemeData(
+        primarySwatch: Colors.deepPurple,
+        brightness: config._bright
+        ),
       home: HomeScreen(),
+    )
     );
   }
 }
 
 class HomeScreen extends StatefulWidget {
+  
   @override
   State<StatefulWidget> createState() => _HomeScreenState();
 }
