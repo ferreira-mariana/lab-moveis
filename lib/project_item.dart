@@ -88,7 +88,7 @@ class ProjectDetail extends StatelessWidget {
                 : Image.file(
               _image,
               height: 240,
-              fit: BoxFit.fitHeight,
+              fit: BoxFit.fitWidth,
             ),
           ),
           Center(
