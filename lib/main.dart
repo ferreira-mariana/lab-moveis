@@ -1,78 +1,60 @@
 import 'package:flutter/material.dart';
-
-import 'create_project_screen.dart';
-import 'project_item.dart';
+import 'package:lpdm_proj/create_project_screen.dart';
+import 'package:lpdm_proj/delete_projects_screen.dart';
+import 'package:lpdm_proj/drawer.dart';
+import 'package:lpdm_proj/models.dart';
+import 'package:lpdm_proj/project_item.dart';
+import 'package:scoped_model/scoped_model.dart';
 import 'package:flutter_list_drag_and_drop/drag_and_drop_list.dart';
-import 'settings_screen.dart';
-import 'delete_projects_screen.dart';
 
-void main() => runApp(MyApp());
+void main() {
+  ConfigModel config = ConfigModel(Brightness.light);
+  DataModel data = DataModel();
+
+  runApp(
+    ScopedModel<ConfigModel>(
+      model: config,
+      child: ScopedModel<DataModel>(
+        model: data,
+        child: MyApp(),
+      ),
+    ),
+  );
+}
 
 class MyApp extends StatefulWidget {
-  @override
   State<StatefulWidget> createState() => _MyAppState();
 }
 
 class _MyAppState extends State<MyApp> {
-  Color primaryColor = Colors.deepPurple;
-  Color buttonColor = Colors.deepPurpleAccent;
-
-  void changeTheme(String theme) {
-    setState(() {
-      switch (theme) {
-        case "light":
-          primaryColor = Colors.deepPurple;
-          buttonColor = Colors.deepPurpleAccent;
-          return;
-        case "dark":
-          primaryColor = Colors.black;
-          buttonColor = Colors.black38;
-          return;
-      }
-    });
-  }
-
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      debugShowCheckedModeBanner: false,
-      theme: ThemeData(
-        primaryColor: primaryColor,
-        buttonColor: buttonColor,
-      ),
-      home: HomeScreen(changeTheme),
+    return ScopedModelDescendant<ConfigModel>(
+      builder: (context, child, config) => MaterialApp(
+            theme: ThemeData(
+                primarySwatch: Colors.deepPurple, brightness: config.bright),
+            home: HomeScreen(),
+          ),
     );
   }
 }
 
 class HomeScreen extends StatefulWidget {
-  final Function changeThemeFunction;
-
-  HomeScreen(this.changeThemeFunction);
-
   @override
   State<StatefulWidget> createState() => _HomeScreenState();
 }
 
 class _HomeScreenState extends State<HomeScreen>
     with SingleTickerProviderStateMixin {
-  List<ProjectItem> projList = new List<ProjectItem>();
   List<DropdownMenuItem<String>> _dropDownMenuItems;
   TabController _tabController;
   Text _title;
-  List _dropDownItems = ['Nome', 'Cidade', 'Estado', 'Custom'];
+  List _dropDownItems = ['Nome', 'Cidade', 'Estado'];
   String _currentDropDownItem;
 
   @override
   void initState() {
     super.initState();
-    //TEMP
-    projList.add(ProjectItem('B', 'Nada', 'B', 'A', null));
-    projList.add(ProjectItem('D', 'Nada', 'A', 'D', null));
-    projList.add(ProjectItem('A', 'Nada', 'D', 'B', null));
-    projList.add(ProjectItem('E', 'Nada', 'C', 'E', null));
-    projList.add(ProjectItem('C', 'Nada', 'E', 'C', null));
-    //TEMP
     _tabController = TabController(vsync: this, length: 2);
     _tabController.addListener(updateTitle);
     _dropDownMenuItems = getDropDownMenuItems();
@@ -91,38 +73,6 @@ class _HomeScreenState extends State<HomeScreen>
     return items;
   }
 
-  addToList(ProjectItem item) {
-    projList.add(item);
-    sortList();
-    updateList();
-  }
-
-  updateList() {
-    setState(() {
-      projList = List.from(projList);
-    });
-  }
-
-  sortList() {
-    switch (_currentDropDownItem) {
-      case "Nome":
-        projList.sort((a, b) {
-          return a.name.toLowerCase().compareTo(b.name.toLowerCase());
-        });
-        break;
-      case "Cidade":
-        projList.sort((a, b) {
-          return a.city.toLowerCase().compareTo(b.city.toLowerCase());
-        });
-        break;
-      case "Estado":
-        projList.sort((a, b) {
-          return a.state.toLowerCase().compareTo(b.state.toLowerCase());
-        });
-        break;
-    }
-  }
-
   updateTitle() {
     setState(() {
       _title = _tabController.index == 0
@@ -134,93 +84,92 @@ class _HomeScreenState extends State<HomeScreen>
   void changedDropDownItem(String selected) {
     setState(() {
       _currentDropDownItem = selected;
-      sortList();
-      projList = List.from(projList);
     });
   }
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      drawer: Drawer(
-        child: SettingsScreen(widget.changeThemeFunction),
-      ),
-      appBar: AppBar(
-        actions: <Widget>[
-          FlatButton(
-            child: Icon(Icons.delete, color: Colors.white,),
-            onPressed: () {
-              Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) =>
-                        DeleteProjectsScreen(projList, updateList),
-                  ));
-            },
-          ),
-          Container(
-            child: Theme(
-              data: Theme.of(context).copyWith(brightness: Brightness.dark),
-              child: DropdownButtonHideUnderline(
-                child: DropdownButton(
-                  value: _currentDropDownItem,
-                  items: _dropDownMenuItems,
-                  onChanged: changedDropDownItem,
+    return ScopedModelDescendant<DataModel>(
+      builder: (context, child, data) => Scaffold(
+            drawer: SideMenu(),
+            appBar: AppBar(
+              actions: <Widget>[
+                FlatButton(
+                  child: Icon(
+                    Icons.delete,
+                    color: Colors.white,
+                  ),
+                  onPressed: () {
+                    Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) =>
+                              DeleteProjectsScreen(data.projList),
+                        ));
+                  },
                 ),
+                Container(
+                  child: Theme(
+                    data:
+                        Theme.of(context).copyWith(brightness: Brightness.dark),
+                    child: DropdownButtonHideUnderline(
+                      child: DropdownButton(
+                          value: _currentDropDownItem,
+                          items: _dropDownMenuItems,
+                          onChanged: (text) {
+                            changedDropDownItem(text);
+                            data.sort(text);
+                          }),
+                    ),
+                  ),
+                ),
+              ],
+              title: _title,
+              bottom: TabBar(
+                controller: _tabController,
+                tabs: [
+                  Tab(icon: Icon(Icons.edit)),
+                  Tab(icon: Icon(Icons.list)),
+                ],
               ),
             ),
-          ),
-        ],
-        title: _title,
-        bottom: TabBar(
-          controller: _tabController,
-          tabs: [
-            Tab(icon: Icon(Icons.edit)),
-            Tab(icon: Icon(Icons.list)),
-          ],
-        ),
-      ),
-      body: TabBarView(
-        controller: _tabController,
-        children: [
-          Center(
-            child: ListView(),
-          ),
-          Scaffold(
-            floatingActionButton: FloatingActionButton(
-              backgroundColor: Theme.of(context).buttonColor,
-              onPressed: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                      builder: (context) =>
-                          AddNewProjectScreen(projList, addToList)),
-                );
-              },
-              child: Icon(Icons.add),
-            ),
-            body: _currentDropDownItem == 'Custom'
-                ? DragAndDropList<ProjectItem>(
-                    projList,
+            body: TabBarView(
+              controller: _tabController,
+              children: [
+                Center(
+                  child: ListView(),
+                ),
+                Scaffold(
+                  floatingActionButton: FloatingActionButton(
+                    backgroundColor: Theme.of(context).buttonColor,
+                    onPressed: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => AddNewProjectScreen()),
+                      );
+                    },
+                    child: Icon(Icons.add),
+                  ),
+                  body: DragAndDropList<ProjectItem>(
+                    data.projList,
                     itemBuilder: (BuildContext context, item) {
                       return new SizedBox(
                         child: item,
                       );
                     },
                     onDragFinish: (before, after) {
-                      ProjectItem data = projList[before];
-                      projList.removeAt(before);
-                      projList.insert(after, data);
+                      ProjectItem item = data.projList[before];
+                      data.projList.removeAt(before);
+                      data.projList.insert(after, item);
                     },
                     dragElevation: 8.0,
                     canBeDraggedTo: (one, two) => true,
-                  )
-                : ListView(
-                    children: projList,
                   ),
+                ),
+              ],
+            ),
           ),
-        ],
-      ),
     );
   }
 }

@@ -1,7 +1,6 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
-import 'package:flutter_list_drag_and_drop/my_draggable.dart';
 
 class ProjectItem extends StatefulWidget {
   final String _name;
@@ -9,11 +8,8 @@ class ProjectItem extends StatefulWidget {
   final String _state;
   final String _city;
   final File _image;
-  bool checked = false;
 
   ProjectItem(this._name, this._detail, this._state, this._city, this._image);
-
-  bool isChecked() => checked;
 
   String get name => _name;
 
