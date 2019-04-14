@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'config.dart';
+import 'config_page.dart';
 
 class Item {
   String nome;

@@ -1,15 +1,15 @@
 import 'package:flutter/material.dart';
-import 'package:lpdm_proj/create_project_screen.dart';
-import 'package:lpdm_proj/delete_projects_screen.dart';
-import 'package:lpdm_proj/drawer.dart';
+import 'package:lpdm_proj/create_project_page.dart';
+import 'package:lpdm_proj/delete_project_page.dart';
+import 'package:lpdm_proj/side_menu.dart';
 import 'package:lpdm_proj/models.dart';
 import 'package:lpdm_proj/project_item.dart';
 import 'package:scoped_model/scoped_model.dart';
 import 'package:flutter_list_drag_and_drop/drag_and_drop_list.dart';
 
 void main() {
-  ConfigModel config = ConfigModel(Brightness.light);
-  DataModel data = DataModel();
+  final ConfigModel config = ConfigModel(Brightness.light);
+  final DataModel data = DataModel();
 
   runApp(
     ScopedModel<ConfigModel>(
@@ -32,7 +32,10 @@ class _MyAppState extends State<MyApp> {
     return ScopedModelDescendant<ConfigModel>(
       builder: (context, child, config) => MaterialApp(
             theme: ThemeData(
-                primarySwatch: Colors.deepPurple, brightness: config.bright),
+              primarySwatch: Colors.deepPurple,
+              brightness: config.bright,
+              iconTheme: IconThemeData(color: Colors.white),
+            ),
             home: HomeScreen(),
           ),
     );
@@ -97,14 +100,14 @@ class _HomeScreenState extends State<HomeScreen>
                 FlatButton(
                   child: Icon(
                     Icons.delete,
-                    color: Colors.white,
+                    color: Theme.of(context).iconTheme.color,
                   ),
                   onPressed: () {
                     Navigator.push(
                         context,
                         MaterialPageRoute(
                           builder: (context) =>
-                              DeleteProjectsScreen(data.projList),
+                              DeleteProjectPage(data.projList),
                         ));
                   },
                 ),
@@ -146,7 +149,7 @@ class _HomeScreenState extends State<HomeScreen>
                       Navigator.push(
                         context,
                         MaterialPageRoute(
-                            builder: (context) => AddNewProjectScreen()),
+                            builder: (context) => CreateProjectPage()),
                       );
                     },
                     child: Icon(Icons.add),

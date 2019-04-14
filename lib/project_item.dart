@@ -1,5 +1,5 @@
 import 'dart:io';
-
+import 'package:photo_view/photo_view.dart';
 import 'package:flutter/material.dart';
 
 class ProjectItem extends StatefulWidget {
@@ -97,10 +97,24 @@ class ProjectDetail extends StatelessWidget {
                     Icons.image,
                     size: 240,
                   )
-                : Image.file(
-                    _image,
-                    height: 240,
-                    fit: BoxFit.fitWidth,
+                : FlatButton(
+                    onPressed: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => Container(
+                                child: PhotoView(
+                                  imageProvider: FileImage(_image),
+                                ),
+                              ),
+                        ),
+                      );
+                    },
+                    child: Image.file(
+                      _image,
+                      height: 240,
+                      fit: BoxFit.fitWidth,
+                    ),
                   ),
           ),
           Center(

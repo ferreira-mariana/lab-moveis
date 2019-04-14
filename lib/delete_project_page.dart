@@ -3,16 +3,16 @@ import 'project_item.dart';
 import 'package:scoped_model/scoped_model.dart';
 import 'package:lpdm_proj/models.dart';
 
-class DeleteProjectsScreen extends StatefulWidget {
+class DeleteProjectPage extends StatefulWidget {
   final List<ProjectItem> list;
 
-  DeleteProjectsScreen(this.list);
+  DeleteProjectPage(this.list);
 
   @override
-  State<StatefulWidget> createState() => _DeleteProjectsScreen();
+  State<StatefulWidget> createState() => _DeleteProjectPage();
 }
 
-class _DeleteProjectsScreen extends State<DeleteProjectsScreen> {
+class _DeleteProjectPage extends State<DeleteProjectPage> {
   List<ProjectItemWithCheckbox> _list = new List<ProjectItemWithCheckbox>();
 
   @override
@@ -30,7 +30,10 @@ class _DeleteProjectsScreen extends State<DeleteProjectsScreen> {
             appBar: AppBar(
               actions: <Widget>[
                 FlatButton(
-                  child: Icon(Icons.delete),
+                  child: Icon(
+                    Icons.delete,
+                    color: Theme.of(context).iconTheme.color,
+                  ),
                   onPressed: () {
                     for (ProjectItemWithCheckbox proj in _list) {
                       if (proj.isChecked()) data.removeFromList(proj.item);

@@ -7,12 +7,12 @@ import 'package:scoped_model/scoped_model.dart';
 
 import 'project_item.dart';
 
-class AddNewProjectScreen extends StatefulWidget {
+class CreateProjectPage extends StatefulWidget {
   @override
-  State<StatefulWidget> createState() => _AddNewProjectScreenState();
+  State<StatefulWidget> createState() => _CreateProjectPageState();
 }
 
-class _AddNewProjectScreenState extends State<AddNewProjectScreen> {
+class _CreateProjectPageState extends State<CreateProjectPage> {
   String _nameText = '';
   String _descriptionText = '';
   String _cityText = '';
