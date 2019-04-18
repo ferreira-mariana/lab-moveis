@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'main.dart';
+import 'models.dart';
 import 'package:scoped_model/scoped_model.dart';
 
 class ConfigPage extends StatelessWidget{
