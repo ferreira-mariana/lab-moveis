@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:lpdm_proj/project_item.dart';
 import 'package:scoped_model/scoped_model.dart';
+import 'package:postgres/postgres.dart';
 
 class ConfigModel extends Model {
   Brightness _bright;
@@ -21,6 +22,7 @@ class ConfigModel extends Model {
 class DataModel extends Model {
   List<ProjectItem> _projList = new List<ProjectItem>();
   String _sort = 'Nome';
+  PostgreSQLConnection connection;
 
   DataModel() {
     _initList();
@@ -29,24 +31,39 @@ class DataModel extends Model {
 
   List<ProjectItem> get projList => _projList;
 
-  void _initList() {
-    projList.add(ProjectItem('B', 'Nada', 'B', 'A', null));
-    projList.add(ProjectItem('D', 'Nada', 'A', 'D', null));
-    projList.add(ProjectItem('A', 'Nada', 'D', 'B', null));
-    projList.add(ProjectItem('E', 'Nada', 'C', 'E', null));
-    projList.add(ProjectItem('C', 'Nada', 'E', 'C', null));
+  void _initList() async {
+    connection = new PostgreSQLConnection("191.250.147.111", 5432, "lpdm",
+        username: "postgres", password: "451226062922");
+    await connection.open();
+    refreshList();
   }
 
-  void addToList(ProjectItem item) {
-    projList.add(item);
+  void refreshList() async {
+    List<List<dynamic>> list = await connection.query("SELECT * FROM project");
+    projList.clear();
+
+    for (int i = 0; i < list.length; i++) {
+      projList
+          .add(ProjectItem(list[i][1], "nada", list[i][2], list[i][3], null));
+    }
     _sortList();
     notifyListeners();
+  }
+
+  void addToList(ProjectItem item) async{
+    await connection.query(
+        "INSERT INTO project VALUES(DEFAULT, @nome, @cidade, @estado)",
+        substitutionValues: {
+          "nome": item.name,
+          "cidade": item.city,
+          "estado": item.state
+        });
+    refreshList();
   }
 
   void removeFromList(ProjectItem item) {
     projList.remove(item);
-    _sortList();
-    notifyListeners();
+    //refreshList();
   }
 
   void sort(String sort) {

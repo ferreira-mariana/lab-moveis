@@ -70,73 +70,76 @@ class _CreateProjectPageState extends State<CreateProjectPage> {
             appBar: AppBar(
               title: Text('Criação de Projeto'),
             ),
-            body: ListView(
-              children: <Widget>[
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: <Widget>[
-                    _image == null
-                        ? Icon(Icons.image, size: 80)
-                        : Image.file(_image, width: 100, height: 100),
-                    FlatButton(
-                      child: Container(
-                        color: Colors.deepPurple[50],
-                        child: Row(
-                          children: <Widget>[
-                            Icon(Icons.attach_file),
-                            Text('Escolha uma Foto')
-                          ],
+            body: SingleChildScrollView(
+              child: Column(
+                children: <Widget>[
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: <Widget>[
+                      _image == null
+                          ? Icon(Icons.image, size: 80)
+                          : Image.file(_image, width: 100, height: 100),
+                      FlatButton(
+                        child: Container(
+                          color: Colors.deepPurple[50],
+                          child: Row(
+                            children: <Widget>[
+                              Icon(Icons.attach_file),
+                              Text('Escolha uma Foto')
+                            ],
+                          ),
                         ),
-                      ),
-                      onPressed: getImage,
-                    )
-                  ],
-                ),
-                CustomTextField(
-                  lines: 1,
-                  length: 30,
-                  name: 'Nome (Obrigatório)',
-                  function: setNameText,
-                ),
-                CustomTextField(
-                  lines: 10,
-                  length: 300,
-                  name: 'Descrição (Obrigatório)',
-                  function: setDescriptionText,
-                ),
-                CustomTextField(
-                  lines: 1,
-                  length: 30,
-                  name: 'Cidade (Obrigatório)',
-                  function: setCityText,
-                ),
-                CustomTextField(
-                  lines: 1,
-                  length: 30,
-                  name: 'Estado (Obrigatório)',
-                  function: setStateText,
-                ),
-                Container(
-                  padding: EdgeInsets.symmetric(horizontal: 120, vertical: 10),
-                  child: RaisedButton(
-                    color: Theme.of(context).buttonColor,
-                    child: Text("Enviar"),
-                    onPressed: () {
-                      if (_nameText != '' &&
-                          _descriptionText != '' &&
-                          _stateText != '' &&
-                          _cityText != '') {
-                        var temp = new ProjectItem(_nameText, _descriptionText,
-                            _stateText, _cityText, _image);
-                        data.addToList(temp);
-                        Navigator.of(context).pop();
-                      } else {
-                        _showDialog();
-                      }
-                    },
+                        onPressed: getImage,
+                      )
+                    ],
                   ),
-                ),
-              ],
+                  CustomTextField(
+                    lines: 1,
+                    length: 30,
+                    name: 'Nome (Obrigatório)',
+                    function: setNameText,
+                  ),
+                  CustomTextField(
+                    lines: 10,
+                    length: 300,
+                    name: 'Descrição (Obrigatório)',
+                    function: setDescriptionText,
+                  ),
+                  CustomTextField(
+                    lines: 1,
+                    length: 30,
+                    name: 'Cidade (Obrigatório)',
+                    function: setCityText,
+                  ),
+                  CustomTextField(
+                    lines: 1,
+                    length: 30,
+                    name: 'Estado (Obrigatório)',
+                    function: setStateText,
+                  ),
+                  Container(
+                    padding:
+                        EdgeInsets.symmetric(horizontal: 120, vertical: 10),
+                    child: RaisedButton(
+                      color: Theme.of(context).buttonColor,
+                      child: Text("Enviar"),
+                      onPressed: () {
+                        if (_nameText != '' &&
+                            _descriptionText != '' &&
+                            _stateText != '' &&
+                            _cityText != '') {
+                          var temp = new ProjectItem(_nameText,
+                              _descriptionText, _stateText, _cityText, _image);
+                          data.addToList(temp);
+                          Navigator.of(context).pop();
+                        } else {
+                          _showDialog();
+                        }
+                      },
+                    ),
+                  ),
+                ],
+              ),
             ),
           ),
     );
