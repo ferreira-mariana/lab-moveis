@@ -23,7 +23,6 @@ dependencies:
   photo_view: ^0.2.4 #Open image on fullscreen with zoom and scroll
   flutter:
     sdk: flutter
-  scoped_model: ^1.0.0
 
 
   # The following adds the Cupertino Icons font to your application.
