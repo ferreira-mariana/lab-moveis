@@ -34,7 +34,6 @@ class _MyAppState extends State<MyApp> {
             theme: ThemeData(
               primarySwatch: Colors.deepPurple,
               brightness: config.bright,
-              iconTheme: IconThemeData(color: Colors.white),
             ),
             home: HomeScreen(),
           ),
