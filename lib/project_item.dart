@@ -38,8 +38,8 @@ class _ProjectItemState extends State<ProjectItem> {
                   Navigator.push(
                     context,
                     MaterialPageRoute(
-                        builder: (context) =>
-                            ProjectDetail(widget._name, widget._detail, widget._image)),
+                        builder: (context) => ProjectDetail(
+                            widget._name, widget._detail, widget._image)),
                   );
                 },
                 child: //Padding(
@@ -118,13 +118,26 @@ class ProjectDetail extends StatelessWidget {
                     ),
                   ),
           ),
+          Container(
+            padding: EdgeInsets.fromLTRB(20, 20, 20, 40),
+            child: Text(
+              _detail,
+              style: TextStyle(fontSize: 16.0),
+            ),
+          ),
           Center(
-            child: Container(
-              padding: EdgeInsets.fromLTRB(0, 50, 0, 0),
+            child: RaisedButton(
+              //botao para se inscrever no projeto
+              onPressed: () {},
+              color: Colors.blue,
+              textColor: Colors.white,
+              padding: const EdgeInsets.all(15.0),
               child: Text(
-                _detail,
-                textAlign: TextAlign.center,
-                style: TextStyle(fontSize: 22.0),
+                'INSCREVA-SE',
+                style: TextStyle(
+                  fontSize: 16.0,
+                  fontWeight: FontWeight.bold
+                ),
               ),
             ),
           ),
