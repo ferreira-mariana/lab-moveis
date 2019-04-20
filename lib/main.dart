@@ -11,14 +11,17 @@ import 'login.dart';
 void main() {
   final ConfigModel config = ConfigModel(Brightness.light);
   final DataModel data = DataModel();
-
+  final UserModel user = UserModel();
   
   runApp(
     ScopedModel<ConfigModel>(
       model: config,
       child: ScopedModel<DataModel>(
         model: data,
-        child: MyApp(),
+        child: ScopedModel<UserModel>(
+          model: user,
+          child: MyApp(),
+          ),
       ),
     ),
   );

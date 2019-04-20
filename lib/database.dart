@@ -65,7 +65,6 @@ class DBProvider {
     var res = await db.rawQuery(
       "SELECT * FROM users;"
       );
-    print(res.length);
     List<User> list = res.isNotEmpty ? res.map((usr) => User.fromMap(usr)).toList() : [];
     return list;
   }

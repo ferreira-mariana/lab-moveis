@@ -1,8 +1,7 @@
+import 'package:scoped_model/scoped_model.dart';
+import 'models.dart';
 import 'main.dart';
 import 'package:flutter/material.dart';
-import 'dart:async' show Future;
-import 'package:flutter/services.dart' show rootBundle;
-import 'dart:convert';
 import 'user.dart';
 import 'database.dart';
 //class User{
@@ -43,15 +42,16 @@ class _LoginPageState extends State<LoginPage>{
 
   checkIfValidUser(List<User> _users){
     for(int i=0;i<_users.length;i++){
-      if(_name.text == _users[i].name && _password.text == _users[i].password) return true;
+      if(_name.text == _users[i].name && _password.text == _users[i].password) return _users[i];
     }
-    return false;
+    return null;
   }
   TextEditingController _name = TextEditingController();
   TextEditingController _password = TextEditingController();
 
   build(context){
-    return Scaffold(
+    return ScopedModelDescendant<UserModel>(
+      builder: (context, child, user) => Scaffold(
       appBar: AppBar(
         title: Text("Login"),
         ),
@@ -60,33 +60,96 @@ class _LoginPageState extends State<LoginPage>{
           builder: (BuildContext context, AsyncSnapshot<List<User>> snapshot){
               return ListView(
               children: <Widget>[
-                TextField(
-                  controller: _name,
-                ),
-                TextField(
-                  controller: _password,
-                ),
-                RaisedButton(
-                  child: Text("Entrar"),
-                  onPressed: (){
-                    if(checkIfValidUser(snapshot.data)){
-                      Navigator.push(
-                        context, 
-                        MaterialPageRoute(
-                        builder: (context) => HomeScreen()
-                      ));
-                    }else{
-                      print(snapshot.data);
-                    } 
+                Container(
+                  
+                  margin: EdgeInsets.only(
+                    top: 50
+                    ),
+                  width:400,
+                  padding: EdgeInsets.all(20),
+                  height:300,
+                  
+                    child: ListView(
+                      children: <Widget>[
+                        Container(
+                          padding: EdgeInsets.all(10),
+                          child: TextFormField(
+                          controller: _name,
+                          autofocus: false,
+                          decoration: InputDecoration(
+                          hintText: "Usuário",
 
-                  },
+                            contentPadding: EdgeInsets.fromLTRB(10, 10, 10, 10),
+                            border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(32.0)
+
+                            )
+                          ),
+                        ),
+                          ),
+                        Container(
+                          padding: EdgeInsets.all(10),
+                          child:TextFormField(
+                              controller: _password,
+                              autofocus: false,
+                              obscureText: true,
+                              decoration: InputDecoration(
+                                hintText: "Senha",
+                                
+                                contentPadding: EdgeInsets.fromLTRB(10, 10, 10, 10),
+                                border: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(32.0)
+                              )
+                            ),
+                          ),
+                        ),
+                      
+                        
+                      
+                Container(
+                  margin: EdgeInsets.only(
+                    left: 50,
+                    right: 50
+                  ),
+                  padding: EdgeInsets.only(
+                    left: 10,
+                    right: 10,
+                    top: 10
+                  ),
+                  child: Material(
+                    borderRadius: BorderRadius.circular(32),
+                    elevation: 5,
+                    child: MaterialButton(
+                      child: Text("Entrar"),
+                    
+                      onPressed: (){
+                        User usr = checkIfValidUser(snapshot.data);
+                        if(usr != null){
+                          user.username = usr.name;
+                          Navigator.push(
+                              context, 
+                              MaterialPageRoute(
+                              builder: (context) => HomeScreen()
+                              ));
+                        }else{
+                          print(snapshot.data);
+                        } 
+                    },
+                  ),
+                  )
+                   
                 )
+                
+                      ],
+                    )
+                    
+                  
+                  )
               ],
             );
-            
-
           }
         )
-      );
-    }
+      )
+    );
   }
+}

@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:scoped_model/scoped_model.dart';
 import 'config.dart';
+import 'models.dart';
 
 class Item{
   String nome;
@@ -47,16 +49,18 @@ class PageState extends State<SideMenu>{
             )
         );
       }
-
-      return Drawer(
+      return ScopedModelDescendant<UserModel>(
+        builder: (context, child, user) =>  Drawer(
           child: new Column(
             children: <Widget>[
               new UserAccountsDrawerHeader(
-                  accountName: new Text("Marcelao"), accountEmail: null),
+                  accountName: new Text(user.username), accountEmail: null),
               new Column(children: drawerOptions)
             ]
           ),
-        );
+        )
+      );
+    
 
     }
 

@@ -2,6 +2,19 @@ import 'package:flutter/material.dart';
 import 'package:lpdm_proj/project_item.dart';
 import 'package:scoped_model/scoped_model.dart';
 
+
+class UserModel extends Model{
+  String _username;
+  
+  UserModel();
+  String get username => _username;
+  set username(String name){
+    _username = name;
+    notifyListeners();
+  }
+  
+}
+
 class ConfigModel extends Model {
   Brightness _bright;
 
