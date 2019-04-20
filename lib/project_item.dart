@@ -39,7 +39,7 @@ class _ProjectItemState extends State<ProjectItem> {
                     context,
                     MaterialPageRoute(
                         builder: (context) =>
-                            ProjectDetail(widget._detail, widget._image)),
+                            ProjectDetail(widget._name, widget._detail, widget._image)),
                   );
                 },
                 child: //Padding(
@@ -74,16 +74,17 @@ class _ProjectItemState extends State<ProjectItem> {
 }
 
 class ProjectDetail extends StatelessWidget {
+  final String _name;
   final String _detail;
   final File _image;
 
-  ProjectDetail(this._detail, this._image);
+  ProjectDetail(this._name, this._detail, this._image);
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text("Descrição do Projeto"),
+        title: Text(_name),
       ),
       body: ListView(
         children: <Widget>[
@@ -123,7 +124,7 @@ class ProjectDetail extends StatelessWidget {
               child: Text(
                 _detail,
                 textAlign: TextAlign.center,
-                style: TextStyle(fontSize: 42),
+                style: TextStyle(fontSize: 22.0),
               ),
             ),
           ),
