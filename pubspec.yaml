@@ -21,6 +21,8 @@ dependencies:
   flutter_list_drag_and_drop: ^0.1.6 #Drag and drop on items on a list
   scoped_model: ^1.0.1 #Data access to all child Widgets from a tree
   photo_view: ^0.2.4 #Open image on fullscreen with zoom and scroll
+  sqflite: any
+  path_provider: any
   flutter:
     sdk: flutter
 
@@ -46,7 +48,8 @@ flutter:
   uses-material-design: true
 
   # To add assets to your application, add an assets section, like this:
-  # assets:
+  assets:
+    - assets/users.json
   #  - images/a_dot_burr.jpeg
   #  - images/a_dot_ham.jpeg
 

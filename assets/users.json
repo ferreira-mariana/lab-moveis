@@ -1,0 +1,31 @@
+{
+    "users":[
+    
+        {
+            "name": "marcelo",
+            "password" : "1234"
+        },
+        
+        {
+            "name": "lucas",
+            "password" : "5678"
+        },
+
+        {
+            "name": "mari",
+            "password" : "abcd"
+        },
+
+        {
+            "name": "daianny",
+            "password" : "efgh"
+        },
+
+        {
+            "name": "bruno",
+            "password" : "ijkl"
+        }
+    
+    ]
+}
+

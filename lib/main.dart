@@ -1,22 +1,27 @@
 import 'package:flutter/material.dart';
 import 'package:lpdm_proj/create_project_page.dart';
 import 'package:lpdm_proj/delete_project_page.dart';
-import 'package:lpdm_proj/side_menu.dart';
+import 'package:lpdm_proj/drawer.dart';
 import 'package:lpdm_proj/models.dart';
 import 'package:lpdm_proj/project_item.dart';
 import 'package:scoped_model/scoped_model.dart';
 import 'package:flutter_list_drag_and_drop/drag_and_drop_list.dart';
+import 'login.dart';
 
 void main() {
   final ConfigModel config = ConfigModel(Brightness.light);
   final DataModel data = DataModel();
-
+  final UserModel user = UserModel();
+  
   runApp(
     ScopedModel<ConfigModel>(
       model: config,
       child: ScopedModel<DataModel>(
         model: data,
-        child: MyApp(),
+        child: ScopedModel<UserModel>(
+          model: user,
+          child: MyApp(),
+          ),
       ),
     ),
   );
@@ -35,13 +40,14 @@ class _MyAppState extends State<MyApp> {
               primarySwatch: Colors.deepPurple,
               brightness: config.bright,
             ),
-            home: HomeScreen(),
+            home: LoginPage(),
           ),
     );
   }
 }
 
 class HomeScreen extends StatefulWidget {
+  
   @override
   State<StatefulWidget> createState() => _HomeScreenState();
 }
