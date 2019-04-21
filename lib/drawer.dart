@@ -50,10 +50,23 @@ class PageState extends State<SideMenu>{
       }
       return ScopedModelDescendant<UserModel>(
         builder: (context, child, user) =>  Drawer(
-          child: ListView(
+          child: ListView( 
             children: <Widget>[
-              UserAccountsDrawerHeader(
-                  accountName: Text(user.username), accountEmail: null),
+              
+              DrawerHeader(
+                  margin: EdgeInsets.fromLTRB(0, 0, 0, 20),
+                  child: Column(
+                    children: <Widget>[
+                      CircleAvatar(),
+                      Material(
+                        textStyle: TextStyle(
+                          fontSize: 30,
+                          color: Colors.deepPurple
+                        ),
+                        child: Text(user.username),
+                      )
+                    ],
+                  ),),
               Column(children: drawerOptions)
             ]
           ),

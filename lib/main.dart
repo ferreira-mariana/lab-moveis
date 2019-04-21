@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:lpdm_proj/create_project_page.dart';
 import 'package:lpdm_proj/delete_project_page.dart';
-import 'package:lpdm_proj/side_menu.dart';
+import 'package:lpdm_proj/drawer.dart';
 import 'package:lpdm_proj/models.dart';
 import 'package:lpdm_proj/project_item.dart';
 import 'package:scoped_model/scoped_model.dart';
