@@ -24,12 +24,11 @@ class SideMenu extends StatefulWidget{
 
 class PageState extends State<SideMenu>{
   int _selectedDrawerIndex = 0;
-
     changePages(int index){
       switch(index){
         case 1:
-
           Navigator.push(context, MaterialPageRoute(builder: (context) => ConfigPage()));
+          break;
       }
       setState((){
         _selectedDrawerIndex = index;
@@ -51,11 +50,11 @@ class PageState extends State<SideMenu>{
       }
       return ScopedModelDescendant<UserModel>(
         builder: (context, child, user) =>  Drawer(
-          child: new Column(
+          child: ListView(
             children: <Widget>[
-              new UserAccountsDrawerHeader(
-                  accountName: new Text(user.username), accountEmail: null),
-              new Column(children: drawerOptions)
+              UserAccountsDrawerHeader(
+                  accountName: Text(user.username), accountEmail: null),
+              Column(children: drawerOptions)
             ]
           ),
         )

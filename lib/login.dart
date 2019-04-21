@@ -18,20 +18,20 @@ class LoginPage extends StatefulWidget{
 }
 
 class _LoginPageState extends State<LoginPage>{
-  //List<User> _users;
+  List<User> _users;
 
-  //Future<List<User>> getData() async{
-    //var source = await rootBundle.loadString('assets/users.json');
+  Future<List<User>> getData() async{
+    var source = await DBProvider.db.getAllUsers();
     //print(source);
-    //setState(() {
-      //_users = source;
+    setState(() {
+      _users = source;
       //var data = json.decode(source);
       //var users = data["users"] as List;
       //print(_users);
       //_users = users.map<User>((json) => User.fromJson(json)).toList();
-    //});
-    //return _users;
-  //}
+    });
+    return _users;
+  }
   @override
   initState(){
     super.initState();
@@ -50,15 +50,13 @@ class _LoginPageState extends State<LoginPage>{
   TextEditingController _password = TextEditingController();
 
   build(context){
+    getData();
     return ScopedModelDescendant<UserModel>(
       builder: (context, child, user) => Scaffold(
       appBar: AppBar(
         title: Text("Login"),
         ),
-        body: FutureBuilder<List<User>>(
-          future: DBProvider.db.getAllUsers(),
-          builder: (BuildContext context, AsyncSnapshot<List<User>> snapshot){
-              return ListView(
+        body: ListView(
               children: <Widget>[
                 Container(
                   
@@ -121,18 +119,18 @@ class _LoginPageState extends State<LoginPage>{
                     elevation: 5,
                     child: MaterialButton(
                       child: Text("Entrar"),
-                    
                       onPressed: (){
-                        User usr = checkIfValidUser(snapshot.data);
+                        User usr = checkIfValidUser(_users);
                         if(usr != null){
                           user.username = usr.name;
+                          print(user.username);
                           Navigator.push(
                               context, 
                               MaterialPageRoute(
                               builder: (context) => HomeScreen()
                               ));
                         }else{
-                          print(snapshot.data);
+                          print(_users);
                         } 
                     },
                   ),
@@ -146,10 +144,8 @@ class _LoginPageState extends State<LoginPage>{
                   
                   )
               ],
-            );
-          }
-        )
-      )
+            )
+      ),
     );
   }
 }
