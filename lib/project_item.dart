@@ -86,8 +86,28 @@ class ProjectDetail extends StatefulWidget {
 }
 
 class _ProjectDetailState extends State<ProjectDetail> {
+  final Set<String> _projSaved = Set<String>(); //conjunto de projetos salvos/inscritos  
+  String _buttonName = 'INSCREVA-SE';
+  Color _buttonColor = Colors.blue;
+  Color _buttonTextColor = Colors.white;
+  //para mudar o botao quando clica
 
-  final Set _projSaved = Set(); //conjunto de projetos salvos/inscritos
+    //salvar Projeto
+    _saveProj(bool alreadySaved) {
+      setState(() {
+        if (alreadySaved) {
+          _projSaved.remove(widget._name); //remove o projeto dos inscritos
+          _buttonName = 'INSCREVA-SE';
+          _buttonColor = Colors.blue;
+          _buttonTextColor = Colors.white;
+        } else {
+          _projSaved.add(widget._name); //adiciona o projeto aos inscritos
+          _buttonName = 'INSCRITO';
+          _buttonColor = Colors.grey;
+          _buttonTextColor = Colors.grey[700];
+        }
+      });
+    }
 
   @override
   Widget build(BuildContext context) {
@@ -144,27 +164,16 @@ class _ProjectDetailState extends State<ProjectDetail> {
 
   //botao para inscrever-se no projeto
   Widget _subscribeButton() {
-    final bool alreadySaved = _projSaved.contains(widget._name);
-
-    //salvar Projeto
-    _saveProj() {
-      if(alreadySaved) {
-        _projSaved.remove(widget._name); //remove o projeto dos inscritos
-        //TODO: muda o botao para inscreva-se
-      } else {
-        _projSaved.add(widget._name); //adiciona o projeto aos inscritos
-        //TODO: muda o botao para inscrito
-      }
-    }
-
+    bool alreadySaved = _projSaved.contains(widget._name);
+  
     return RaisedButton(
       //botao para se inscrever no projeto
-      onPressed: _saveProj, //vai para a funcao de salvar o projeto
-      color: Colors.blue,
-      textColor: Colors.white,
+      onPressed: () {_saveProj(alreadySaved);}, //vai para a funcao de salvar o projeto
+      color: _buttonColor,
+      textColor: _buttonTextColor,
       padding: const EdgeInsets.all(15.0),
       child: Text(
-        'INSCREVA-SE',
+        _buttonName,
         style: TextStyle(fontSize: 16.0, fontWeight: FontWeight.bold),
       ),
     );
