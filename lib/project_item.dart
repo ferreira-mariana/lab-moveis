@@ -167,7 +167,6 @@ class _ProjectDetailState extends State<ProjectDetail> {
     bool alreadySaved = _projSaved.contains(widget._name);
   
     return RaisedButton(
-      //botao para se inscrever no projeto
       onPressed: () {_saveProj(alreadySaved);}, //vai para a funcao de salvar o projeto
       color: _buttonColor,
       textColor: _buttonTextColor,
