@@ -12,7 +12,7 @@ void main() {
   final ConfigModel config = ConfigModel(Brightness.light);
   final DataModel data = DataModel();
   final UserModel user = UserModel();
-  
+
   runApp(
     ScopedModel<ConfigModel>(
       model: config,
@@ -21,7 +21,7 @@ void main() {
         child: ScopedModel<UserModel>(
           model: user,
           child: MyApp(),
-          ),
+        ),
       ),
     ),
   );
@@ -47,7 +47,6 @@ class _MyAppState extends State<MyApp> {
 }
 
 class HomeScreen extends StatefulWidget {
-  
   @override
   State<StatefulWidget> createState() => _HomeScreenState();
 }
@@ -148,6 +147,12 @@ class _HomeScreenState extends State<HomeScreen>
                   child: ListView(),
                 ),
                 Scaffold(
+                  appBar: AppBar(
+                    leading: Icon(Icons.search),
+                    title: TextField(
+                      style: TextStyle(color: Colors.white),
+                    ),
+                  ),
                   floatingActionButton: FloatingActionButton(
                     backgroundColor: Theme.of(context).buttonColor,
                     onPressed: () {
