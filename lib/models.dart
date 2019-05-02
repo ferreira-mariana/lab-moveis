@@ -87,4 +87,8 @@ class DataModel extends Model {
         break;
     }
   }
+
+  void updateList(){
+    notifyListeners();
+  }
 }

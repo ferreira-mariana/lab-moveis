@@ -21,7 +21,7 @@ void main() {
         child: ScopedModel<UserModel>(
           model: user,
           child: MyApp(),
-          ),
+        ),
       ),
     ),
   );
@@ -47,7 +47,6 @@ class _MyAppState extends State<MyApp> {
 }
 
 class HomeScreen extends StatefulWidget {
-
   @override
   State<StatefulWidget> createState() => _HomeScreenState();
 }
@@ -56,6 +55,7 @@ class _HomeScreenState extends State<HomeScreen>
     with SingleTickerProviderStateMixin {
   List<DropdownMenuItem<String>> _dropDownMenuItems;
   TabController _tabController;
+  TextEditingController _searchController;
   Text _title;
   List _dropDownItems = ['Nome', 'Cidade', 'Estado'];
   String _currentDropDownItem;
@@ -67,6 +67,7 @@ class _HomeScreenState extends State<HomeScreen>
     _tabController.addListener(updateTitle);
     _dropDownMenuItems = getDropDownMenuItems();
     _currentDropDownItem = _dropDownMenuItems[0].value;
+    _searchController = new TextEditingController();
     updateTitle();
   }
 
@@ -93,6 +94,12 @@ class _HomeScreenState extends State<HomeScreen>
     setState(() {
       _currentDropDownItem = selected;
     });
+  }
+
+  bool searchList(ProjectItem item) {
+    return (item.name.toLowerCase().contains(_searchController.text.toLowerCase()) ||
+        item.city.toLowerCase().contains(_searchController.text.toLowerCase()) ||
+        item.state.toLowerCase().contains(_searchController.text.toLowerCase()));
   }
 
   @override
@@ -148,6 +155,27 @@ class _HomeScreenState extends State<HomeScreen>
                   child: ListView(),
                 ),
                 Scaffold(
+                  appBar: AppBar(
+                    leading: Icon(Icons.search),
+                    actions: <Widget>[
+                      FlatButton(
+                        onPressed: () {
+                          _searchController.text = "";
+                        },
+                        child: Icon(
+                          Icons.cancel,
+                          color: Colors.white,
+                        ),
+                      )
+                    ],
+                    title: TextField(
+                      controller: _searchController,
+                      onChanged: (text) {
+                        data.updateList();
+                      },
+                      style: TextStyle(color: Colors.white),
+                    ),
+                  ),
                   floatingActionButton: FloatingActionButton(
                     backgroundColor: Theme.of(context).buttonColor,
                     onPressed: () {
@@ -163,13 +191,15 @@ class _HomeScreenState extends State<HomeScreen>
                     data.projList.length,
                     itemBuilder: (BuildContext context, item) {
                       return new SizedBox(
-                        child: data.projList[item],
+                        child: searchList(data.projList[item])
+                            ? data.projList[item]
+                            : Container(),
                       );
                     },
                     onDragFinish: (before, after) {
-                        ProjectItem item = data.projList[before];
-                        data.projList.removeAt(before);
-                        data.projList.insert(after, item);
+                      ProjectItem item = data.projList[before];
+                      data.projList.removeAt(before);
+                      data.projList.insert(after, item);
                     },
                     dragElevation: 8.0,
                     canBeDraggedTo: (one, two) => true,
