@@ -5,14 +5,14 @@ import 'package:lpdm_proj/drawer.dart';
 import 'package:lpdm_proj/models.dart';
 import 'package:lpdm_proj/project_item.dart';
 import 'package:scoped_model/scoped_model.dart';
-import 'package:flutter_list_drag_and_drop/drag_and_drop_list.dart';
+import 'package:dragable_flutter_list/dragable_flutter_list.dart';
 import 'login.dart';
 
 void main() {
   final ConfigModel config = ConfigModel(Brightness.light);
   final DataModel data = DataModel();
   final UserModel user = UserModel();
-  
+
   runApp(
     ScopedModel<ConfigModel>(
       model: config,
@@ -47,7 +47,7 @@ class _MyAppState extends State<MyApp> {
 }
 
 class HomeScreen extends StatefulWidget {
-  
+
   @override
   State<StatefulWidget> createState() => _HomeScreenState();
 }
@@ -159,17 +159,17 @@ class _HomeScreenState extends State<HomeScreen>
                     },
                     child: Icon(Icons.add),
                   ),
-                  body: DragAndDropList<ProjectItem>(
-                    data.projList,
+                  body: DragAndDropList(
+                    data.projList.length,
                     itemBuilder: (BuildContext context, item) {
                       return new SizedBox(
-                        child: item,
+                        child: data.projList[item],
                       );
                     },
                     onDragFinish: (before, after) {
-                      ProjectItem item = data.projList[before];
-                      data.projList.removeAt(before);
-                      data.projList.insert(after, item);
+                        ProjectItem item = data.projList[before];
+                        data.projList.removeAt(before);
+                        data.projList.insert(after, item);
                     },
                     dragElevation: 8.0,
                     canBeDraggedTo: (one, two) => true,
