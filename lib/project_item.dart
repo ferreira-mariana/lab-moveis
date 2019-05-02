@@ -126,7 +126,7 @@ class _ProjectDetailState extends State<ProjectDetail> {
               shape: BoxShape.rectangle,
               border: Border.all(),
             ),
-            child: widget._imageList.length == 0
+            child: widget._imageList == null || widget._imageList.length == 0
                 ? Icon(
                     Icons.image,
                     size: 240,
