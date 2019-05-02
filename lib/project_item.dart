@@ -7,15 +7,17 @@ class ProjectItem extends StatefulWidget {
   final String _detail;
   final String _state;
   final String _city;
-  final File _image;
+  final List<File> _imageList;
+  final File _miniatureImage;
 
-  ProjectItem(this._name, this._detail, this._state, this._city, this._image);
+  ProjectItem(this._name, this._detail, this._state, this._city,
+      this._imageList, this._miniatureImage);
 
   String get name => _name;
 
   String get detail => _detail;
 
-  File get image => _image;
+  List<File> get imageList => _imageList;
 
   String get city => _city;
 
@@ -39,16 +41,16 @@ class _ProjectItemState extends State<ProjectItem> {
                     context,
                     MaterialPageRoute(
                         builder: (context) => ProjectDetail(
-                            widget._name, widget._detail, widget._image)),
+                            widget._name, widget._detail, widget._imageList)),
                   );
                 },
                 child: //Padding(
                     Row(
                   children: <Widget>[
-                    widget._image == null
+                    widget._miniatureImage == null
                         ? Icon(Icons.image, size: 80)
                         : Image.file(
-                            widget._image,
+                            widget._miniatureImage,
                             width: 80,
                             height: 80,
                           ),
@@ -77,37 +79,39 @@ class _ProjectItemState extends State<ProjectItem> {
 class ProjectDetail extends StatefulWidget {
   final String _name;
   final String _detail;
-  final File _image;
+  final List<File> _imageList;
 
-  ProjectDetail(this._name, this._detail, this._image);
+  ProjectDetail(this._name, this._detail, this._imageList);
 
   @override
   _ProjectDetailState createState() => new _ProjectDetailState();
 }
 
 class _ProjectDetailState extends State<ProjectDetail> {
-  final Set<String> _projSaved = Set<String>(); //conjunto de projetos salvos/inscritos  
+  final Set<String> _projSaved =
+      Set<String>(); //conjunto de projetos salvos/inscritos
   String _buttonName = 'INSCREVA-SE';
   Color _buttonColor = Colors.blue;
   Color _buttonTextColor = Colors.white;
+
   //para mudar o botao quando clica
 
-    //salvar Projeto
-    _saveProj(bool alreadySaved) {
-      setState(() {
-        if (alreadySaved) {
-          _projSaved.remove(widget._name); //remove o projeto dos inscritos
-          _buttonName = 'INSCREVA-SE';
-          _buttonColor = Colors.blue;
-          _buttonTextColor = Colors.white;
-        } else {
-          _projSaved.add(widget._name); //adiciona o projeto aos inscritos
-          _buttonName = 'INSCRITO';
-          _buttonColor = Colors.grey;
-          _buttonTextColor = Colors.grey[700];
-        }
-      });
-    }
+  //salvar Projeto
+  _saveProj(bool alreadySaved) {
+    setState(() {
+      if (alreadySaved) {
+        _projSaved.remove(widget._name); //remove o projeto dos inscritos
+        _buttonName = 'INSCREVA-SE';
+        _buttonColor = Colors.blue;
+        _buttonTextColor = Colors.white;
+      } else {
+        _projSaved.add(widget._name); //adiciona o projeto aos inscritos
+        _buttonName = 'INSCRITO';
+        _buttonColor = Colors.grey;
+        _buttonTextColor = Colors.grey[700];
+      }
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -122,28 +126,36 @@ class _ProjectDetailState extends State<ProjectDetail> {
               shape: BoxShape.rectangle,
               border: Border.all(),
             ),
-            child: widget._image == null
+            child: widget._imageList.length == 0
                 ? Icon(
                     Icons.image,
                     size: 240,
                   )
-                : FlatButton(
-                    onPressed: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => Container(
-                                child: PhotoView(
-                                  imageProvider: FileImage(widget._image),
-                                ),
+                : SizedBox(
+                    height: 200,
+                    child: ListView.builder(
+                      physics: ClampingScrollPhysics(),
+                      shrinkWrap: true,
+                      scrollDirection: Axis.horizontal,
+                      itemCount: widget._imageList.length,
+                      itemBuilder: (BuildContext context, int index) =>
+                          FlatButton(
+                              child: Image(
+                                image: FileImage(widget._imageList[index]),
                               ),
-                        ),
-                      );
-                    },
-                    child: Image.file(
-                      widget._image,
-                      height: 240,
-                      fit: BoxFit.fitWidth,
+                              onPressed: () {
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) => Container(
+                                          child: PhotoView(
+                                            imageProvider: FileImage(
+                                                widget._imageList[index]),
+                                          ),
+                                        ),
+                                  ),
+                                );
+                              }),
                     ),
                   ),
           ),
@@ -165,7 +177,7 @@ class _ProjectDetailState extends State<ProjectDetail> {
   //botao para inscrever-se no projeto
   Widget _subscribeButton() {
     bool alreadySaved = _projSaved.contains(widget._name);
-  
+
     return RaisedButton(
       onPressed: () {_saveProj(alreadySaved);}, //vai para a funcao de salvar o projeto
       color: _buttonColor,
