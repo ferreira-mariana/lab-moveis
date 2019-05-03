@@ -97,9 +97,15 @@ class _HomeScreenState extends State<HomeScreen>
   }
 
   bool searchItemInList(ProjectItem item) {
-    return (item.name.toLowerCase().contains(_searchController.text.toLowerCase()) ||
-        item.city.toLowerCase().contains(_searchController.text.toLowerCase()) ||
-        item.state.toLowerCase().contains(_searchController.text.toLowerCase()));
+    return (item.name
+            .toLowerCase()
+            .contains(_searchController.text.toLowerCase()) ||
+        item.city
+            .toLowerCase()
+            .contains(_searchController.text.toLowerCase()) ||
+        item.state
+            .toLowerCase()
+            .contains(_searchController.text.toLowerCase()));
   }
 
   @override
@@ -171,30 +177,24 @@ class _HomeScreenState extends State<HomeScreen>
                       Padding(
                         padding: EdgeInsets.only(top: 5),
                       ),
-                      Row(
-                        children: <Widget>[
-                          Expanded(
-                            child: TextField(
-                              controller: _searchController,
-                              onChanged: (text) {
-                                data.updateList();
-                              },
-                              decoration: InputDecoration(
-                                border: OutlineInputBorder(
-                                    borderRadius: BorderRadius.circular(25.0)),
-                                prefixIcon: Icon(Icons.search),
-                                hintText: "Procurar...",
-                              ),
-                            ),
-                          ),
-                          IconButton(
-                            icon: Icon(Icons.cancel, color: Colors.deepPurple,),
+                      TextField(
+                        controller: _searchController,
+                        onChanged: (text) {
+                          data.updateList();
+                        },
+                        decoration: InputDecoration(
+                          border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(25.0)),
+                          prefixIcon: Icon(Icons.search),
+                          suffixIcon: IconButton(
+                            icon: Icon(Icons.cancel),
                             onPressed: () {
                               _searchController.text = "";
                               data.updateList();
                             },
                           ),
-                        ],
+                          hintText: "Procurar...",
+                        ),
                       ),
                       Expanded(
                         child: DragAndDropList(
