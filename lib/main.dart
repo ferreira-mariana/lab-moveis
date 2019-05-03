@@ -198,21 +198,35 @@ class _HomeScreenState extends State<HomeScreen>
                       ),
                       Expanded(
                         child: DragAndDropList(
-                          data.projList.length,
+                          data.projList.length + 1,
                           itemBuilder: (BuildContext context, item) {
-                            return new SizedBox(
-                              child: searchItemInList(data.projList[item])
-                                  ? data.projList[item]
-                                  : Container(),
-                            );
+                            if (item == data.projList.length) {
+                              return new SizedBox(
+                                height: 80,
+                                child: Center(
+                                  child: Text("Fim"),
+                                ),
+                              );
+                            } else {
+                              return new SizedBox(
+                                child: searchItemInList(data.projList[item])
+                                    ? data.projList[item]
+                                    : Container(),
+                              );
+                            }
                           },
                           onDragFinish: (before, after) {
                             ProjectItem item = data.projList[before];
                             data.projList.removeAt(before);
                             data.projList.insert(after, item);
                           },
+                          canBeDraggedTo: (one, two) {
+                            return two != data.projList.length - 1;
+                          },
+                          canDrag: (item) {
+                            return item != data.projList.length;
+                          },
                           dragElevation: 8.0,
-                          canBeDraggedTo: (one, two) => true,
                         ),
                       ),
                     ],

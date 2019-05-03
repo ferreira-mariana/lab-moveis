@@ -48,6 +48,11 @@ class DataModel extends Model {
     projList.add(ProjectItem('A', 'Nada', 'D', 'B', null, null));
     projList.add(ProjectItem('E', 'Nada', 'C', 'E', null, null));
     projList.add(ProjectItem('C', 'Nada', 'E', 'C', null, null));
+    projList.add(ProjectItem('B', 'Nada', 'B', 'A', null, null));
+    projList.add(ProjectItem('D', 'Nada', 'A', 'D', null, null));
+    projList.add(ProjectItem('A', 'Nada', 'D', 'B', null, null));
+    projList.add(ProjectItem('E', 'Nada', 'C', 'E', null, null));
+    projList.add(ProjectItem('C', 'Nada', 'E', 'C', null, null));
   }
 
   void addToList(ProjectItem item) {
