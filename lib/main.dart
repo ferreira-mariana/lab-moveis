@@ -96,7 +96,7 @@ class _HomeScreenState extends State<HomeScreen>
     });
   }
 
-  bool searchList(ProjectItem item) {
+  bool searchItemInList(ProjectItem item) {
     return (item.name.toLowerCase().contains(_searchController.text.toLowerCase()) ||
         item.city.toLowerCase().contains(_searchController.text.toLowerCase()) ||
         item.state.toLowerCase().contains(_searchController.text.toLowerCase()));
@@ -155,27 +155,6 @@ class _HomeScreenState extends State<HomeScreen>
                   child: ListView(),
                 ),
                 Scaffold(
-                  appBar: AppBar(
-                    leading: Icon(Icons.search),
-                    actions: <Widget>[
-                      FlatButton(
-                        onPressed: () {
-                          _searchController.text = "";
-                        },
-                        child: Icon(
-                          Icons.cancel,
-                          color: Colors.white,
-                        ),
-                      )
-                    ],
-                    title: TextField(
-                      controller: _searchController,
-                      onChanged: (text) {
-                        data.updateList();
-                      },
-                      style: TextStyle(color: Colors.white),
-                    ),
-                  ),
                   floatingActionButton: FloatingActionButton(
                     backgroundColor: Theme.of(context).buttonColor,
                     onPressed: () {
@@ -187,22 +166,56 @@ class _HomeScreenState extends State<HomeScreen>
                     },
                     child: Icon(Icons.add),
                   ),
-                  body: DragAndDropList(
-                    data.projList.length,
-                    itemBuilder: (BuildContext context, item) {
-                      return new SizedBox(
-                        child: searchList(data.projList[item])
-                            ? data.projList[item]
-                            : Container(),
-                      );
-                    },
-                    onDragFinish: (before, after) {
-                      ProjectItem item = data.projList[before];
-                      data.projList.removeAt(before);
-                      data.projList.insert(after, item);
-                    },
-                    dragElevation: 8.0,
-                    canBeDraggedTo: (one, two) => true,
+                  body: Column(
+                    children: <Widget>[
+                      Padding(
+                        padding: EdgeInsets.only(top: 5),
+                      ),
+                      Row(
+                        children: <Widget>[
+                          Expanded(
+                            child: TextField(
+                              controller: _searchController,
+                              onChanged: (text) {
+                                data.updateList();
+                              },
+                              decoration: InputDecoration(
+                                border: OutlineInputBorder(
+                                    borderRadius: BorderRadius.circular(25.0)),
+                                prefixIcon: Icon(Icons.search),
+                                hintText: "Procurar...",
+                              ),
+                            ),
+                          ),
+                          IconButton(
+                            icon: Icon(Icons.cancel, color: Colors.deepPurple,),
+                            onPressed: () {
+                              _searchController.text = "";
+                              data.updateList();
+                            },
+                          ),
+                        ],
+                      ),
+                      Expanded(
+                        child: DragAndDropList(
+                          data.projList.length,
+                          itemBuilder: (BuildContext context, item) {
+                            return new SizedBox(
+                              child: searchItemInList(data.projList[item])
+                                  ? data.projList[item]
+                                  : Container(),
+                            );
+                          },
+                          onDragFinish: (before, after) {
+                            ProjectItem item = data.projList[before];
+                            data.projList.removeAt(before);
+                            data.projList.insert(after, item);
+                          },
+                          dragElevation: 8.0,
+                          canBeDraggedTo: (one, two) => true,
+                        ),
+                      ),
+                    ],
                   ),
                 ),
               ],
