@@ -44,13 +44,13 @@ class _RootPageState extends State<RootPage>{
   build(context){
     if(isLoggedIn){
       return new ScopedModelDescendant<UserModel>(
-          builder: (context, child, user) {
-            user.username = currUser.name;
-            HomeScreen();
-            }
+        builder: (context, child, user) {
+          user.username = currUser.name;
+          return HomeScreen();
+        }
       );
     }else{
-      return new LoginPage(logIn: onLogin);
+      return new LoginPage(logIn: onLogin);//LoginPage(logIn: onLogin);
     }
         
   }

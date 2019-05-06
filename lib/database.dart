@@ -24,7 +24,7 @@ class DBProvider {
   initDB() async{
     Directory documentsDirectory = await getApplicationDocumentsDirectory();
     return await openDatabase(
-    join(documentsDirectory.path, 'app_database.db'),
+    join(documentsDirectory.path, 'app_database3.db'),
     onOpen: (db){},
     version: 1,
     onCreate: (db, version){
@@ -76,13 +76,13 @@ class DBProvider {
     return res.isNotEmpty ? User.fromMap(res.first) : null;
   }
 
-  Future<bool> changeLoginStatus(String name) async{
+  void changeLoginStatus(String name, int writeValue) async{
     final db = await database;
-    var res = await db.query("users", where: "isLoggedIn = ?", whereArgs: [1]);
-    int writeValue;
-    res.first["isLoggedIn"] ? writeValue = 0 : writeValue = 1;
-    var res2 = await db.update("users", {'isLoggedIn' : 1}, where: "name = ?", whereArgs: [name]);
-    return res.first["isLoggedIn"];
+    //var res = await db.query("users", where: "isLoggedIn = ?", whereArgs: [0]);
+    //print(res);
+    //int writeValue;
+    //res.first["isLoggedIn"] ? writeValue = 0 : writeValue = 1;
+    await db.update("users", {'isLoggedIn' : writeValue}, where: "name = ?", whereArgs: [name]);
   }  
 }
 
