@@ -11,7 +11,6 @@ import 'package:scoped_model/scoped_model.dart';
 class RootPage extends StatefulWidget{
   @override
   State<StatefulWidget> createState() => _RootPageState();
-
 }
 
 class _RootPageState extends State<RootPage>{
@@ -28,18 +27,18 @@ class _RootPageState extends State<RootPage>{
         user == null ? isLoggedIn = false : isLoggedIn = true;
       });
     });
-
   }
   
   void onLogin(){
+    print("AEASDASDASDASD");
     DBProvider.db.getLoggedIn().then((user){
       setState(() {
        isLoggedIn = true;
        currUser = user; 
       });
     });
-
   }
+
   @override
   build(context){
     if(isLoggedIn){
@@ -50,9 +49,8 @@ class _RootPageState extends State<RootPage>{
         }
       );
     }else{
-      return new LoginPage(logIn: onLogin);//LoginPage(logIn: onLogin);
+      return new LoginPage(logIn: onLogin);
     }
-        
   }
 }
 

@@ -124,10 +124,9 @@ class _LoginPageState extends State<LoginPage>{
                         User usr = checkIfValidUser(_users);
                         if(usr != null){
                           user.username = usr.name;
-                          DBProvider.db.changeLoginStatus(usr.name, 1);
+                          DBProvider.db.logIn(usr.name);
                           print(user.username);
                           widget.logIn();
-                          
                         }else{
                           print(_users);
                         } 

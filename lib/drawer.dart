@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:lpdm_proj/main.dart';
+import 'package:lpdm_proj/root.dart';
 import 'package:scoped_model/scoped_model.dart';
 import 'config.dart';
 import 'models.dart';
+import 'database.dart';
 
 class Item{
   String nome;
@@ -29,6 +32,9 @@ class PageState extends State<SideMenu>{
         case 1:
           Navigator.push(context, MaterialPageRoute(builder: (context) => ConfigPage()));
           break;
+        case 2:
+          DBProvider.db.logOut();
+          Navigator.pushReplacement(context, new MaterialPageRoute(builder: (context) => RootPage()));
       }
       setState((){
         _selectedDrawerIndex = index;

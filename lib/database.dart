@@ -76,13 +76,19 @@ class DBProvider {
     return res.isNotEmpty ? User.fromMap(res.first) : null;
   }
 
-  void changeLoginStatus(String name, int writeValue) async{
+  void logIn(String name) async{
     final db = await database;
     //var res = await db.query("users", where: "isLoggedIn = ?", whereArgs: [0]);
     //print(res);
     //int writeValue;
     //res.first["isLoggedIn"] ? writeValue = 0 : writeValue = 1;
-    await db.update("users", {'isLoggedIn' : writeValue}, where: "name = ?", whereArgs: [name]);
-  }  
+    await db.update("users", {'isLoggedIn' : 1}, where: "name = ?", whereArgs: [name]);
+  }
+
+  void logOut() async{
+    final db = await database;
+    var res = await db.query("users", where: "isLoggedIn = ?", whereArgs: [1]);
+    await db.update("users", {'isLoggedIn' : 0}, where: "name = ?", whereArgs: [res.first["name"]]);
+  }
 }
 
