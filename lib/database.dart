@@ -31,15 +31,16 @@ class DBProvider {
       db.execute(
         "CREATE TABLE users("
           "name TEXT PRIMARY KEY,"
-          "password TEXT"
-        ");" 
+          "password TEXT,"
+          "isLoggedIn BIT"
+        ");"
       );
-      return db.execute("INSERT INTO users(name, password) VALUES "
-          "('marcelo', '1234'),"
-          "('lucas', '5678'),"
-          "('mari', 'abcd'),"
-          "('daianny', 'efgh'),"
-          "('bruno', 'ijkl');" 
+      return db.execute("INSERT INTO users(name, password, isLoggedIn) VALUES "
+          "('marcelo', '1234', 0),"
+          "('lucas', '5678', 0),"
+          "('mari', 'abcd', 0),"
+          "('daianny', 'efgh', 0),"
+          "('bruno', 'ijkl', 0);" 
         );
     },
     );
@@ -68,6 +69,20 @@ class DBProvider {
     List<User> list = res.isNotEmpty ? res.map((usr) => User.fromMap(usr)).toList() : [];
     return list;
   }
-  
+
+  Future<User> getLoggedIn() async{
+    final db = await database;
+    var res = await db.query('users', where: "isLoggedIn = ?", whereArgs: [1]);
+    return res.isNotEmpty ? User.fromMap(res.first) : null;
+  }
+
+  Future<bool> changeLoginStatus(String name) async{
+    final db = await database;
+    var res = await db.query("users", where: "isLoggedIn = ?", whereArgs: [1]);
+    int writeValue;
+    res.first["isLoggedIn"] ? writeValue = 0 : writeValue = 1;
+    var res2 = await db.update("users", {'isLoggedIn' : 1}, where: "name = ?", whereArgs: [name]);
+    return res.first["isLoggedIn"];
+  }  
 }
 

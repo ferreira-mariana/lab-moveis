@@ -14,6 +14,10 @@ import 'database.dart';
 //}
 
 class LoginPage extends StatefulWidget{
+  final VoidCallback logIn;
+  LoginPage({this.logIn});
+  
+
   State<StatefulWidget> createState() => _LoginPageState();
 }
 
@@ -23,19 +27,17 @@ class _LoginPageState extends State<LoginPage>{
   Future<List<User>> getData() async{
     var source = await DBProvider.db.getAllUsers();
     //print(source);
-    setState(() {
-      _users = source;
-      //var data = json.decode(source);
-      //var users = data["users"] as List;
-      //print(_users);
-      //_users = users.map<User>((json) => User.fromJson(json)).toList();
-    });
-    return _users;
+    return source;
+    
   }
   @override
   initState(){
     super.initState();
-    
+    getData().then((users){
+      setState(() {
+       _users = users; 
+      });
+    });
     //_users.add(User('Luquinhas', '5678'));
     //_users.add(User('Marcelo', '1234'));
   }
@@ -50,7 +52,6 @@ class _LoginPageState extends State<LoginPage>{
   TextEditingController _password = TextEditingController();
 
   build(context){
-    getData();
     return ScopedModelDescendant<UserModel>(
       builder: (context, child, user) => Scaffold(
       appBar: AppBar(
@@ -123,12 +124,10 @@ class _LoginPageState extends State<LoginPage>{
                         User usr = checkIfValidUser(_users);
                         if(usr != null){
                           user.username = usr.name;
+                          DBProvider.db.changeLoginStatus(usr.name);
                           print(user.username);
-                          Navigator.push(
-                              context, 
-                              MaterialPageRoute(
-                              builder: (context) => HomeScreen()
-                              ));
+                          widget.logIn();
+                          
                         }else{
                           print(_users);
                         } 

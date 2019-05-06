@@ -6,7 +6,7 @@ import 'package:lpdm_proj/models.dart';
 import 'package:lpdm_proj/project_item.dart';
 import 'package:scoped_model/scoped_model.dart';
 import 'package:flutter_list_drag_and_drop/drag_and_drop_list.dart';
-import 'login.dart';
+import 'root.dart';
 
 void main() {
   final ConfigModel config = ConfigModel(Brightness.light);
@@ -40,7 +40,7 @@ class _MyAppState extends State<MyApp> {
               primarySwatch: Colors.deepPurple,
               brightness: config.bright,
             ),
-            home: LoginPage(),
+            home: RootPage(),
           ),
     );
   }
