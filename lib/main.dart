@@ -35,7 +35,8 @@ class _MyAppState extends State<MyApp> {
   @override
   Widget build(BuildContext context) {
     return ScopedModelDescendant<ConfigModel>(
-      builder: (context, child, config) => MaterialApp(
+      builder: (context, child, config) =>
+          MaterialApp(
             theme: ThemeData(
               primarySwatch: Colors.deepPurple,
               brightness: config.bright,
@@ -98,8 +99,8 @@ class _HomeScreenState extends State<HomeScreen>
 
   bool searchItemInList(ProjectItem item) {
     return (item.name
-            .toLowerCase()
-            .contains(_searchController.text.toLowerCase()) ||
+        .toLowerCase()
+        .contains(_searchController.text.toLowerCase()) ||
         item.city
             .toLowerCase()
             .contains(_searchController.text.toLowerCase()) ||
@@ -111,14 +112,16 @@ class _HomeScreenState extends State<HomeScreen>
   @override
   Widget build(BuildContext context) {
     return ScopedModelDescendant<DataModel>(
-      builder: (context, child, data) => Scaffold(
+      builder: (context, child, data) =>
+          Scaffold(
+            primary: true,
             drawer: SideMenu(),
             appBar: AppBar(
               actions: <Widget>[
                 FlatButton(
                   child: Icon(
                     Icons.delete,
-                    color: Theme.of(context).iconTheme.color,
+                    color: Colors.white,
                   ),
                   onPressed: () {
                     Navigator.push(
@@ -132,25 +135,37 @@ class _HomeScreenState extends State<HomeScreen>
                 Container(
                   child: Theme(
                     data:
-                        Theme.of(context).copyWith(brightness: Brightness.dark),
+                    Theme.of(context).copyWith(brightness: Brightness.dark),
                     child: DropdownButtonHideUnderline(
                       child: DropdownButton(
-                          value: _currentDropDownItem,
-                          items: _dropDownMenuItems,
-                          onChanged: (text) {
-                            changedDropDownItem(text);
-                            data.sort(text);
-                          }),
+                        iconSize: 0,
+                        hint: Icon(
+                          Icons.sort,
+                          color: Colors.white,
+                        ),
+                        items: _dropDownMenuItems,
+                        onChanged: (text) {
+                          changedDropDownItem(text);
+                          data.sort(text);
+                        },
+                      ),
                     ),
                   ),
                 ),
               ],
-              title: _title,
+              //title: _title,
               bottom: TabBar(
+                labelPadding: EdgeInsets.only(top: 10),
                 controller: _tabController,
                 tabs: [
-                  Tab(icon: Icon(Icons.edit)),
-                  Tab(icon: Icon(Icons.list)),
+                  Tab(
+                    icon: Icon(Icons.edit),
+                    text: "Meus Projetos",
+                  ),
+                  Tab(
+                    icon: Icon(Icons.list),
+                    text: "Lista de Projetos",
+                  ),
                 ],
               ),
             ),
@@ -162,7 +177,6 @@ class _HomeScreenState extends State<HomeScreen>
                 ),
                 Scaffold(
                   floatingActionButton: FloatingActionButton(
-                    backgroundColor: Theme.of(context).buttonColor,
                     onPressed: () {
                       Navigator.push(
                         context,
@@ -170,7 +184,10 @@ class _HomeScreenState extends State<HomeScreen>
                             builder: (context) => CreateProjectPage()),
                       );
                     },
-                    child: Icon(Icons.add),
+                    child: Icon(
+                      Icons.add,
+                      color: Colors.white,
+                    ),
                   ),
                   body: Column(
                     children: <Widget>[

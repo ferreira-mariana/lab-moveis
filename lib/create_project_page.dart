@@ -206,7 +206,7 @@ class _CreateProjectPageState extends State<CreateProjectPage> {
                   ),
                   Column(
                     children: <Widget>[
-                      Text("Selecione imagens para o evento"),
+                      Text("Selecione imagens para o projeto"),
                       Padding(
                         padding: EdgeInsets.symmetric(vertical: 10),
                       ),
@@ -248,7 +248,10 @@ class _CreateProjectPageState extends State<CreateProjectPage> {
                         padding: EdgeInsets.fromLTRB(0, 10, 0, 0),
                       ),
                       Container(
-                        decoration: BoxDecoration(border: Border.all()),
+                        decoration: BoxDecoration(
+                          border: Border.all(),
+                          borderRadius: BorderRadius.circular(20),
+                        ),
                         margin: EdgeInsets.symmetric(horizontal: 70),
                         child: Row(
                           mainAxisAlignment: MainAxisAlignment.center,
@@ -264,7 +267,16 @@ class _CreateProjectPageState extends State<CreateProjectPage> {
                                     size: 80,
                                   ),
                             FlatButton(
-                              child: Icon(Icons.attach_file),
+                              child: SizedBox(
+                                width: 50,
+                                height: 50,
+                                child: DecoratedBox(
+                                  decoration: BoxDecoration(
+                                    border: Border.all(),
+                                    borderRadius: BorderRadius.circular(20)),
+                                  child: Icon(Icons.add),
+                                ),
+                              ),
                               onPressed: () {
                                 _image == null
                                     ? _imageSourceSelectorDialog(
@@ -305,8 +317,8 @@ class _CreateProjectPageState extends State<CreateProjectPage> {
                     padding:
                         EdgeInsets.symmetric(horizontal: 120, vertical: 10),
                     child: RaisedButton(
-                      color: Theme.of(context).buttonColor,
-                      child: Text("Enviar"),
+                      color: Theme.of(context).primaryColor,
+                      child: Text("Enviar", style: TextStyle(color: Colors.white),),
                       onPressed: () {
                         if (_nameText != '' &&
                             _descriptionText != '' &&
@@ -363,7 +375,8 @@ class _CustomTextFieldState extends State<CustomTextField> {
     return Container(
       padding: EdgeInsets.fromLTRB(10, 10, 10, 0),
       child: Container(
-        decoration: BoxDecoration(border: Border.all()),
+        decoration: BoxDecoration(
+            border: Border.all(), borderRadius: BorderRadius.circular(20)),
         padding: EdgeInsets.symmetric(horizontal: 20),
         child: Center(
           child: TextField(
@@ -423,7 +436,8 @@ class NewImageButton extends StatelessWidget {
         width: 50,
         height: 50,
         child: DecoratedBox(
-          decoration: BoxDecoration(border: Border.all()),
+          decoration: BoxDecoration(
+            border: Border.all(), borderRadius: BorderRadius.circular(20)),
           child: Icon(Icons.add),
         ),
       ),

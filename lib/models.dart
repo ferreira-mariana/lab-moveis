@@ -18,7 +18,7 @@ class UserModel extends Model{
 class ConfigModel extends Model {
   Brightness _bright;
 
-  ConfigModel(Brightness _bright);
+  ConfigModel(this._bright);
 
   Brightness get bright => _bright;
 
@@ -48,11 +48,11 @@ class DataModel extends Model {
     projList.add(ProjectItem('A', 'Nada', 'D', 'B', null, null));
     projList.add(ProjectItem('E', 'Nada', 'C', 'E', null, null));
     projList.add(ProjectItem('C', 'Nada', 'E', 'C', null, null));
-    projList.add(ProjectItem('B', 'Nada', 'B', 'A', null, null));
-    projList.add(ProjectItem('D', 'Nada', 'A', 'D', null, null));
-    projList.add(ProjectItem('A', 'Nada', 'D', 'B', null, null));
-    projList.add(ProjectItem('E', 'Nada', 'C', 'E', null, null));
-    projList.add(ProjectItem('C', 'Nada', 'E', 'C', null, null));
+    projList.add(ProjectItem('G', 'Nada', 'B', 'A', null, null));
+    projList.add(ProjectItem('I', 'Nada', 'A', 'D', null, null));
+    projList.add(ProjectItem('J', 'Nada', 'D', 'B', null, null));
+    projList.add(ProjectItem('F', 'Nada', 'C', 'E', null, null));
+    projList.add(ProjectItem('H', 'Nada', 'E', 'C', null, null));
   }
 
   void addToList(ProjectItem item) {
