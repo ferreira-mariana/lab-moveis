@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:lpdm_proj/project_item.dart';
 import 'package:scoped_model/scoped_model.dart';
@@ -5,14 +6,47 @@ import 'package:scoped_model/scoped_model.dart';
 
 class UserModel extends Model{
   String _username;
-  
-  UserModel();
+  List<ProjectItem> _userProjects = new List<ProjectItem>();
+
+  UserModel(){
+    updateUserProjects();
+  }
+
   String get username => _username;
   set username(String name){
     _username = name;
     notifyListeners();
   }
-  
+
+  List<ProjectItem> get userProjects => _userProjects;
+
+  updateUserProjects() async{
+    CollectionReference projectCollection = Firestore.instance.collection("projects");
+    
+    /*await messages.add(<String, dynamic>{
+      'message': 'Hello world!',
+      'created_at': FieldValue.serverTimestamp(),
+    });*/
+    /*Future<QuerySnapshot> future = projectCollection.getDocuments();
+
+    future.then((value) {
+      for(DocumentSnapshot item in value.documents){
+        String name;
+        String state;
+        String city;
+        String description;
+
+        item.data.forEach((k, v) {
+          if(k == "name") name = v;
+          if(k == "city") city = v;
+          if(k == "state") state = v;
+          if(k == "description") description = v;
+        });
+        userProjects.add(ProjectItem(name, description, state, city, null, null));
+      }
+      notifyListeners();
+    });*/
+  }
 }
 
 class ConfigModel extends Model {
