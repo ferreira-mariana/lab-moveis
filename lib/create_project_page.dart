@@ -18,12 +18,48 @@ class _CreateProjectPageState extends State<CreateProjectPage> {
   String _cityText = '';
   String _stateText = '';
   File _image;
+  List<DisplayImage> _imageList = new List<DisplayImage>();
 
-  Future getImage() async {
-    var image = await ImagePicker.pickImage(source: ImageSource.gallery);
+  addImage(File image) {
+    if (_imageList.length < 5)
+      _imageList.insert(
+          _imageList.length, DisplayImage(_changeImageDialog, image));
+  }
+
+  removeImage(Widget item) {
+    _imageList.remove(item);
+    setState(() {
+      _imageList = List.from(_imageList);
+    });
+  }
+
+  changeImage(Widget item, image) {
+    if (image == null) return;
+    int i = _imageList.indexOf(item);
+    _imageList.remove(item);
+    _imageList.insert(i, DisplayImage(_changeImageDialog, image));
+  }
+
+  Future getImage(
+      String select, bool isMiniature, bool isChanging, Widget item) async {
+    var image;
+
+    if (select == "Galeria") {
+      image = await ImagePicker.pickImage(source: ImageSource.gallery);
+    } else {
+      image = await ImagePicker.pickImage(source: ImageSource.camera);
+    }
 
     setState(() {
-      _image = image;
+      if (image != null) {
+        if (isMiniature) {
+          _image = image;
+        } else if (isChanging) {
+          changeImage(item, image);
+        } else {
+          addImage(image);
+        }
+      }
     });
   }
 
@@ -43,7 +79,7 @@ class _CreateProjectPageState extends State<CreateProjectPage> {
     _stateText = text;
   }
 
-  void _showDialog() {
+  void _showErrorDialog() {
     showDialog(
       context: context,
       builder: (BuildContext context) {
@@ -63,6 +99,97 @@ class _CreateProjectPageState extends State<CreateProjectPage> {
     );
   }
 
+  void _imageSourceSelectorDialog(
+      bool isMiniature, bool isChanging, Widget item) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text("Escolha"),
+          actions: <Widget>[
+            FlatButton(
+              child: Text("Câmera"),
+              onPressed: () {
+                getImage("Camera", isMiniature, isChanging, item);
+                Navigator.of(context).pop();
+              },
+            ),
+            FlatButton(
+              child: Text("Galeria"),
+              onPressed: () {
+                getImage("Galeria", isMiniature, isChanging, item);
+                Navigator.of(context).pop();
+              },
+            ),
+            FlatButton(
+              child: Text("Cancelar"),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  void _changeImageDialog(bool isMiniature, Widget item) {
+    showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            title: Text("Escolha"),
+            actions: <Widget>[
+              FlatButton(
+                child: Text("Mudar"),
+                onPressed: () {
+                  Navigator.of(context).pop();
+                  _imageSourceSelectorDialog(isMiniature, true, item);
+                },
+              ),
+              FlatButton(
+                child: Text("Remover"),
+                onPressed: () {
+                  if (isMiniature)
+                    setState(() {
+                      _image = null;
+                    });
+                  else
+                    removeImage(item);
+                  Navigator.of(context).pop();
+                },
+              ),
+              FlatButton(
+                child: Text("Cancelar"),
+                onPressed: () {
+                  Navigator.of(context).pop();
+                },
+              ),
+            ],
+          );
+        });
+  }
+
+  void _maxImagesErrorDialog() {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          actions: <Widget>[
+            FlatButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+              child: Text("Ok"),
+            )
+          ],
+          title: Text("Erro"),
+          content: Text("Número máximo de imagens atingido"),
+        );
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return ScopedModelDescendant<DataModel>(
@@ -70,73 +197,154 @@ class _CreateProjectPageState extends State<CreateProjectPage> {
             appBar: AppBar(
               title: Text('Criação de Projeto'),
             ),
-            body: ListView(
-              children: <Widget>[
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: <Widget>[
-                    _image == null
-                        ? Icon(Icons.image, size: 80)
-                        : Image.file(_image, width: 100, height: 100),
-                    FlatButton(
-                      child: Container(
-                        color: Colors.deepPurple[50],
+            body: SingleChildScrollView(
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: <Widget>[
+                  Padding(
+                    padding: EdgeInsets.fromLTRB(0, 10, 0, 0),
+                  ),
+                  Column(
+                    children: <Widget>[
+                      Text("Selecione imagens para o projeto"),
+                      Padding(
+                        padding: EdgeInsets.symmetric(vertical: 10),
+                      ),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: <Widget>[
+                          Text(_imageList.length.toString() + "/5"),
+                          NewImageButton(_imageSourceSelectorDialog, _imageList,
+                              _maxImagesErrorDialog),
+                        ],
+                      ),
+                      _imageList.length > 0
+                          ? Container(
+                              //decoration: BoxDecoration(border: Border.all()),
+                              margin: EdgeInsets.all(5),
+                              child: SizedBox(
+                                height: 150,
+                                child: ListView.builder(
+                                  physics: ClampingScrollPhysics(),
+                                  shrinkWrap: true,
+                                  scrollDirection: Axis.horizontal,
+                                  itemCount: _imageList.length,
+                                  itemBuilder:
+                                      (BuildContext context, int index) =>
+                                          _imageList[index],
+                                ),
+                              ),
+                            )
+                          : Container(),
+                    ],
+                  ),
+                  Padding(
+                    padding: EdgeInsets.fromLTRB(0, 10, 0, 0),
+                  ),
+                  Column(
+                    children: <Widget>[
+                      Text("Selecione uma miniatura"),
+                      Padding(
+                        padding: EdgeInsets.fromLTRB(0, 10, 0, 0),
+                      ),
+                      Container(
+                        decoration: BoxDecoration(
+                          border: Border.all(),
+                          borderRadius: BorderRadius.circular(20),
+                        ),
+                        margin: EdgeInsets.symmetric(horizontal: 70),
                         child: Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
                           children: <Widget>[
-                            Icon(Icons.attach_file),
-                            Text('Escolha uma Foto')
+                            _image != null
+                                ? Image(
+                                    image: FileImage(_image),
+                                    height: 80,
+                                    width: 80,
+                                  )
+                                : Icon(
+                                    Icons.image,
+                                    size: 80,
+                                  ),
+                            FlatButton(
+                              child: SizedBox(
+                                width: 50,
+                                height: 50,
+                                child: DecoratedBox(
+                                  decoration: BoxDecoration(
+                                    border: Border.all(),
+                                    borderRadius: BorderRadius.circular(20)),
+                                  child: Icon(Icons.add),
+                                ),
+                              ),
+                              onPressed: () {
+                                _image == null
+                                    ? _imageSourceSelectorDialog(
+                                        true, true, null)
+                                    : _changeImageDialog(true, null);
+                              },
+                            ),
                           ],
                         ),
                       ),
-                      onPressed: getImage,
-                    )
-                  ],
-                ),
-                CustomTextField(
-                  lines: 1,
-                  length: 30,
-                  name: 'Nome (Obrigatório)',
-                  function: setNameText,
-                ),
-                CustomTextField(
-                  lines: 10,
-                  length: 300,
-                  name: 'Descrição (Obrigatório)',
-                  function: setDescriptionText,
-                ),
-                CustomTextField(
-                  lines: 1,
-                  length: 30,
-                  name: 'Cidade (Obrigatório)',
-                  function: setCityText,
-                ),
-                CustomTextField(
-                  lines: 1,
-                  length: 30,
-                  name: 'Estado (Obrigatório)',
-                  function: setStateText,
-                ),
-                Container(
-                  padding: EdgeInsets.symmetric(horizontal: 120, vertical: 10),
-                  child: RaisedButton(
-                    color: Theme.of(context).buttonColor,
-                    child: Text("Enviar"),
-                    onPressed: () {
-                      if (_nameText != '' &&
-                          _descriptionText != '' &&
-                          _stateText != '' &&
-                          _cityText != '') {
-                        var temp = new ProjectItem(_nameText, _descriptionText,
-                            _stateText, _cityText, _image);
-                        data.addToList(temp);
-                        Navigator.of(context).pop();
-                      } else {
-                        _showDialog();
-                      }
-                    },
+                    ],
                   ),
-                ),
-              ],
+                  CustomTextField(
+                    lines: 1,
+                    length: 30,
+                    name: 'Nome (Obrigatório)',
+                    function: setNameText,
+                  ),
+                  CustomTextField(
+                    lines: 10,
+                    length: 300,
+                    name: 'Descrição (Obrigatório)',
+                    function: setDescriptionText,
+                  ),
+                  CustomTextField(
+                    lines: 1,
+                    length: 30,
+                    name: 'Cidade (Obrigatório)',
+                    function: setCityText,
+                  ),
+                  CustomTextField(
+                    lines: 1,
+                    length: 30,
+                    name: 'Estado (Obrigatório)',
+                    function: setStateText,
+                  ),
+                  Container(
+                    padding:
+                        EdgeInsets.symmetric(horizontal: 120, vertical: 10),
+                    child: RaisedButton(
+                      color: Theme.of(context).primaryColor,
+                      child: Text("Enviar", style: TextStyle(color: Colors.white),),
+                      onPressed: () {
+                        if (_nameText != '' &&
+                            _descriptionText != '' &&
+                            _stateText != '' &&
+                            _cityText != '') {
+                          List<File> imageFileList = new List<File>();
+                          for (DisplayImage image in _imageList) {
+                            imageFileList.add(image.image);
+                          }
+                          var temp = new ProjectItem(
+                              _nameText,
+                              _descriptionText,
+                              _stateText,
+                              _cityText,
+                              imageFileList,
+                              _image);
+                          data.addToList(temp);
+                          Navigator.of(context).pop();
+                        } else {
+                          _showErrorDialog();
+                        }
+                      },
+                    ),
+                  ),
+                ],
+              ),
             ),
           ),
     );
@@ -165,9 +373,10 @@ class _CustomTextFieldState extends State<CustomTextField> {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: EdgeInsets.symmetric(horizontal: 20, vertical: 20),
+      padding: EdgeInsets.fromLTRB(10, 10, 10, 0),
       child: Container(
-        decoration: BoxDecoration(border: Border.all()),
+        decoration: BoxDecoration(
+            border: Border.all(), borderRadius: BorderRadius.circular(20)),
         padding: EdgeInsets.symmetric(horizontal: 20),
         child: Center(
           child: TextField(
@@ -177,6 +386,59 @@ class _CustomTextFieldState extends State<CustomTextField> {
             maxLength: widget.length,
             decoration: InputDecoration(labelText: widget.name),
           ),
+        ),
+      ),
+    );
+  }
+}
+
+class DisplayImage extends StatefulWidget {
+  final Function changeImageDialog;
+  final File _image;
+
+  DisplayImage(this.changeImageDialog, this._image);
+
+  File get image => _image;
+
+  @override
+  State<StatefulWidget> createState() => _DisplayImageState();
+}
+
+class _DisplayImageState extends State<DisplayImage> {
+  @override
+  Widget build(BuildContext context) {
+    return FlatButton(
+      onPressed: () => widget.changeImageDialog(false, widget),
+      child: Image(
+        image: FileImage(widget.image),
+      ),
+    );
+  }
+}
+
+class NewImageButton extends StatelessWidget {
+  final Function addImage;
+  final Function errorDialog;
+  final List<DisplayImage> list;
+
+  NewImageButton(this.addImage, this.list, this.errorDialog);
+
+  @override
+  Widget build(BuildContext context) {
+    return FlatButton(
+      onPressed: () {
+        if (list.length < 5)
+          addImage(false, false, null);
+        else
+          errorDialog();
+      },
+      child: SizedBox(
+        width: 50,
+        height: 50,
+        child: DecoratedBox(
+          decoration: BoxDecoration(
+            border: Border.all(), borderRadius: BorderRadius.circular(20)),
+          child: Icon(Icons.add),
         ),
       ),
     );

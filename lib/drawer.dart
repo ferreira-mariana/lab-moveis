@@ -21,11 +21,11 @@ class SideMenu extends StatefulWidget{
 
   @override
   State<StatefulWidget> createState() {
-    return new PageState();
+    return new _SideMenuState();
   }
 }
 
-class PageState extends State<SideMenu>{
+class _SideMenuState extends State<SideMenu>{
   int _selectedDrawerIndex = 0;
     changePages(int index){
       switch(index){

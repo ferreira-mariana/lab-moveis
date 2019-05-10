@@ -32,7 +32,7 @@ class _DeleteProjectPage extends State<DeleteProjectPage> {
                 FlatButton(
                   child: Icon(
                     Icons.delete,
-                    color: Theme.of(context).iconTheme.color,
+                    color: Colors.white,
                   ),
                   onPressed: () {
                     for (ProjectItemWithCheckbox proj in _list) {
@@ -88,7 +88,7 @@ class _ProjectItemWithCheckboxState extends State<ProjectItemWithCheckbox> {
                 _checkBoxChange(change);
               },
               checkColor: Colors.white,
-              activeColor: Theme.of(context).buttonColor,
+              activeColor: Colors.deepPurple,
             ),
           ],
         ),
