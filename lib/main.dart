@@ -8,6 +8,7 @@ import 'package:scoped_model/scoped_model.dart';
 import 'package:dragable_flutter_list/dragable_flutter_list.dart';
 import 'login.dart';
 import 'root.dart';
+import 'authentication.dart';
 
 void main() {
   final ConfigModel config = ConfigModel(Brightness.light);
@@ -42,13 +43,15 @@ class _MyAppState extends State<MyApp> {
               primarySwatch: Colors.deepPurple,
               brightness: config.bright,
             ),
-            home: RootPage(),
+            home: RootPage(auth: new Auth()),
           ),
     );
   }
 }
 
 class HomeScreen extends StatefulWidget {
+  final BaseAuth auth;
+  HomeScreen({this.auth});
   @override
   State<StatefulWidget> createState() => _HomeScreenState();
 }
@@ -116,7 +119,7 @@ class _HomeScreenState extends State<HomeScreen>
       builder: (context, child, data) =>
           Scaffold(
             primary: true,
-            drawer: SideMenu(),
+            drawer: SideMenu(auth: widget.auth),
             appBar: AppBar(
               actions: <Widget>[
                 FlatButton(

@@ -1,9 +1,7 @@
 import 'package:scoped_model/scoped_model.dart';
 import 'models.dart';
-import 'main.dart';
 import 'package:flutter/material.dart';
-import 'user.dart';
-import 'database.dart';
+import 'authentication.dart';
 //class User{
 //  String name;
 //  String password;
@@ -15,39 +13,19 @@ import 'database.dart';
 
 class LoginPage extends StatefulWidget{
   final VoidCallback logIn;
-  LoginPage({this.logIn});
-  
+  final BaseAuth auth;
 
+  LoginPage({this.logIn, this.auth});
   State<StatefulWidget> createState() => _LoginPageState();
 }
 
 class _LoginPageState extends State<LoginPage>{
-  List<User> _users;
-
-  Future<List<User>> getData() async{
-    var source = await DBProvider.db.getAllUsers();
-    //print(source);
-    return source;
-    
-  }
   @override
   initState(){
     super.initState();
-    getData().then((users){
-      setState(() {
-       _users = users; 
-      });
-    });
-    //_users.add(User('Luquinhas', '5678'));
-    //_users.add(User('Marcelo', '1234'));
+    
   }
 
-  checkIfValidUser(List<User> _users){
-    for(int i=0;i<_users.length;i++){
-      if(_name.text == _users[i].name && _password.text == _users[i].password) return _users[i];
-    }
-    return null;
-  }
   TextEditingController _name = TextEditingController();
   TextEditingController _password = TextEditingController();
 
@@ -121,15 +99,15 @@ class _LoginPageState extends State<LoginPage>{
                     child: MaterialButton(
                       child: Text("Entrar"),
                       onPressed: (){
-                        User usr = checkIfValidUser(_users);
-                        if(usr != null){
-                          user.username = usr.name;
-                          DBProvider.db.logIn(usr.name);
-                          print(user.username);
-                          widget.logIn();
-                        }else{
-                          print(_users);
-                        } 
+                        widget.auth.signIn(_name.text, _password.text).then((userId){
+                          if(userId.length > 0 && userId != null){
+                          //DBProvider.db.logIn(usr.name);
+                          //print(user.username);
+                          
+                            widget.logIn();
+                          
+                        }
+                        });
                     },
                   ),
                   )

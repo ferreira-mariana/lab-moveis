@@ -1,23 +1,23 @@
 import 'package:flutter/material.dart';
-import 'package:lpdm_proj/main.dart';
 import 'package:lpdm_proj/root.dart';
 import 'package:scoped_model/scoped_model.dart';
 import 'config.dart';
 import 'models.dart';
-import 'database.dart';
 
+import 'authentication.dart';
 class Item{
   String nome;
   Item(this.nome);
 }
 
 class SideMenu extends StatefulWidget{
-
+  final BaseAuth auth;
   final itens = [
     new Item("Perfil"),
     new Item("Configurações"),
     new Item("Sair")
   ];
+  SideMenu({this.auth});
 
   @override
   State<StatefulWidget> createState() {
@@ -33,8 +33,8 @@ class _SideMenuState extends State<SideMenu>{
           Navigator.push(context, MaterialPageRoute(builder: (context) => ConfigPage()));
           break;
         case 2:
-          DBProvider.db.logOut();
-          Navigator.pushReplacement(context, new MaterialPageRoute(builder: (context) => RootPage()));
+          widget.auth.signOut();
+          Navigator.pushReplacement(context, new MaterialPageRoute(builder: (context) => RootPage(auth: widget.auth,)));
       }
       setState((){
         _selectedDrawerIndex = index;
