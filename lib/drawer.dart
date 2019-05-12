@@ -64,10 +64,13 @@ class _SideMenuState extends State<SideMenu>{
                       CircleAvatar(),
                       Material(
                         textStyle: TextStyle(
-                          fontSize: 30,
+                          fontSize: 25,
                           color: Colors.deepPurple
                         ),
-                        child: Text(user.username),
+                        child: Padding(
+                          padding: EdgeInsets.all(30.0),
+                          child: Text(user.username),
+                        ),
                       )
                     ],
                   ),),
