@@ -1,4 +1,6 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:lpdm_proj/root.dart';
 import 'package:scoped_model/scoped_model.dart';
 import 'config.dart';
 import 'models.dart';
@@ -9,8 +11,7 @@ class Item{
 }
 
 class SideMenu extends StatefulWidget{
-
-  final itens = [
+  final items = [
     new Item("Perfil"),
     new Item("Configurações"),
     new Item("Sair")
@@ -29,6 +30,10 @@ class _SideMenuState extends State<SideMenu>{
         case 1:
           Navigator.push(context, MaterialPageRoute(builder: (context) => ConfigPage()));
           break;
+        case 2:
+          FirebaseAuth.instance.signOut();
+          //widget.auth.signOut();
+          Navigator.pushReplacement(context, new MaterialPageRoute(builder: (context) => RootPage()));
       }
       setState((){
         _selectedDrawerIndex = index;
@@ -38,8 +43,8 @@ class _SideMenuState extends State<SideMenu>{
     @override
     Widget build(BuildContext context) {
       var drawerOptions = <Widget>[];
-      for (var i = 0; i < widget.itens.length; i++) {
-        var d = widget.itens[i];
+      for (var i = 0; i < widget.items.length; i++) {
+        var d = widget.items[i];
         drawerOptions.add(
             new ListTile(
               title: new Text(d.nome),
@@ -52,7 +57,6 @@ class _SideMenuState extends State<SideMenu>{
         builder: (context, child, user) =>  Drawer(
           child: ListView( 
             children: <Widget>[
-              
               DrawerHeader(
                   margin: EdgeInsets.fromLTRB(0, 0, 0, 20),
                   child: Column(
@@ -72,9 +76,6 @@ class _SideMenuState extends State<SideMenu>{
           ),
         )
       );
-    
-
     }
-
 }
 

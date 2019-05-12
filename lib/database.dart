@@ -5,7 +5,7 @@ import 'package:sqflite/sqflite.dart';
 import 'package:path/path.dart';
 import 'user.dart';
 
-class DBProvider {
+/*class DBProvider {
   
   static Database _database;
 
@@ -24,22 +24,23 @@ class DBProvider {
   initDB() async{
     Directory documentsDirectory = await getApplicationDocumentsDirectory();
     return await openDatabase(
-    join(documentsDirectory.path, 'app_database.db'),
+    join(documentsDirectory.path, 'app_database3.db'),
     onOpen: (db){},
     version: 1,
     onCreate: (db, version){
       db.execute(
         "CREATE TABLE users("
           "name TEXT PRIMARY KEY,"
-          "password TEXT"
-        ");" 
+          "password TEXT,"
+          "isLoggedIn BIT"
+        ");"
       );
-      return db.execute("INSERT INTO users(name, password) VALUES "
-          "('marcelo', '1234'),"
-          "('lucas', '5678'),"
-          "('mari', 'abcd'),"
-          "('daianny', 'efgh'),"
-          "('bruno', 'ijkl');" 
+      return db.execute("INSERT INTO users(name, password, isLoggedIn) VALUES "
+          "('marcelo', '1234', 0),"
+          "('lucas', '5678', 0),"
+          "('mari', 'abcd', 0),"
+          "('daianny', 'efgh', 0),"
+          "('bruno', 'ijkl', 0);" 
         );
     },
     );
@@ -68,6 +69,26 @@ class DBProvider {
     List<User> list = res.isNotEmpty ? res.map((usr) => User.fromMap(usr)).toList() : [];
     return list;
   }
-  
-}
 
+  Future<User> getLoggedIn() async{
+    final db = await database;
+    var res = await db.query('users', where: "isLoggedIn = ?", whereArgs: [1]);
+    return res.isNotEmpty ? User.fromMap(res.first) : null;
+  }
+
+  void logIn(String name) async{
+    final db = await database;
+    //var res = await db.query("users", where: "isLoggedIn = ?", whereArgs: [0]);
+    //print(res);
+    //int writeValue;
+    //res.first["isLoggedIn"] ? writeValue = 0 : writeValue = 1;
+    await db.update("users", {'isLoggedIn' : 1}, where: "name = ?", whereArgs: [name]);
+  }
+
+  void logOut() async{
+    final db = await database;
+    var res = await db.query("users", where: "isLoggedIn = ?", whereArgs: [1]);
+    await db.update("users", {'isLoggedIn' : 0}, where: "name = ?", whereArgs: [res.first["name"]]);
+  }
+}
+*/
