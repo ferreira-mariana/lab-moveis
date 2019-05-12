@@ -48,12 +48,12 @@ class _RootPageState extends State<RootPage> {
     if (isLoggedIn) {
       return new ScopedModelDescendant<UserModel>(
           builder: (context, child, user) {
+        user.username = currUser.name;
+        user.uid = currUser.uid;
         if (initUserData) {
           user.createUserDocument();
           initUserData = false;
         }
-        user.username = currUser.name;
-        user.uid = currUser.uid;
         return HomeScreen();
       });
     } else {

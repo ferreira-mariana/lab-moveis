@@ -74,7 +74,6 @@ class UserModel extends Model {
         });
       }
     });
-
     _updated = true;
   }
 
