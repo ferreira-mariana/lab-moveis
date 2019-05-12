@@ -54,7 +54,7 @@ class _LoginPageState extends State<LoginPage>{
                           controller: _name,
                           autofocus: false,
                           decoration: InputDecoration(
-                          hintText: "Usuário",
+                          hintText: "Email",
 
                             contentPadding: EdgeInsets.fromLTRB(10, 10, 10, 10),
                             border: OutlineInputBorder(
