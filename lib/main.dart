@@ -41,17 +41,13 @@ class _MyAppState extends State<MyApp> {
               primarySwatch: Colors.deepPurple,
               brightness: config.bright,
             ),
-            home: RootPage(auth: new Auth()),
+            home: RootPage(),
           ),
     );
   }
 }
 
 class HomeScreen extends StatefulWidget {
-  final BaseAuth auth;
-
-  HomeScreen({this.auth});
-
   @override
   State<StatefulWidget> createState() => _HomeScreenState();
 }
@@ -117,153 +113,159 @@ class _HomeScreenState extends State<HomeScreen>
   Widget build(BuildContext context) {
     return ScopedModelDescendant<DataModel>(
       builder: (context, child, data) => ScopedModelDescendant<UserModel>(
-        builder: (context, child, user) => Scaffold(
-          drawer: SideMenu(auth: widget.auth),
-          appBar: AppBar(
-            actions: <Widget>[
-              FlatButton(
-                child: Icon(
-                  Icons.delete,
-                  color: Colors.white,
-                ),
-                onPressed: () {
-                  Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) =>
-                            DeleteProjectPage(data.projList),
-                      ));
-                },
-              ),
-              Container(
-                child: Theme(
-                  data: Theme.of(context)
-                      .copyWith(brightness: Brightness.dark),
-                  child: DropdownButtonHideUnderline(
-                    child: DropdownButton(
-                      iconSize: 0,
-                      hint: Icon(
-                        Icons.sort,
-                        color: Colors.white,
-                      ),
-                      items: _dropDownMenuItems,
-                      onChanged: (text) {
-                        changedDropDownItem(text);
-                        data.sort(text);
-                      },
-                    ),
-                  ),
-                ),
-              ),
-            ],
-            //title: _title,
-            bottom: TabBar(
-              labelPadding: EdgeInsets.only(top: 10),
-              controller: _tabController,
-              tabs: [
-                Tab(
-                  icon: Icon(Icons.edit),
-                  text: "Meus Projetos",
-                ),
-                Tab(
-                  icon: Icon(Icons.list),
-                  text: "Lista de Projetos",
-                ),
-              ],
-            ),
-          ),
-          body: TabBarView(
-            controller: _tabController,
-            children: [
-              Center(
-                child: ListView.builder(
-                  itemCount: user.userProjects.length,
-                  itemBuilder: (BuildContext context, item) {
-                    return new SizedBox(
-                      child: user.userProjects[item],
-                    );
-                  },
-                ),
-              ),
-              Scaffold(
-                floatingActionButton: FloatingActionButton(
-                  onPressed: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                          builder: (context) => CreateProjectPage()),
-                    );
-                  },
-                  child: Icon(
-                    Icons.add,
-                    color: Colors.white,
-                  ),
-                ),
-                body: Column(
-                  children: <Widget>[
-                    Padding(
-                      padding: EdgeInsets.only(top: 5),
-                    ),
-                    TextField(
-                      controller: _searchController,
-                      onChanged: (text) {
-                        data.updateList();
-                      },
-                      decoration: InputDecoration(
-                        border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(25.0)),
-                        prefixIcon: Icon(Icons.search),
-                        suffixIcon: IconButton(
-                          icon: Icon(Icons.cancel),
-                          onPressed: () {
-                            _searchController.text = "";
-                            data.updateList();
-                          },
+            builder: (context, child, user) => Scaffold(
+                  drawer: SideMenu(),
+                  appBar: AppBar(
+                    actions: <Widget>[
+                      FlatButton(
+                        child: Icon(
+                          Icons.delete,
+                          color: Colors.white,
                         ),
-                        hintText: "Procurar...",
+                        onPressed: () {
+                          Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) =>
+                                    DeleteProjectPage(data.projList),
+                              ));
+                        },
                       ),
-                    ),
-                    Expanded(
-                      child: DragAndDropList(
-                        data.projList.length + 1,
-                        itemBuilder: (BuildContext context, item) {
-                          if (item == data.projList.length) {
-                            return new SizedBox(
-                              height: 80,
-                              child: Center(
-                                child: Text("Fim"),
+                      Container(
+                        child: Theme(
+                          data: Theme.of(context)
+                              .copyWith(brightness: Brightness.dark),
+                          child: DropdownButtonHideUnderline(
+                            child: DropdownButton(
+                              iconSize: 0,
+                              hint: Icon(
+                                Icons.sort,
+                                color: Colors.white,
                               ),
-                            );
-                          } else {
-                            return new SizedBox(
-                              child:
-                                  searchItemInList(data.projList[item])
-                                      ? data.projList[item]
-                                      : Container(),
-                            );
-                          }
-                        },
-                        onDragFinish: (before, after) {
-                          ProjectItem item = data.projList[before];
-                          data.projList.removeAt(before);
-                          data.projList.insert(after, item);
-                        },
-                        canBeDraggedTo: (one, two) {
-                          return two != data.projList.length - 1;
-                        },
-                        canDrag: (item) {
-                          return item != data.projList.length;
-                        },
-                        dragElevation: 8.0,
+                              items: _dropDownMenuItems,
+                              onChanged: (text) {
+                                changedDropDownItem(text);
+                                data.sort(text);
+                              },
+                            ),
+                          ),
+                        ),
                       ),
+                    ],
+                    //title: _title,
+                    bottom: TabBar(
+                      labelPadding: EdgeInsets.only(top: 10),
+                      controller: _tabController,
+                      tabs: [
+                        Tab(
+                          icon: Icon(Icons.edit),
+                          text: "Meus Projetos",
+                        ),
+                        Tab(
+                          icon: Icon(Icons.list),
+                          text: "Lista de Projetos",
+                        ),
+                      ],
                     ),
-                  ],
+                  ),
+                  body: TabBarView(
+                    controller: _tabController,
+                    children: [
+                      Center(
+                        child: user.isUpdated
+                            ? ListView.builder(
+                                itemCount: user.userProjects.length,
+                                itemBuilder: (BuildContext context, item) {
+                                  return new SizedBox(
+                                    child: user.userProjects[item],
+                                  );
+                                },
+                              )
+                            : Center(child: CircularProgressIndicator()),
+                      ),
+                      Scaffold(
+                        floatingActionButton: FloatingActionButton(
+                          onPressed: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (context) => CreateProjectPage()),
+                            );
+                          },
+                          child: Icon(
+                            Icons.add,
+                            color: Colors.white,
+                          ),
+                        ),
+                        body: Column(
+                          children: <Widget>[
+                            Padding(
+                              padding: EdgeInsets.only(top: 5),
+                            ),
+                            TextField(
+                              controller: _searchController,
+                              onChanged: (text) {
+                                data.updateList();
+                              },
+                              decoration: InputDecoration(
+                                border: OutlineInputBorder(
+                                    borderRadius: BorderRadius.circular(25.0)),
+                                prefixIcon: Icon(Icons.search),
+                                suffixIcon: IconButton(
+                                  icon: Icon(Icons.cancel),
+                                  onPressed: () {
+                                    _searchController.text = "";
+                                    data.updateList();
+                                  },
+                                ),
+                                hintText: "Procurar...",
+                              ),
+                            ),
+                            Expanded(
+                              child: data.isUpdated
+                                  ? DragAndDropList(
+                                      data.projList.length + 1,
+                                      itemBuilder:
+                                          (BuildContext context, item) {
+                                        if (item == data.projList.length) {
+                                          return new SizedBox(
+                                            height: 80,
+                                            child: Center(
+                                              child: Text("Fim"),
+                                            ),
+                                          );
+                                        } else {
+                                          return new SizedBox(
+                                            child: searchItemInList(
+                                                    data.projList[item])
+                                                ? data.projList[item]
+                                                : Container(),
+                                          );
+                                        }
+                                      },
+                                      onDragFinish: (before, after) {
+                                        ProjectItem item =
+                                            data.projList[before];
+                                        data.projList.removeAt(before);
+                                        data.projList.insert(after, item);
+                                      },
+                                      canBeDraggedTo: (one, two) {
+                                        return two != data.projList.length - 1;
+                                      },
+                                      canDrag: (item) {
+                                        return item != data.projList.length;
+                                      },
+                                      dragElevation: 8.0,
+                                    )
+                                  : Center(child: CircularProgressIndicator()),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
-              ),
-            ],
           ),
-        ),
-      ),
     );
   }
 }

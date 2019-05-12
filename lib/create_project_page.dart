@@ -328,14 +328,7 @@ class _CreateProjectPageState extends State<CreateProjectPage> {
                           for (DisplayImage image in _imageList) {
                             imageFileList.add(image.image);
                           }
-                          var temp = new ProjectItem(
-                              _nameText,
-                              _descriptionText,
-                              _stateText,
-                              _cityText,
-                              imageFileList,
-                              _image);
-                          data.addToList(temp);
+                          data.addProject(_nameText, _cityText, _stateText, _descriptionText);
                           Navigator.of(context).pop();
                         } else {
                           _showErrorDialog();

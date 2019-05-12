@@ -5,7 +5,7 @@ import 'package:sqflite/sqflite.dart';
 import 'package:path/path.dart';
 import 'user.dart';
 
-class DBProvider {
+/*class DBProvider {
   
   static Database _database;
 
@@ -91,4 +91,4 @@ class DBProvider {
     await db.update("users", {'isLoggedIn' : 0}, where: "name = ?", whereArgs: [res.first["name"]]);
   }
 }
-
+*/
