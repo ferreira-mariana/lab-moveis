@@ -10,8 +10,8 @@ class ProjectItem extends StatefulWidget {
   final String _state;
   final String _city;
   final String _projectId;
-  final List<File> _imageList;
-  final File _miniatureImage;
+  final List<String> _imageList;
+  final String _miniatureImage;
 
   ProjectItem(this._name, this._detail, this._state, this._city,
       this._imageList, this._miniatureImage, this._projectId);
@@ -20,7 +20,7 @@ class ProjectItem extends StatefulWidget {
 
   String get detail => _detail;
 
-  List<File> get imageList => _imageList;
+  List<String> get imageList => _imageList;
 
   String get city => _city;
 
@@ -33,6 +33,7 @@ class ProjectItem extends StatefulWidget {
 }
 
 class _ProjectItemState extends State<ProjectItem> {
+
   @override
   Widget build(BuildContext context) {
     return ScopedModelDescendant<UserModel>(
@@ -60,7 +61,7 @@ class _ProjectItemState extends State<ProjectItem> {
                         children: <Widget>[
                           widget._miniatureImage == null
                               ? Icon(Icons.image, size: 80)
-                              : Image.file(
+                              : Image.network(
                                   widget._miniatureImage,
                                   width: 80,
                                   height: 80,
@@ -92,7 +93,7 @@ class ProjectDetail extends StatefulWidget {
   final String _name;
   final String _detail;
   final String _projectId;
-  final List<File> _imageList;
+  final List<String> _imageList;
   final Function _checkUserSubscription;
 
   ProjectDetail(this._name, this._detail, this._imageList, this._projectId,
@@ -163,9 +164,8 @@ class _ProjectDetailState extends State<ProjectDetail> {
                             itemCount: widget._imageList.length,
                             itemBuilder: (BuildContext context, int index) =>
                                 FlatButton(
-                                    child: Image(
-                                      image:
-                                          FileImage(widget._imageList[index]),
+                                    child: Image.network(
+                                        widget._imageList[index]
                                     ),
                                     onPressed: () {
                                       Navigator.push(
@@ -173,8 +173,7 @@ class _ProjectDetailState extends State<ProjectDetail> {
                                         MaterialPageRoute(
                                           builder: (context) => Container(
                                                 child: PhotoView(
-                                                  imageProvider: FileImage(
-                                                      widget._imageList[index]),
+                                                  imageProvider: NetworkImage(widget._imageList[index]),
                                                 ),
                                               ),
                                         ),

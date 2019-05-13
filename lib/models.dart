@@ -1,7 +1,11 @@
+import 'dart:io';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:lpdm_proj/create_project_page.dart';
 import 'package:lpdm_proj/project_item.dart';
 import 'package:scoped_model/scoped_model.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 
 class UserModel extends Model {
   String _username;
@@ -59,15 +63,18 @@ class UserModel extends Model {
               String state;
               String city;
               String description;
-
+              String imgRef;
+              List<String> detailImgRefs;
               item.data.forEach((k, v) {
                 if (k == "name") name = v;
                 if (k == "city") city = v;
                 if (k == "state") state = v;
+                if (k == "imageUrl") imgRef = v;
+                if (k == "detailImageUrls") detailImgRefs = List<String>.from(v);
                 if (k == "description") description = v;
               });
               userProjects.add(ProjectItem(
-                  name, description, state, city, null, null, item.documentID));
+                  name, description, state, city, detailImgRefs, imgRef, item.documentID));
             }
           }
           notifyListeners();
@@ -153,15 +160,20 @@ class DataModel extends Model {
         String state;
         String city;
         String description;
+        String thumbRef;
+        List<String> imgRefs;
 
         item.data.forEach((k, v) {
           if (k == "name") name = v;
           if (k == "city") city = v;
           if (k == "state") state = v;
           if (k == "description") description = v;
+          if (k == "imageUrl") thumbRef = v;
+          if (k == "detailImageUrls") imgRefs = List<String>.from(v);
+    
         });
         projList.add(ProjectItem(
-            name, description, state, city, null, null, item.documentID));
+            name, description, state, city, imgRefs, thumbRef, item.documentID));
       }
       notifyListeners();
     });
@@ -169,13 +181,26 @@ class DataModel extends Model {
     _updated = true;
   }
 
-  void addProject(String name, String city, String state, String description) async{
+  void addProject(String name, String city, String state, String description, File imgMini, List<DisplayImage> imgs) async{
     CollectionReference projectCollection = Firestore.instance.collection("projects");
+    
+    StorageReference storageRef = FirebaseStorage.instance.ref().child(imgMini.toString());
+    StorageTaskSnapshot downloadUrl = await storageRef.putFile(imgMini).onComplete;
+    String urlMini = await downloadUrl.ref.getDownloadURL();
+    List<String> imgUrls = new List<String>();
+    
+    for(DisplayImage img in imgs){
+      storageRef = FirebaseStorage.instance.ref().child(img.image.toString());
+      downloadUrl = await storageRef.putFile(img.image).onComplete;
+      imgUrls.add(await downloadUrl.ref.getDownloadURL());
+    }
     await projectCollection.add(<String, dynamic> {
       "name" : name,
       "city" : city,
       "state" : state,
       "description" : description,
+      "imageUrl" : urlMini,
+      "detailImageUrls" : imgUrls
     });
     _initList();
   }
