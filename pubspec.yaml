@@ -28,6 +28,8 @@ dependencies:
   sqflite: any
   path_provider: any
   firebase_storage: ^3.0.0
+  cached_network_image: ^0.8.0
+  flutter_advanced_networkimage: any
   flutter:
     sdk: flutter
 

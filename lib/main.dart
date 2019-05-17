@@ -7,6 +7,7 @@ import 'package:lpdm_proj/project_item.dart';
 import 'package:scoped_model/scoped_model.dart';
 import 'package:dragable_flutter_list/dragable_flutter_list.dart';
 import 'root.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 import 'authentication.dart';
 
 void main() {

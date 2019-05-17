@@ -3,6 +3,8 @@ import 'package:lpdm_proj/models.dart';
 import 'package:photo_view/photo_view.dart';
 import 'package:flutter/material.dart';
 import 'package:scoped_model/scoped_model.dart';
+import 'package:flutter_advanced_networkimage/provider.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 
 class ProjectItem extends StatefulWidget {
   final String _name;
@@ -164,8 +166,9 @@ class _ProjectDetailState extends State<ProjectDetail> {
                             itemCount: widget._imageList.length,
                             itemBuilder: (BuildContext context, int index) =>
                                 FlatButton(
-                                    child: Image.network(
-                                        widget._imageList[index]
+                                    child: CachedNetworkImage(
+                                      imageUrl: widget._imageList[index],//)//Image.network(
+                                      //widget._imageList[index]
                                     ),
                                     onPressed: () {
                                       Navigator.push(
@@ -173,7 +176,7 @@ class _ProjectDetailState extends State<ProjectDetail> {
                                         MaterialPageRoute(
                                           builder: (context) => Container(
                                                 child: PhotoView(
-                                                  imageProvider: NetworkImage(widget._imageList[index]),
+                                                  imageProvider: AdvancedNetworkImage(widget._imageList[index], useDiskCache: true),
                                                 ),
                                               ),
                                         ),
