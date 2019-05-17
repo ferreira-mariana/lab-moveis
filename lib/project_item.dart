@@ -63,10 +63,10 @@ class _ProjectItemState extends State<ProjectItem> {
                         children: <Widget>[
                           widget._miniatureImage == null
                               ? Icon(Icons.image, size: 80)
-                              : Image.network(
-                                  widget._miniatureImage,
-                                  width: 80,
-                                  height: 80,
+                              : CachedNetworkImage(
+                                imageUrl: widget._miniatureImage,
+                                height: 80,
+                                width: 80,
                                 ),
                           Padding(
                             padding: EdgeInsets.symmetric(horizontal: 5),
