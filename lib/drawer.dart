@@ -2,6 +2,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:lpdm_proj/root.dart';
 import 'package:scoped_model/scoped_model.dart';
+import 'profile.dart';
 import 'config.dart';
 import 'models.dart';
 
@@ -27,9 +28,13 @@ class _SideMenuState extends State<SideMenu> {
   int _selectedDrawerIndex = 0;
   changePages(int index) {
     switch (index) {
+      case 0:
+        Navigator.push(
+          context, MaterialPageRoute(builder: (context) => ProfilePage()));
+        break;
       case 1:
         Navigator.push(
-            context, MaterialPageRoute(builder: (context) => ConfigPage()));
+          context, MaterialPageRoute(builder: (context) => ConfigPage()));
         break;
       case 2:
         FirebaseAuth.instance.signOut();
