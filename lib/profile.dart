@@ -81,17 +81,21 @@ class ProfilePage extends StatelessWidget {
                           ),
                         ],
                       ),
-                      // RichText(
-                      //   text: TextSpan(
-                      //     text: 'Email ',
-                      //     style: TextStyle(color: Colors.grey[700]),
-                      //     children: <TextSpan>[
-                      //       TextSpan(
-                      //           text: user.username,
-                      //           style: TextStyle(fontWeight: FontWeight.bold)),
-                      //     ],
-                      //   ),
-                      // ),
+                      Row(
+                        children: <Widget>[
+                          RichText(
+                          text: TextSpan(
+                            text: 'Projetos inscritos ',
+                            style: TextStyle(color: Colors.grey[500], fontSize: 16),
+                            children: <TextSpan>[
+                             TextSpan(
+                                 text: user.userProjects.length.toString(),
+                                 style: TextStyle(fontWeight: FontWeight.w500, color: Colors.grey[700])),
+                             ],
+                            ),
+                          ),
+                        ],
+                      ),
                     ],
                   ),
                 ),
