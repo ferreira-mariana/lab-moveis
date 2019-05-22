@@ -168,7 +168,7 @@ class DataModel extends Model {
           if (k == "city") city = v;
           if (k == "state") state = v;
           if (k == "description") description = v;
-          if (k == "imageUrl") thumbRef = v;
+          if (k == "imageUrl") thumbRef = v.toString();
           if (k == "detailImageUrls") imgRefs = List<String>.from(v);
     
         });
