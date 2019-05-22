@@ -15,48 +15,46 @@ class LoginPage extends StatefulWidget {
 }
 
 class _LoginPageState extends State<LoginPage> {
-  GoogleSignIn _googleSignIn = new GoogleSignIn();
+  final FirebaseAuth _auth = FirebaseAuth.instance;
+  final GoogleSignIn googleSignIn = new GoogleSignIn();
 
-  TextEditingController _name = TextEditingController();
-  TextEditingController _password = TextEditingController();
+  _signIn() async {
+    GoogleSignInAccount googleSignInAccount = await googleSignIn.signIn();
+    GoogleSignInAuthentication gSA = await googleSignInAccount.authentication;
+
+    final AuthCredential credential = GoogleAuthProvider.getCredential(
+      accessToken: gSA.accessToken,
+      idToken: gSA.idToken,
+    );
+
+    final FirebaseUser user = await _auth.signInWithCredential(credential);
+
+    widget.user.username = user.displayName;
+    widget.user.uid = user.uid;
+    widget.user.createUserDocument();
+
+    googleSignIn.signOut();
+
+    Navigator.pushReplacement(
+        context, MaterialPageRoute(builder: (context) => HomeScreen()));
+  }
 
   @override
-  void initState() {
+  void initState(){
     super.initState();
-    _googleSignIn.signInSilently().whenComplete(() {
-      widget.user.username = _googleSignIn.currentUser.displayName;
-      widget.user.uid = _googleSignIn.currentUser.id;
+    initUser();
+  }
+
+  initUser() async {
+    FirebaseUser user = await FirebaseAuth.instance.currentUser();
+    if (user != null) {
+      widget.user.username = user.displayName;
+      widget.user.uid = user.uid;
       widget.user.createUserDocument();
-      return Navigator.pushReplacement(
+
+      Navigator.pushReplacement(
           context, MaterialPageRoute(builder: (context) => HomeScreen()));
-    });
-  }
-
-  initLogin() {
-    _googleSignIn.onCurrentUserChanged
-        .listen((GoogleSignInAccount account) async {
-      if (account != null) {
-        widget.user.username = account.displayName;
-        widget.user.uid = account.id;
-        widget.user.createUserDocument();
-        Navigator.pushReplacement(context,
-            MaterialPageRoute(builder: (context) {
-          return HomeScreen();
-        }));
-      } else {
-        // user NOT logged
-      }
-    });
-  }
-
-  doLogin() async {
-    await _googleSignIn.signIn();
-    widget.user.username = _googleSignIn.currentUser.displayName;
-    widget.user.uid = _googleSignIn.currentUser.id;
-    widget.user.createUserDocument();
-    Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) {
-      return HomeScreen();
-    }));
+    }
   }
 
   build(context) {
@@ -82,7 +80,7 @@ class _LoginPageState extends State<LoginPage> {
                         child: MaterialButton(
                           child: Text("Entrar com Gmail"),
                           onPressed: () {
-                            doLogin();
+                            _signIn();
                           },
                         ),
                       ),

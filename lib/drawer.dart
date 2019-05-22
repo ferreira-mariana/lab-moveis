@@ -1,3 +1,4 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:lpdm_proj/config_page.dart';
@@ -26,15 +27,15 @@ class SideMenu extends StatefulWidget{
 class _SideMenuState extends State<SideMenu>{
   GoogleSignIn _googleSignIn = new GoogleSignIn();
   int _selectedDrawerIndex = 0;
-    changePages(int index){
+    changePages(int index) async{
       switch(index){
         case 1:
           Navigator.push(context, MaterialPageRoute(builder: (context) => ConfigPage()));
           break;
         case 2:
-          //FirebaseAuth.instance.signOut();
+          await FirebaseAuth.instance.signOut();
           //widget.auth.signOut();
-          _googleSignIn.signOut();
+          //Firebas.signOut();
           Navigator.pushReplacement(context, new MaterialPageRoute(builder: (context) => MyApp()));
       }
       setState((){

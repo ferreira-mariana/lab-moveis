@@ -54,6 +54,9 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen>
     with SingleTickerProviderStateMixin {
+  AllProjectsPage allProjectsPage = new AllProjectsPage();
+  UserProjectsPage userProjectsPage = new UserProjectsPage();
+
   List<DropdownMenuItem<String>> _dropDownMenuItems;
   List<Widget> actionBarWidges = new List<Widget>();
   TabController _tabController;
@@ -161,8 +164,8 @@ class _HomeScreenState extends State<HomeScreen>
                   body: TabBarView(
                     controller: _tabController,
                     children: [
-                      UserProjectsPage(),
-                      AllProjectsPage(),
+                      userProjectsPage,
+                      allProjectsPage,
                     ],
                   ),
                 ),
