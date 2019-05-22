@@ -10,8 +10,9 @@ import 'package:firebase_storage/firebase_storage.dart';
 class UserModel extends Model {
   String _username;
   String _uid;
+  String _sort = 'Nome';
   bool _updated = false;
-  List<ProjectItem> _userProjects = new List<ProjectItem>();
+  List<ProjectItem> _projList = new List<ProjectItem>();
 
   String get username => _username;
 
@@ -29,9 +30,10 @@ class UserModel extends Model {
 
   bool get isUpdated => _updated;
 
-  List<ProjectItem> get userProjects => _userProjects;
+  List<ProjectItem> get projList => _projList;
 
   createUserDocument() async{
+    _updated = false;
     DocumentReference userProjects = Firestore.instance.collection("users").document(_uid);
     await userProjects.get().then((onValue) async{
       if(!onValue.exists) {
@@ -49,14 +51,14 @@ class UserModel extends Model {
 
     List<String> projects;
     DocumentReference userDocument = Firestore.instance.collection("users").document(_uid);
-    userDocument.get().then((onValue) async {
+    await userDocument.get().then((onValue) async {
       projects = List.from(onValue['projects']);
-      userProjects.clear();
+      projList.clear();
       for (String i in projects) {
         CollectionReference projectCollection = Firestore.instance.collection("projects");
         Future<QuerySnapshot> query = projectCollection.getDocuments();
 
-        query.then((value) {
+        await query.then((value) {
           for (DocumentSnapshot item in value.documents) {
             if (item.documentID == i) {
               String name;
@@ -73,34 +75,28 @@ class UserModel extends Model {
                 if (k == "detailImageUrls") detailImgRefs = List<String>.from(v);
                 if (k == "description") description = v;
               });
-              userProjects.add(ProjectItem(
+              projList.add(ProjectItem(
                   name, description, state, city, detailImgRefs, imgRef, item.documentID));
             }
           }
-          notifyListeners();
         });
       }
     });
+    updateList();
     _updated = true;
   }
 
   Future<void> subscribeToProject(String proj) async {
     DocumentReference userProjects = Firestore.instance.collection("users").document(_uid);
-
     List<String> temp = new List<String>();
     temp.add(proj);
     await userProjects.updateData({'projects': FieldValue.arrayUnion(temp)});
-
     updateUserProjects();
   }
 
-  Future<void> unsubscribeToProject(String proj) async {
+  Future<void> unsubscribeToProjects(List<String> proj) async {
     DocumentReference userProjects = Firestore.instance.collection("users").document(_uid);
-
-    List<String> temp = new List<String>();
-    temp.add(proj);
-    await userProjects.updateData({'projects': FieldValue.arrayRemove(temp)});
-
+    await userProjects.updateData({'projects': FieldValue.arrayRemove(proj)});
     updateUserProjects();
   }
 
@@ -115,20 +111,34 @@ class UserModel extends Model {
       return Future.value(false);
     });
   }
-}
 
-class ConfigModel extends Model {
-  Brightness _bright;
+  void sort(String sort) {
+    _sort = sort;
+    _sortList();
+    notifyListeners();
+  }
 
-  ConfigModel(this._bright);
+  void _sortList() {
+    switch (_sort) {
+      case "Nome":
+        projList.sort((a, b) {
+          return a.name.toLowerCase().compareTo(b.name.toLowerCase());
+        });
+        break;
+      case "Cidade":
+        projList.sort((a, b) {
+          return a.city.toLowerCase().compareTo(b.city.toLowerCase());
+        });
+        break;
+      case "Estado":
+        projList.sort((a, b) {
+          return a.state.toLowerCase().compareTo(b.state.toLowerCase());
+        });
+        break;
+    }
+  }
 
-  Brightness get bright => _bright;
-
-  changeBrightness() {
-    _bright == Brightness.light
-        ? _bright = Brightness.dark
-        : _bright = Brightness.light;
-
+  void updateList(){
     notifyListeners();
   }
 }
@@ -139,7 +149,7 @@ class DataModel extends Model {
   bool _updated = false;
 
   DataModel() {
-    _initList();
+    updateProjects();
     _sortList();
   }
 
@@ -147,14 +157,14 @@ class DataModel extends Model {
 
   bool get isUpdated => _updated;
 
-  void _initList() {
+  void updateProjects() async{
     _updated = false;
 
     _projList = new List<ProjectItem>();
     CollectionReference projectCollection = Firestore.instance.collection("projects");
     Future<QuerySnapshot> query = projectCollection.getDocuments();
 
-    query.then((value) {
+    await query.then((value) {
       for (DocumentSnapshot item in value.documents) {
         String name;
         String state;
@@ -177,13 +187,12 @@ class DataModel extends Model {
       }
       notifyListeners();
     });
-
     _updated = true;
   }
 
   void addProject(String name, String city, String state, String description, File imgMini, List<DisplayImage> imgs) async{
     CollectionReference projectCollection = Firestore.instance.collection("projects");
-    
+
     StorageReference storageRef = FirebaseStorage.instance.ref().child(imgMini.toString());
     StorageTaskSnapshot downloadUrl = await storageRef.putFile(imgMini).onComplete;
     String urlMini = await downloadUrl.ref.getDownloadURL();
@@ -202,13 +211,7 @@ class DataModel extends Model {
       "imageUrl" : urlMini,
       "detailImageUrls" : imgUrls
     });
-    _initList();
-  }
-
-  void removeFromList(ProjectItem item) {
-    projList.remove(item);
-    _sortList();
-    notifyListeners();
+    updateProjects();
   }
 
   void sort(String sort) {
@@ -238,6 +241,22 @@ class DataModel extends Model {
   }
 
   void updateList() {
+    notifyListeners();
+  }
+}
+
+class ConfigModel extends Model {
+  Brightness _bright;
+
+  ConfigModel(this._bright);
+
+  Brightness get bright => _bright;
+
+  changeBrightness() {
+    _bright == Brightness.light
+        ? _bright = Brightness.dark
+        : _bright = Brightness.light;
+
     notifyListeners();
   }
 }

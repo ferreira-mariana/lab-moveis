@@ -1,130 +1,97 @@
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:google_sign_in/google_sign_in.dart';
+import 'package:lpdm_proj/main.dart';
 import 'package:scoped_model/scoped_model.dart';
 import 'models.dart';
 import 'package:flutter/material.dart';
 import 'authentication.dart';
-//class User{
-//  String name;
-//  String password;
-//  User(name, password){
-//    this.name = name;
-//    this.password = password;
-//  }
-//}
 
-class LoginPage extends StatefulWidget{
-  final VoidCallback logIn;
+class LoginPage extends StatefulWidget {
+  final UserModel user;
 
-  LoginPage({this.logIn});
+  LoginPage(this.user);
+
   State<StatefulWidget> createState() => _LoginPageState();
 }
 
-class _LoginPageState extends State<LoginPage>{
-  @override
-  initState(){
-    super.initState();
-
-  }
+class _LoginPageState extends State<LoginPage> {
+  GoogleSignIn _googleSignIn = new GoogleSignIn();
 
   TextEditingController _name = TextEditingController();
   TextEditingController _password = TextEditingController();
 
-  
+  @override
+  void initState() {
+    super.initState();
+    _googleSignIn.signInSilently().whenComplete(() {
+      widget.user.username = _googleSignIn.currentUser.displayName;
+      widget.user.uid = _googleSignIn.currentUser.id;
+      widget.user.createUserDocument();
+      return Navigator.pushReplacement(
+          context, MaterialPageRoute(builder: (context) => HomeScreen()));
+    });
+  }
 
-  build(context){
+  initLogin() {
+    _googleSignIn.onCurrentUserChanged
+        .listen((GoogleSignInAccount account) async {
+      if (account != null) {
+        widget.user.username = account.displayName;
+        widget.user.uid = account.id;
+        widget.user.createUserDocument();
+        Navigator.pushReplacement(context,
+            MaterialPageRoute(builder: (context) {
+          return HomeScreen();
+        }));
+      } else {
+        // user NOT logged
+      }
+    });
+  }
+
+  doLogin() async {
+    await _googleSignIn.signIn();
+    widget.user.username = _googleSignIn.currentUser.displayName;
+    widget.user.uid = _googleSignIn.currentUser.id;
+    widget.user.createUserDocument();
+    Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) {
+      return HomeScreen();
+    }));
+  }
+
+  build(context) {
     return ScopedModelDescendant<UserModel>(
       builder: (context, child, user) => Scaffold(
-      appBar: AppBar(
-        title: Text("Login"),
-        ),
-        body: ListView(
+            appBar: AppBar(
+              title: Text("Login"),
+            ),
+            body: ListView(
               children: <Widget>[
                 Container(
-
-                  margin: EdgeInsets.only(
-                    top: 50
-                    ),
-                  width:400,
+                  margin: EdgeInsets.only(top: 50),
+                  width: 400,
                   padding: EdgeInsets.all(20),
-                  height:300,
-
-                    child: ListView(
-                      children: <Widget>[
-                        Container(
-                          padding: EdgeInsets.all(10),
-                          child: TextFormField(
-                          controller: _name,
-                          autofocus: false,
-                          decoration: InputDecoration(
-                          hintText: "Usuário",
-
-                            contentPadding: EdgeInsets.fromLTRB(10, 10, 10, 10),
-                            border: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(32.0)
-
-                            )
-                          ),
+                  height: 300,
+                  child: Center(
+                    child: Container(
+                      margin: EdgeInsets.only(left: 50, right: 50),
+                      padding: EdgeInsets.only(left: 10, right: 10, top: 10),
+                      child: Material(
+                        borderRadius: BorderRadius.circular(32),
+                        elevation: 5,
+                        child: MaterialButton(
+                          child: Text("Entrar com Gmail"),
+                          onPressed: () {
+                            doLogin();
+                          },
                         ),
-                          ),
-                        Container(
-                          padding: EdgeInsets.all(10),
-                          child:TextFormField(
-                              controller: _password,
-                              autofocus: false,
-                              obscureText: true,
-                              decoration: InputDecoration(
-                                hintText: "Senha",
-
-                                contentPadding: EdgeInsets.fromLTRB(10, 10, 10, 10),
-                                border: OutlineInputBorder(
-                                  borderRadius: BorderRadius.circular(32.0)
-                              )
-                            ),
-                          ),
-                        ),
-
-
-
-                Container(
-                  margin: EdgeInsets.only(
-                    left: 50,
-                    right: 50
+                      ),
+                    ),
                   ),
-                  padding: EdgeInsets.only(
-                    left: 10,
-                    right: 10,
-                    top: 10
-                  ),
-                  child: Material(
-                    borderRadius: BorderRadius.circular(32),
-                    elevation: 5,
-                    child: MaterialButton(
-                      child: Text("Entrar"),
-                      onPressed: (){
-                        FirebaseAuth.instance.signInWithEmailAndPassword(email: _name.text, password: _password.text).then((userId) async {
-                          if(userId.toString().length > 0 && userId != null){
-                            /*await FirebaseAuth.instance.currentUser().then((onValue){
-                              print(onValue.uid);
-                            });*/
-                            //await user.createUserDocument();
-                            //await user.updateUserProjects();
-                            widget.logIn();
-                          }
-                        });
-                    },
-                  ),
-                  )
-
-                )
-
-                      ],
-                    )
-
-
-                  )
+                ),
               ],
-            )
-      ),
+            ),
+          ),
     );
   }
 }
