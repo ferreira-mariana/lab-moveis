@@ -214,12 +214,12 @@ class _ProjectDetailState extends State<ProjectDetail> {
                   checkSubscription(user.checkSubscription);
                 });
               } else {
-                user.unsubscribeToProject(widget._projectId).then((onValue) {
+                List<String> temp = [widget._projectId];
+                user.unsubscribeToProjects(temp).then((onValue) {
                   checkSubscription(user.checkSubscription);
                 });
               }
             },
-            //vai para a funcao de salvar o projeto
             color: _buttonColor,
             textColor: _buttonTextColor,
             padding: const EdgeInsets.all(15.0),

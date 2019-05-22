@@ -25,8 +25,8 @@ class _DeleteProjectPage extends State<DeleteProjectPage> {
 
   @override
   Widget build(BuildContext context) {
-    return ScopedModelDescendant<DataModel>(
-      builder: (context, child, data) => Scaffold(
+    return ScopedModelDescendant<UserModel>(
+      builder: (context, child, user) => Scaffold(
             appBar: AppBar(
               actions: <Widget>[
                 FlatButton(
@@ -35,9 +35,11 @@ class _DeleteProjectPage extends State<DeleteProjectPage> {
                     color: Colors.white,
                   ),
                   onPressed: () {
+                    List<String> temp = new List<String>();
                     for (ProjectItemWithCheckbox proj in _list) {
-                      if (proj.isChecked()) data.removeFromList(proj.item);
+                      if (proj.isChecked()) temp.add(proj.item.projectId);
                     }
+                    user.unsubscribeToProjects(temp);
                     Navigator.of(context).pop();
                   },
                 )

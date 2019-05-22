@@ -15,11 +15,11 @@
       },
       "oauth_client": [
         {
-          "client_id": "763074978248-f27qv117ltn180os5djdpnt7cngmj8lp.apps.googleusercontent.com",
+          "client_id": "763074978248-dtpfv5lhbkfefssitahl0rdkrk8r982l.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {
             "package_name": "com.example.lpdm_proj",
-            "certificate_hash": "ee9a7913ac3f3685c27ab3c8a9513c345fcc3867"
+            "certificate_hash": "944d3bf8256f53dfb48daa8b13e2d99171dc93c6"
           }
         },
         {
@@ -36,7 +36,7 @@
         "appinvite_service": {
           "other_platform_oauth_client": [
             {
-              "client_id": "763074978248-p5cf5iskjkl9ph6hkm6ui90183hrh171.apps.googleusercontent.com",
+              "client_id": "763074978248-5pt6lkg9v8d2oi1jp78nc6cgig86o0lf.apps.googleusercontent.com",
               "client_type": 3
             }
           ]
