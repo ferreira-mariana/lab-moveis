@@ -1,8 +1,9 @@
-import 'dart:io';
 import 'package:lpdm_proj/models.dart';
 import 'package:photo_view/photo_view.dart';
 import 'package:flutter/material.dart';
 import 'package:scoped_model/scoped_model.dart';
+import 'package:flutter_advanced_networkimage/provider.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 
 class ProjectItem extends StatefulWidget {
   final String _name;
@@ -10,8 +11,8 @@ class ProjectItem extends StatefulWidget {
   final String _state;
   final String _city;
   final String _projectId;
-  final List<File> _imageList;
-  final File _miniatureImage;
+  final List<String> _imageList;
+  final String _miniatureImage;
 
   ProjectItem(this._name, this._detail, this._state, this._city,
       this._imageList, this._miniatureImage, this._projectId);
@@ -20,7 +21,7 @@ class ProjectItem extends StatefulWidget {
 
   String get detail => _detail;
 
-  List<File> get imageList => _imageList;
+  List<String> get imageList => _imageList;
 
   String get city => _city;
 
@@ -33,6 +34,7 @@ class ProjectItem extends StatefulWidget {
 }
 
 class _ProjectItemState extends State<ProjectItem> {
+
   @override
   Widget build(BuildContext context) {
     return ScopedModelDescendant<UserModel>(
@@ -60,10 +62,10 @@ class _ProjectItemState extends State<ProjectItem> {
                         children: <Widget>[
                           widget._miniatureImage == null
                               ? Icon(Icons.image, size: 80)
-                              : Image.file(
-                                  widget._miniatureImage,
-                                  width: 80,
-                                  height: 80,
+                              : CachedNetworkImage(
+                                imageUrl: widget._miniatureImage,
+                                height: 80,
+                                width: 80,
                                 ),
                           Padding(
                             padding: EdgeInsets.symmetric(horizontal: 5),
@@ -92,7 +94,7 @@ class ProjectDetail extends StatefulWidget {
   final String _name;
   final String _detail;
   final String _projectId;
-  final List<File> _imageList;
+  final List<String> _imageList;
   final Function _checkUserSubscription;
 
   ProjectDetail(this._name, this._detail, this._imageList, this._projectId,
@@ -106,7 +108,7 @@ class _ProjectDetailState extends State<ProjectDetail> {
   String _buttonName = 'INSCREVA-SE';
   Color _buttonColor = Colors.blue;
   Color _buttonTextColor = Colors.white;
-  bool loading = true;
+  Widget subscribeButton;
   bool subscribed;
 
   @override
@@ -116,12 +118,15 @@ class _ProjectDetailState extends State<ProjectDetail> {
   }
 
   checkSubscription(checkUserSubscription) {
+    setState(() {
+      subscribeButton = CircularProgressIndicator(); 
+    });
     checkUserSubscription(widget._projectId).then((onValue) {
       subscribed = onValue;
       setState(() {
         if (!subscribed) {
           _buttonName = 'INSCREVA-SE';
-          _buttonColor = Colors.blue;
+          _buttonColor = Colors.deepPurpleAccent;
           _buttonTextColor = Colors.white;
         } else {
           //adiciona o projeto aos inscritos
@@ -129,7 +134,7 @@ class _ProjectDetailState extends State<ProjectDetail> {
           _buttonColor = Colors.grey;
           _buttonTextColor = Colors.grey[700];
         }
-        loading = false;
+        subscribeButton = _subscribeButton();
       });
     });
   }
@@ -163,9 +168,9 @@ class _ProjectDetailState extends State<ProjectDetail> {
                             itemCount: widget._imageList.length,
                             itemBuilder: (BuildContext context, int index) =>
                                 FlatButton(
-                                    child: Image(
-                                      image:
-                                          FileImage(widget._imageList[index]),
+                                    child: CachedNetworkImage(
+                                      imageUrl: widget._imageList[index],//)//Image.network(
+                                      //widget._imageList[index]
                                     ),
                                     onPressed: () {
                                       Navigator.push(
@@ -173,8 +178,7 @@ class _ProjectDetailState extends State<ProjectDetail> {
                                         MaterialPageRoute(
                                           builder: (context) => Container(
                                                 child: PhotoView(
-                                                  imageProvider: FileImage(
-                                                      widget._imageList[index]),
+                                                  imageProvider: AdvancedNetworkImage(widget._imageList[index], useDiskCache: true),
                                                 ),
                                               ),
                                         ),
@@ -191,9 +195,7 @@ class _ProjectDetailState extends State<ProjectDetail> {
                   ),
                 ),
                 Center(
-                  child: loading
-                      ? CircularProgressIndicator()
-                      : _subscribeButton(),
+                  child: subscribeButton,
                 ),
               ],
             ),
@@ -206,18 +208,18 @@ class _ProjectDetailState extends State<ProjectDetail> {
     return ScopedModelDescendant<UserModel>(
       builder: (context, child, user) => RaisedButton(
             onPressed: () {
-              loading = true;
+              setState(() {subscribeButton = CircularProgressIndicator();});
               if (!subscribed) {
                 user.subscribeToProject(widget._projectId).then((onValue) {
                   checkSubscription(user.checkSubscription);
                 });
               } else {
-                user.unsubscribeToProject(widget._projectId).then((onValue) {
+                List<String> temp = [widget._projectId];
+                user.unsubscribeToProjects(temp).then((onValue) {
                   checkSubscription(user.checkSubscription);
                 });
               }
             },
-            //vai para a funcao de salvar o projeto
             color: _buttonColor,
             textColor: _buttonTextColor,
             padding: const EdgeInsets.all(15.0),

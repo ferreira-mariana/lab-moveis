@@ -1,9 +1,10 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:lpdm_proj/root.dart';
+import 'package:lpdm_proj/config_page.dart';
+import 'package:lpdm_proj/main_page.dart';
+import 'package:lpdm_proj/models.dart';
+import 'package:lpdm_proj/profile_page.dart';
 import 'package:scoped_model/scoped_model.dart';
-import 'profile.dart';
-import 'config.dart';
 import 'models.dart';
 
 class Item {
@@ -26,26 +27,25 @@ class SideMenu extends StatefulWidget {
 
 class _SideMenuState extends State<SideMenu> {
   int _selectedDrawerIndex = 0;
-  changePages(int index) {
-    switch (index) {
-      case 0:
-        Navigator.push(
-          context, MaterialPageRoute(builder: (context) => ProfilePage()));
-        break;
-      case 1:
-        Navigator.push(
-          context, MaterialPageRoute(builder: (context) => ConfigPage()));
-        break;
-      case 2:
-        FirebaseAuth.instance.signOut();
-        //widget.auth.signOut();
-        Navigator.pushReplacement(
-            context, new MaterialPageRoute(builder: (context) => RootPage()));
+
+    changePages(int index) async{
+      switch(index){
+        case 0:
+          Navigator.push(
+              context, MaterialPageRoute(builder: (context) => ProfilePage()));
+          break;
+        case 1:
+          Navigator.push(context, MaterialPageRoute(builder: (context) => ConfigPage()));
+          break;
+        case 2:
+          await FirebaseAuth.instance.signOut();
+          Navigator.pushReplacement(context, new MaterialPageRoute(builder: (context) => MyApp()));
+      }
+      setState((){
+        _selectedDrawerIndex = index;
+      });
+
     }
-    setState(() {
-      _selectedDrawerIndex = index;
-    });
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -65,7 +65,7 @@ class _SideMenuState extends State<SideMenu> {
                   margin: EdgeInsets.fromLTRB(0, 0, 0, 20),
                   child: Column(
                     children: <Widget>[
-                      CircleAvatar(),
+                      CircleAvatar(backgroundImage: NetworkImage(user.imgUrl),),
                       Material(
                         textStyle:
                             TextStyle(fontSize: 25, color: Colors.deepPurple),
@@ -77,7 +77,7 @@ class _SideMenuState extends State<SideMenu> {
                               Padding(padding: EdgeInsets.only(bottom: 8.0)),
                               Text.rich(
                                 TextSpan(
-                                  text: user.userProjects.length.toString(), style: TextStyle(fontSize: 14),
+                                  text: user.projList.length.toString(), style: TextStyle(fontSize: 14),
                                   children: <TextSpan>[
                                     TextSpan(
                                         text: ' projetos inscritos',
