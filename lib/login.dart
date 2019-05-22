@@ -1,8 +1,9 @@
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:scoped_model/scoped_model.dart';
 import 'models.dart';
+import 'main.dart';
 import 'package:flutter/material.dart';
-import 'authentication.dart';
+import 'user.dart';
+import 'database.dart';
 //class User{
 //  String name;
 //  String password;
@@ -13,23 +14,43 @@ import 'authentication.dart';
 //}
 
 class LoginPage extends StatefulWidget{
-  final VoidCallback logIn;
-
-  LoginPage({this.logIn});
   State<StatefulWidget> createState() => _LoginPageState();
 }
 
 class _LoginPageState extends State<LoginPage>{
+  List<User> _users;
+
+  Future<List<User>> getData() async{
+    var source = await DBProvider.db.getAllUsers();
+    //print(source);
+    setState(() {
+      _users = source;
+      //var data = json.decode(source);
+      //var users = data["users"] as List;
+      //print(_users);
+      //_users = users.map<User>((json) => User.fromJson(json)).toList();
+    });
+    return _users;
+  }
   @override
   initState(){
     super.initState();
-
+    
+    //_users.add(User('Luquinhas', '5678'));
+    //_users.add(User('Marcelo', '1234'));
   }
 
+  checkIfValidUser(List<User> _users){
+    for(int i=0;i<_users.length;i++){
+      if(_name.text == _users[i].name && _password.text == _users[i].password) return _users[i];
+    }
+    return null;
+  }
   TextEditingController _name = TextEditingController();
   TextEditingController _password = TextEditingController();
 
   build(context){
+    getData();
     return ScopedModelDescendant<UserModel>(
       builder: (context, child, user) => Scaffold(
       appBar: AppBar(
@@ -38,14 +59,14 @@ class _LoginPageState extends State<LoginPage>{
         body: ListView(
               children: <Widget>[
                 Container(
-
+                  
                   margin: EdgeInsets.only(
                     top: 50
                     ),
                   width:400,
                   padding: EdgeInsets.all(20),
                   height:300,
-
+                  
                     child: ListView(
                       children: <Widget>[
                         Container(
@@ -54,7 +75,7 @@ class _LoginPageState extends State<LoginPage>{
                           controller: _name,
                           autofocus: false,
                           decoration: InputDecoration(
-                          hintText: "Email",
+                          hintText: "Usuário",
 
                             contentPadding: EdgeInsets.fromLTRB(10, 10, 10, 10),
                             border: OutlineInputBorder(
@@ -72,7 +93,7 @@ class _LoginPageState extends State<LoginPage>{
                               obscureText: true,
                               decoration: InputDecoration(
                                 hintText: "Senha",
-
+                                
                                 contentPadding: EdgeInsets.fromLTRB(10, 10, 10, 10),
                                 border: OutlineInputBorder(
                                   borderRadius: BorderRadius.circular(32.0)
@@ -80,9 +101,9 @@ class _LoginPageState extends State<LoginPage>{
                             ),
                           ),
                         ),
-
-
-
+                      
+                        
+                      
                 Container(
                   margin: EdgeInsets.only(
                     left: 50,
@@ -99,26 +120,28 @@ class _LoginPageState extends State<LoginPage>{
                     child: MaterialButton(
                       child: Text("Entrar"),
                       onPressed: (){
-                        FirebaseAuth.instance.signInWithEmailAndPassword(email: _name.text, password: _password.text).then((userId) async {
-                          if(userId.toString().length > 0 && userId != null){
-                            /*await FirebaseAuth.instance.currentUser().then((onValue){
-                              print(onValue.uid);
-                            });*/
-                            //await user.createUserDocument();
-                            //await user.updateUserProjects();
-                            widget.logIn();
-                          }
-                        });
+                        User usr = checkIfValidUser(_users);
+                        if(usr != null){
+                          user.username = usr.name;
+                          print(user.username);
+                          Navigator.push(
+                              context, 
+                              MaterialPageRoute(
+                              builder: (context) => HomeScreen()
+                              ));
+                        }else{
+                          print(_users);
+                        } 
                     },
                   ),
                   )
-
+                   
                 )
-
+                
                       ],
                     )
-
-
+                    
+                  
                   )
               ],
             )

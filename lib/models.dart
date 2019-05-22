@@ -1,119 +1,24 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:lpdm_proj/project_item.dart';
 import 'package:scoped_model/scoped_model.dart';
 
-class UserModel extends Model {
+
+class UserModel extends Model{
   String _username;
-  String _uid;
-  bool _updated = false;
-  List<ProjectItem> _userProjects = new List<ProjectItem>();
-
+  
+  UserModel();
   String get username => _username;
-
-  set username(String name) {
+  set username(String name){
     _username = name;
     notifyListeners();
   }
-
-  String get uid => _uid;
-
-  set uid(String uid) {
-    _uid = uid;
-    notifyListeners();
-  }
-
-  bool get isUpdated => _updated;
-
-  List<ProjectItem> get userProjects => _userProjects;
-
-  createUserDocument() async{
-    DocumentReference userProjects = Firestore.instance.collection("users").document(_uid);
-    await userProjects.get().then((onValue) async{
-      if(!onValue.exists) {
-        await userProjects.setData(<String, dynamic> {
-          "projects" : new List<String>(),
-        });
-      }
-    });
-
-    await updateUserProjects();
-  }
-
-  updateUserProjects() async {
-    _updated = false;
-
-    List<String> projects;
-    DocumentReference userDocument = Firestore.instance.collection("users").document(_uid);
-    userDocument.get().then((onValue) async {
-      projects = List.from(onValue['projects']);
-      userProjects.clear();
-      for (String i in projects) {
-        CollectionReference projectCollection = Firestore.instance.collection("projects");
-        Future<QuerySnapshot> query = projectCollection.getDocuments();
-
-        query.then((value) {
-          for (DocumentSnapshot item in value.documents) {
-            if (item.documentID == i) {
-              String name;
-              String state;
-              String city;
-              String description;
-
-              item.data.forEach((k, v) {
-                if (k == "name") name = v;
-                if (k == "city") city = v;
-                if (k == "state") state = v;
-                if (k == "description") description = v;
-              });
-              userProjects.add(ProjectItem(
-                  name, description, state, city, null, null, item.documentID));
-            }
-          }
-          notifyListeners();
-        });
-      }
-    });
-    _updated = true;
-  }
-
-  Future<void> subscribeToProject(String proj) async {
-    DocumentReference userProjects = Firestore.instance.collection("users").document(_uid);
-
-    List<String> temp = new List<String>();
-    temp.add(proj);
-    await userProjects.updateData({'projects': FieldValue.arrayUnion(temp)});
-
-    updateUserProjects();
-  }
-
-  Future<void> unsubscribeToProject(String proj) async {
-    DocumentReference userProjects = Firestore.instance.collection("users").document(_uid);
-
-    List<String> temp = new List<String>();
-    temp.add(proj);
-    await userProjects.updateData({'projects': FieldValue.arrayRemove(temp)});
-
-    updateUserProjects();
-  }
-
-  Future<bool> checkSubscription(String proj) async{
-    List<String> projects;
-    DocumentReference userDocument = Firestore.instance.collection("users").document(_uid);
-    return await userDocument.get().then((onValue) async {
-      projects = List.from(onValue['projects']);
-      for (String i in projects) {
-        if(i == proj) return Future.value(true);
-      }
-      return Future.value(false);
-    });
-  }
+  
 }
 
 class ConfigModel extends Model {
   Brightness _bright;
 
-  ConfigModel(this._bright);
+  ConfigModel(Brightness _bright);
 
   Brightness get bright => _bright;
 
@@ -127,57 +32,36 @@ class ConfigModel extends Model {
 }
 
 class DataModel extends Model {
-  List<ProjectItem> _projList;
+  List<ProjectItem> _projList = new List<ProjectItem>();
+  List<ProjectItem> _projsInscritos = new List<ProjectItem>();
   String _sort = 'Nome';
-  bool _updated = false;
 
   DataModel() {
     _initList();
+    _initList2();
     _sortList();
+    _sortListSubscribed();
   }
 
   List<ProjectItem> get projList => _projList;
-
-  bool get isUpdated => _updated;
+  List<ProjectItem> get projsInscritos => _projsInscritos;
 
   void _initList() {
-    _updated = false;
-
-    _projList = new List<ProjectItem>();
-    CollectionReference projectCollection = Firestore.instance.collection("projects");
-    Future<QuerySnapshot> query = projectCollection.getDocuments();
-
-    query.then((value) {
-      for (DocumentSnapshot item in value.documents) {
-        String name;
-        String state;
-        String city;
-        String description;
-
-        item.data.forEach((k, v) {
-          if (k == "name") name = v;
-          if (k == "city") city = v;
-          if (k == "state") state = v;
-          if (k == "description") description = v;
-        });
-        projList.add(ProjectItem(
-            name, description, state, city, null, null, item.documentID));
-      }
-      notifyListeners();
-    });
-
-    _updated = true;
+    projList.add(ProjectItem('B', 'Nada', 'B', 'A', null, 0));
+    projList.add(ProjectItem('D', 'Nada', 'A', 'D', null, 0));
+    projList.add(ProjectItem('A', 'Nada', 'D', 'B', null, 0));
+    projList.add(ProjectItem('E', 'Nada', 'C', 'E', null, 0));
+    projList.add(ProjectItem('C', 'Nada', 'E', 'C', null, 0));
   }
 
-  void addProject(String name, String city, String state, String description) async{
-    CollectionReference projectCollection = Firestore.instance.collection("projects");
-    await projectCollection.add(<String, dynamic> {
-      "name" : name,
-      "city" : city,
-      "state" : state,
-      "description" : description,
-    });
-    _initList();
+  void _initList2() {
+    projsInscritos.add(ProjectItem('D', 'Nada', 'K', 'A', null, 1));
+  }
+
+  void addToList(ProjectItem item) {
+    projList.add(item);
+    _sortList();
+    notifyListeners();
   }
 
   void removeFromList(ProjectItem item) {
@@ -186,9 +70,52 @@ class DataModel extends Model {
     notifyListeners();
   }
 
+  void addToListSubscribed(ProjectItem item) {
+    projList.remove(item);
+    item.changeInscrito();
+    projsInscritos.add(item);
+    _sortListSubscribed();
+    notifyListeners();
+  }
+
+  void removeFromListSubscribed(ProjectItem item) {
+    projsInscritos.remove(item);
+    item.changeInscrito();
+    projList.add(item);
+    _sortList();
+    notifyListeners();
+  }
+
+  void removeFromListSubscribedString(String item) {
+    for (ProjectItem proj in projsInscritos){
+      if (proj.name == item){
+        projsInscritos.remove(proj);
+        proj.changeInscrito();
+        projList.add(proj);
+        _sortList();
+        notifyListeners();
+        break;
+      }
+    }
+  }
+
+  void addToListSubscribedString(String item) {
+    for (ProjectItem proj in projsInscritos){
+      if (proj.name == item){
+        projList.remove(proj);
+        proj.changeInscrito();
+        projsInscritos.add(proj);
+        _sortListSubscribed();
+        notifyListeners();
+        break;
+      }
+    }
+  }
+
   void sort(String sort) {
     _sort = sort;
     _sortList();
+    _sortListSubscribed();
     notifyListeners();
   }
 
@@ -212,7 +139,23 @@ class DataModel extends Model {
     }
   }
 
-  void updateList() {
-    notifyListeners();
+  void _sortListSubscribed() {
+    switch (_sort) {
+      case "Nome":
+        projsInscritos.sort((a, b) {
+          return a.name.toLowerCase().compareTo(b.name.toLowerCase());
+        });
+        break;
+      case "Cidade":
+        projsInscritos.sort((a, b) {
+          return a.city.toLowerCase().compareTo(b.city.toLowerCase());
+        });
+        break;
+      case "Estado":
+        projsInscritos.sort((a, b) {
+          return a.state.toLowerCase().compareTo(b.state.toLowerCase());
+        });
+        break;
+    }
   }
 }
