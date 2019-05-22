@@ -1,4 +1,3 @@
-import 'dart:io';
 import 'package:lpdm_proj/models.dart';
 import 'package:photo_view/photo_view.dart';
 import 'package:flutter/material.dart';
@@ -109,7 +108,7 @@ class _ProjectDetailState extends State<ProjectDetail> {
   String _buttonName = 'INSCREVA-SE';
   Color _buttonColor = Colors.blue;
   Color _buttonTextColor = Colors.white;
-  bool loading = true;
+  Widget subscribeButton;
   bool subscribed;
 
   @override
@@ -119,12 +118,15 @@ class _ProjectDetailState extends State<ProjectDetail> {
   }
 
   checkSubscription(checkUserSubscription) {
+    setState(() {
+      subscribeButton = CircularProgressIndicator(); 
+    });
     checkUserSubscription(widget._projectId).then((onValue) {
       subscribed = onValue;
       setState(() {
         if (!subscribed) {
           _buttonName = 'INSCREVA-SE';
-          _buttonColor = Colors.blue;
+          _buttonColor = Colors.deepPurpleAccent;
           _buttonTextColor = Colors.white;
         } else {
           //adiciona o projeto aos inscritos
@@ -132,7 +134,7 @@ class _ProjectDetailState extends State<ProjectDetail> {
           _buttonColor = Colors.grey;
           _buttonTextColor = Colors.grey[700];
         }
-        loading = false;
+        subscribeButton = _subscribeButton();
       });
     });
   }
@@ -193,9 +195,7 @@ class _ProjectDetailState extends State<ProjectDetail> {
                   ),
                 ),
                 Center(
-                  child: loading
-                      ? CircularProgressIndicator()
-                      : _subscribeButton(),
+                  child: subscribeButton,
                 ),
               ],
             ),
@@ -208,7 +208,7 @@ class _ProjectDetailState extends State<ProjectDetail> {
     return ScopedModelDescendant<UserModel>(
       builder: (context, child, user) => RaisedButton(
             onPressed: () {
-              loading = true;
+              setState(() {subscribeButton = CircularProgressIndicator();});
               if (!subscribed) {
                 user.subscribeToProject(widget._projectId).then((onValue) {
                   checkSubscription(user.checkSubscription);

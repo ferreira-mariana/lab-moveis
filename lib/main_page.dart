@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:lpdm_proj/delete_project_page.dart';
-import 'package:lpdm_proj/drawer.dart';
-import 'package:lpdm_proj/login.dart';
+import 'package:lpdm_proj/drawer_page.dart';
+import 'package:lpdm_proj/login_page.dart';
 import 'package:lpdm_proj/models.dart';
 import 'package:lpdm_proj/user_projects_page.dart';
 import 'package:scoped_model/scoped_model.dart';
@@ -52,90 +52,32 @@ class HomeScreen extends StatefulWidget {
   State<StatefulWidget> createState() => _HomeScreenState();
 }
 
-class _HomeScreenState extends State<HomeScreen>
-    with SingleTickerProviderStateMixin {
+class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateMixin {
   AllProjectsPage allProjectsPage = new AllProjectsPage();
   UserProjectsPage userProjectsPage = new UserProjectsPage();
-
-  List<DropdownMenuItem<String>> _dropDownMenuItems;
-  List<Widget> actionBarWidges = new List<Widget>();
+  List<Widget> actionBarWidgets = new List<Widget>();
   TabController _tabController;
-  List _dropDownItems = ['Nome', 'Cidade', 'Estado'];
 
   @override
   void initState() {
     super.initState();
     _tabController = TabController(vsync: this, length: 2);
-    _dropDownMenuItems = getDropDownMenuItems();
+    _tabController.addListener(tabChanged);
+    tabChanged();
   }
 
-  List<DropdownMenuItem<String>> getDropDownMenuItems() {
-    List<DropdownMenuItem<String>> items = new List();
-    for (String city in _dropDownItems) {
-      items.add(new DropdownMenuItem(
-        value: city,
-        child: new Text(city),
-      ));
-    }
-    return items;
-  }
-
-  List<Widget> _getAppBarActions(UserModel user, DataModel data) {
-    List<Widget> temp = new List<Widget>();
-    if (_tabController.index == 0) {
-      temp.add(
-        FlatButton(
-          child: Icon(
-            Icons.delete,
-            color: Colors.white,
-          ),
-          onPressed: () {
-            Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => DeleteProjectPage(user.projList),
-                ));
-          },
-        ),
-      );
-      temp.add(
-        Container(
-          child: DropdownButtonHideUnderline(
-            child: DropdownButton(
-              iconSize: 0,
-              hint: Icon(
-                Icons.sort,
-                color: Colors.white,
-              ),
-              items: _dropDownMenuItems,
-              onChanged: (text) {
-                user.sort(text);
-              },
-            ),
-          ),
-        ),
-      );
-    } else {
-      temp.add(
-        Container(
-          child: DropdownButtonHideUnderline(
-            child: DropdownButton(
-              iconSize: 0,
-              hint: Icon(
-                Icons.sort,
-                color: Colors.white,
-              ),
-              items: _dropDownMenuItems,
-              onChanged: (text) {
-                data.sort(text);
-              },
-            ),
-          ),
-        ),
-      );
-    }
-
-    return temp;
+  void tabChanged(){
+      List<Widget> temp = new List<Widget>();
+      if(_tabController.index == 0){
+        temp.add(userProjectsPage.deleteProjects);
+        temp.add(userProjectsPage.sortProjects);
+      }else{
+        temp.add(allProjectsPage.refreshProjects);
+        temp.add(allProjectsPage.sortProjects);
+      }
+    setState(() {
+      actionBarWidgets = temp;
+    });
   }
 
   @override
@@ -145,7 +87,7 @@ class _HomeScreenState extends State<HomeScreen>
             builder: (context, child, user) => Scaffold(
                   drawer: SideMenu(),
                   appBar: AppBar(
-                    actions: _getAppBarActions(user, data),
+                    actions: actionBarWidgets,
                     bottom: TabBar(
                       labelPadding: EdgeInsets.only(top: 10),
                       controller: _tabController,

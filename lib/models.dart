@@ -34,6 +34,8 @@ class UserModel extends Model {
 
   createUserDocument() async{
     _updated = false;
+    notifyListeners();
+
     DocumentReference userProjects = Firestore.instance.collection("users").document(_uid);
     await userProjects.get().then((onValue) async{
       if(!onValue.exists) {
@@ -48,6 +50,7 @@ class UserModel extends Model {
 
   updateUserProjects() async {
     _updated = false;
+    notifyListeners();
 
     List<String> projects;
     DocumentReference userDocument = Firestore.instance.collection("users").document(_uid);
@@ -82,8 +85,8 @@ class UserModel extends Model {
         });
       }
     });
-    updateList();
     _updated = true;
+    notifyListeners();
   }
 
   Future<void> subscribeToProject(String proj) async {
@@ -159,6 +162,7 @@ class DataModel extends Model {
 
   void updateProjects() async{
     _updated = false;
+    notifyListeners();
 
     _projList = new List<ProjectItem>();
     CollectionReference projectCollection = Firestore.instance.collection("projects");
@@ -185,12 +189,15 @@ class DataModel extends Model {
         projList.add(ProjectItem(
             name, description, state, city, imgRefs, thumbRef, item.documentID));
       }
-      notifyListeners();
     });
     _updated = true;
+    notifyListeners();
   }
 
   void addProject(String name, String city, String state, String description, File imgMini, List<DisplayImage> imgs) async{
+    _updated = false;
+    notifyListeners();
+
     CollectionReference projectCollection = Firestore.instance.collection("projects");
 
     StorageReference storageRef = FirebaseStorage.instance.ref().child(imgMini.toString());
@@ -257,5 +264,6 @@ class ConfigModel extends Model {
         ? _bright = Brightness.dark
         : _bright = Brightness.light;
 
+    notifyListeners();
   }
 }

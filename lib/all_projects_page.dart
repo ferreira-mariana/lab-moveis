@@ -3,34 +3,65 @@ import 'package:lpdm_proj/create_project_page.dart';
 import 'package:lpdm_proj/models.dart';
 import 'package:lpdm_proj/project_item.dart';
 import 'package:scoped_model/scoped_model.dart';
-import 'package:dragable_flutter_list/dragable_flutter_list.dart';
 
-class AllProjectsPage extends StatefulWidget {
+class AllProjectsPage extends StatefulWidget{
+  final Widget refreshProjects = ScopedModelDescendant<DataModel>(
+    builder: (context, child, data) => FlatButton(
+      child: Icon(
+        Icons.update,
+        color: Colors.white,
+      ),
+      onPressed: () {
+        data.updateProjects();
+      },
+    ),
+  );
+
+  final Widget sortProjects =
+  ScopedModelDescendant<DataModel>(builder: (context, child, data) {
+    List _dropDownItems = ['Nome', 'Cidade', 'Estado'];
+
+    List<DropdownMenuItem<String>> getDropDownMenuItems() {
+      List<DropdownMenuItem<String>> items = new List();
+      for (String city in _dropDownItems) {
+        items.add(new DropdownMenuItem(
+          value: city,
+          child: new Text(city),
+        ));
+      }
+      return items;
+    }
+
+    List<DropdownMenuItem<String>> _dropDownMenuItems = getDropDownMenuItems();
+
+    return Container(
+      child: DropdownButtonHideUnderline(
+        child: DropdownButton(
+          iconSize: 0,
+          hint: Icon(
+            Icons.sort,
+            color: Colors.white,
+          ),
+          items: _dropDownMenuItems,
+          onChanged: (text) {
+            data.sort(text);
+          },
+        ),
+      ),
+    );
+  });
+
   @override
   State<StatefulWidget> createState() => _AllProjectsState();
 }
 
-class _AllProjectsState extends State<AllProjectsPage> {
+class _AllProjectsState extends State<AllProjectsPage> with AutomaticKeepAliveClientMixin{
   TextEditingController _searchController;
-  List<DropdownMenuItem<String>> _dropDownMenuItems;
-  List _dropDownItems = ['Nome', 'Cidade', 'Estado'];
 
   @override
   void initState() {
     super.initState();
     _searchController = new TextEditingController();
-    _dropDownMenuItems = getDropDownMenuItems();
-  }
-
-  List<DropdownMenuItem<String>> getDropDownMenuItems() {
-    List<DropdownMenuItem<String>> items = new List();
-    for (String city in _dropDownItems) {
-      items.add(new DropdownMenuItem(
-        value: city,
-        child: new Text(city),
-      ));
-    }
-    return items;
   }
 
   bool searchItemInList(ProjectItem item) {
@@ -44,6 +75,9 @@ class _AllProjectsState extends State<AllProjectsPage> {
             .toLowerCase()
             .contains(_searchController.text.toLowerCase()));
   }
+
+  @override
+  bool get wantKeepAlive => true;
 
   @override
   Widget build(BuildContext context) {
