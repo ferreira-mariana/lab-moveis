@@ -11,6 +11,7 @@ class UserModel extends Model {
   String _username;
   String _uid;
   String _sort = 'Nome';
+  String _imgUrl;
   bool _updated = false;
   List<ProjectItem> _projList = new List<ProjectItem>();
 
@@ -25,6 +26,14 @@ class UserModel extends Model {
 
   set uid(String uid) {
     _uid = uid;
+    notifyListeners();
+  }
+
+
+  String get imgUrl => _imgUrl;
+
+  set imgUrl(String value) {
+    _imgUrl = value;
     notifyListeners();
   }
 

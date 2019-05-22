@@ -20,13 +20,13 @@ class ProfilePage extends StatelessWidget {
                       child: Column(
                         children: <Widget>[
                           Text(
-                            'Nome',
+                            user.username,
                             textAlign: TextAlign.left,
                             style: TextStyle(fontSize: 20.0),
                           ),
                           RichText(
                             text: TextSpan(
-                              text: user.userProjects.length.toString(),
+                              text: user.projList.length.toString(),
                               style: TextStyle(
                                   color: Colors.grey[700], fontSize: 16),
                               children: <TextSpan>[
@@ -44,7 +44,7 @@ class ProfilePage extends StatelessWidget {
                         fit: BoxFit.contain,
                         child: Padding(
                           padding: EdgeInsets.only(left: 20.0),
-                          child: CircleAvatar(),
+                          child: CircleAvatar(backgroundImage: NetworkImage(user.imgUrl),),
                         ),
                       ),
                     ),

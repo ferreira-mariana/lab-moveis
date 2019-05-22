@@ -30,6 +30,7 @@ class _LoginPageState extends State<LoginPage> {
 
     widget.user.username = user.displayName;
     widget.user.uid = user.uid;
+    widget.user.imgUrl = user.photoUrl;
     widget.user.createUserDocument();
 
     googleSignIn.signOut();
@@ -49,6 +50,7 @@ class _LoginPageState extends State<LoginPage> {
     if (user != null) {
       widget.user.username = user.displayName;
       widget.user.uid = user.uid;
+      widget.user.imgUrl = user.photoUrl;
       widget.user.createUserDocument();
 
       Navigator.pushReplacement(
