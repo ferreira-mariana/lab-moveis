@@ -257,6 +257,5 @@ class ConfigModel extends Model {
         ? _bright = Brightness.dark
         : _bright = Brightness.light;
 
-    notifyListeners();
   }
 }
