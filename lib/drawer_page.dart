@@ -1,7 +1,7 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:lpdm_proj/config_page.dart';
-import 'package:lpdm_proj/main_page.dart';
+import 'package:lpdm_proj/main.dart';
 import 'package:lpdm_proj/models.dart';
 import 'package:lpdm_proj/profile_page.dart';
 import 'package:scoped_model/scoped_model.dart';

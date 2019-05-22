@@ -1,6 +1,6 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:google_sign_in/google_sign_in.dart';
-import 'package:lpdm_proj/main_page.dart';
+import 'package:lpdm_proj/main.dart';
 import 'package:scoped_model/scoped_model.dart';
 import 'models.dart';
 import 'package:flutter/material.dart';
