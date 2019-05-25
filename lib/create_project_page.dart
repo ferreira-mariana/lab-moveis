@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
@@ -5,9 +6,10 @@ import 'package:lpdm_proj/models.dart';
 import 'package:scoped_model/scoped_model.dart';
 import 'package:flutter_google_places/flutter_google_places.dart';
 import 'package:google_maps_webservice/places.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
 
-const kGoogleApiKey = "AIzaSyCe-T7VrbtVqCLBNrgt1A0kxeTwnqFFKNA";
-GoogleMapsPlaces _places = GoogleMapsPlaces(apiKey: kGoogleApiKey);
+PlacesDetailsResponse addressDetail = null;
+Widget addressResults = new Container();
 
 class CreateProjectPage extends StatefulWidget {
   @override
@@ -21,8 +23,6 @@ class _CreateProjectPageState extends State<CreateProjectPage> {
   String _stateText = '';
   File _image;
   List<DisplayImage> _imageList = new List<DisplayImage>();
-  Widget addressResults = new Container();
-  PlacesDetailsResponse addressDetail;
 
   addImage(File image) {
     if (_imageList.length < 5)
@@ -193,20 +193,6 @@ class _CreateProjectPageState extends State<CreateProjectPage> {
       },
     );
   }
-  
-  Widget getAddressFields(List<AddressComponent> result){
-    List<Widget> textFieldList = new List<Widget>();
-    for(AddressComponent c in result){
-      print(c.types);
-      if(c.types.contains('street_number')) textFieldList.add(Text("Numero: ${c.longName}"));
-      else if(c.types.contains('route')) textFieldList.add(Text("Rua: ${c.longName}"));
-      else if(c.types.contains('sublocality_level_1')) textFieldList.add(Text("Bairro: ${c.longName}"));
-      else if(c.types.contains('administrative_area_level_2')) textFieldList.add(Text("Cidade: ${c.longName}"));
-      else if(c.types.contains('administrative_area_level_1')) textFieldList.add(Text("Estado: ${c.longName}"));
-      else if(c.types.contains('country')) textFieldList.add(Text("Pais: ${c.longName}"));
-    }
-    return Column(children: textFieldList);
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -290,8 +276,8 @@ class _CreateProjectPageState extends State<CreateProjectPage> {
                                 height: 50,
                                 child: DecoratedBox(
                                   decoration: BoxDecoration(
-                                    border: Border.all(),
-                                    borderRadius: BorderRadius.circular(20)),
+                                      border: Border.all(),
+                                      borderRadius: BorderRadius.circular(20)),
                                   child: Icon(Icons.add),
                                 ),
                               ),
@@ -319,25 +305,27 @@ class _CreateProjectPageState extends State<CreateProjectPage> {
                     name: 'Descrição (Obrigatório)',
                     function: setDescriptionText,
                   ),
-                  RaisedButton(child: Text("ENDEREÇO"), onPressed: () async{
-                    Prediction p = await PlacesAutocomplete.show(
-                      context: context,
-                      apiKey: kGoogleApiKey,
-                      mode: Mode.overlay,
-                      language: "pt",);
-                    addressDetail = await _places.getDetailsByPlaceId(p.placeId);
-                    setState(() {
-                      addressResults = getAddressFields(addressDetail.result.addressComponents);
-                    });
-                  },),
+                  RaisedButton(
+                    child: Text("ENDEREÇO"),
+                    onPressed: () async {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => GoogleMapsViewer()),
+                      );
+                    },
+                  ),
                   addressResults,
                   Container(
                     padding:
                         EdgeInsets.symmetric(horizontal: 120, vertical: 10),
                     child: RaisedButton(
                       color: Theme.of(context).primaryColor,
-                      child: Text("Enviar", style: TextStyle(color: Colors.white),),
-                      onPressed: () async{
+                      child: Text(
+                        "Enviar",
+                        style: TextStyle(color: Colors.white),
+                      ),
+                      onPressed: () async {
                         if (_nameText != '' &&
                             _descriptionText != '' &&
                             addressDetail != null) {
@@ -345,7 +333,8 @@ class _CreateProjectPageState extends State<CreateProjectPage> {
                           for (DisplayImage image in _imageList) {
                             imageFileList.add(image.image);
                           }
-                          data.addProject(_nameText, addressDetail, _descriptionText, _image, _imageList);
+                          data.addProject(_nameText, addressDetail,
+                              _descriptionText, _image, _imageList);
                           Navigator.of(context).pop();
                         } else {
                           _showErrorDialog();
@@ -447,10 +436,124 @@ class NewImageButton extends StatelessWidget {
         height: 50,
         child: DecoratedBox(
           decoration: BoxDecoration(
-            border: Border.all(), borderRadius: BorderRadius.circular(20)),
+              border: Border.all(), borderRadius: BorderRadius.circular(20)),
           child: Icon(Icons.add),
         ),
       ),
+    );
+  }
+}
+
+class GoogleMapsViewer extends StatefulWidget {
+  @override
+  State<GoogleMapsViewer> createState() => _GoogleMapsViewerState();
+}
+
+class _GoogleMapsViewerState extends State<GoogleMapsViewer> {
+  static const kGoogleApiKey = "AIzaSyCe-T7VrbtVqCLBNrgt1A0kxeTwnqFFKNA";
+  GoogleMapsPlaces _places = GoogleMapsPlaces(apiKey: kGoogleApiKey);
+  Completer<GoogleMapController> _controller = Completer();
+  Set<Marker> markerSet;
+  LatLng position;
+  CameraPosition _cameraPosition;
+
+  @override
+  void initState() {
+    super.initState();
+    position = new LatLng(0, 0);
+    _cameraPosition = CameraPosition(
+      target: position,
+    );
+    markerSet = new Set<Marker>();
+  }
+
+  void getInput() async {
+    Prediction p = await PlacesAutocomplete.show(
+      context: context,
+      apiKey: kGoogleApiKey,
+      mode: Mode.overlay,
+      language: "pt",
+    );
+    addressDetail = await _places.getDetailsByPlaceId(p.placeId);
+    addressResults = getAddressFields(addressDetail.result.addressComponents);
+    position = LatLng(addressDetail.result.geometry.location.lat,
+        addressDetail.result.geometry.location.lng);
+
+    _cameraPosition = CameraPosition(
+      target: position,
+      zoom: 16.0,
+    );
+    markerSet = new Set<Marker>();
+    markerSet.add(
+      Marker(markerId: MarkerId('0'), position: position),
+    );
+
+    setState(() {
+      markerSet = Set.from(markerSet);
+    });
+
+    final GoogleMapController controller = await _controller.future;
+    controller.animateCamera(CameraUpdate.newCameraPosition(_cameraPosition));
+  }
+
+  Widget getAddressFields(List<AddressComponent> result) {
+    List<Widget> textFieldList = new List<Widget>();
+    for (AddressComponent c in result) {
+      print(c.types);
+      if (c.types.contains('street_number'))
+        textFieldList.add(Text("Numero: ${c.longName}"));
+      else if (c.types.contains('route'))
+        textFieldList.add(Text("Rua: ${c.longName}"));
+      else if (c.types.contains('sublocality_level_1'))
+        textFieldList.add(Text("Bairro: ${c.longName}"));
+      else if (c.types.contains('administrative_area_level_2'))
+        textFieldList.add(Text("Cidade: ${c.longName}"));
+      else if (c.types.contains('administrative_area_level_1'))
+        textFieldList.add(Text("Estado: ${c.longName}"));
+      else if (c.types.contains('country'))
+        textFieldList.add(Text("Pais: ${c.longName}"));
+    }
+    return Column(children: textFieldList);
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return new Scaffold(
+      body: GoogleMap(
+        markers: markerSet,
+        mapType: MapType.normal,
+        initialCameraPosition: _cameraPosition,
+        onMapCreated: (GoogleMapController controller) {
+          _controller.complete(controller);
+          getInput();
+        },
+      ),
+      floatingActionButton: Column(mainAxisAlignment: MainAxisAlignment.end, crossAxisAlignment: CrossAxisAlignment.end, children: <Widget>[
+        FloatingActionButton.extended(
+          heroTag: null,
+          icon: Icon(Icons.map),
+          label: Text("Escolher"),
+          onPressed: getInput,
+        ),
+        Padding(padding: EdgeInsets.symmetric(vertical: 5),),
+        Row(crossAxisAlignment: CrossAxisAlignment.end, mainAxisAlignment: MainAxisAlignment.end, children: <Widget>[
+          FloatingActionButton(
+            heroTag: null,
+            child: Icon(Icons.check),
+            onPressed: () {Navigator.of(context).pop();},
+          ),
+          Padding(padding: EdgeInsets.symmetric(horizontal: 10),),
+          FloatingActionButton(
+            heroTag: null,
+            child: Icon(Icons.clear),
+            onPressed: () {
+              addressDetail = null;
+              addressResults = Container();
+              Navigator.of(context).pop();
+            },
+          ),
+        ],)
+      ],)
     );
   }
 }
