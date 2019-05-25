@@ -191,7 +191,10 @@ class DataModel extends Model {
           if (k == "city") city = v;
           if (k == "state") state = v;
           if (k == "description") description = v;
-          if (k == "imageUrl") thumbRef = v.toString();
+          if (k == "imageUrl"){
+            if(v==null) thumbRef = null;
+            else thumbRef = v.toString();
+          } 
           if (k == "detailImageUrls") imgRefs = List<String>.from(v);
     
         });
@@ -209,9 +212,16 @@ class DataModel extends Model {
 
     CollectionReference projectCollection = Firestore.instance.collection("projects");
 
-    StorageReference storageRef = FirebaseStorage.instance.ref().child(imgMini.toString());
-    StorageTaskSnapshot downloadUrl = await storageRef.putFile(imgMini).onComplete;
-    String urlMini = await downloadUrl.ref.getDownloadURL();
+    StorageReference storageRef;
+    StorageTaskSnapshot downloadUrl;
+    String urlMini;
+
+    if(imgMini!=null){
+      storageRef = FirebaseStorage.instance.ref().child(imgMini.toString());
+      downloadUrl = await storageRef.putFile(imgMini).onComplete;
+      urlMini = await downloadUrl.ref.getDownloadURL();
+    }else urlMini = null;
+    
     List<String> imgUrls = new List<String>();
     
     for(DisplayImage img in imgs){
