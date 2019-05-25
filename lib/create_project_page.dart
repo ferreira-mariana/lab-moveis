@@ -3,6 +3,11 @@ import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:lpdm_proj/models.dart';
 import 'package:scoped_model/scoped_model.dart';
+import 'package:flutter_google_places/flutter_google_places.dart';
+import 'package:google_maps_webservice/places.dart';
+
+const kGoogleApiKey = "AIzaSyCe-T7VrbtVqCLBNrgt1A0kxeTwnqFFKNA";
+GoogleMapsPlaces _places = GoogleMapsPlaces(apiKey: kGoogleApiKey);
 
 class CreateProjectPage extends StatefulWidget {
   @override
@@ -16,6 +21,8 @@ class _CreateProjectPageState extends State<CreateProjectPage> {
   String _stateText = '';
   File _image;
   List<DisplayImage> _imageList = new List<DisplayImage>();
+  Widget addressResults = new Container();
+  PlacesDetailsResponse addressDetail;
 
   addImage(File image) {
     if (_imageList.length < 5)
@@ -186,6 +193,20 @@ class _CreateProjectPageState extends State<CreateProjectPage> {
       },
     );
   }
+  
+  Widget getAddressFields(List<AddressComponent> result){
+    List<Widget> textFieldList = new List<Widget>();
+    for(AddressComponent c in result){
+      print(c.types);
+      if(c.types.contains('street_number')) textFieldList.add(Text("Numero: ${c.longName}"));
+      else if(c.types.contains('route')) textFieldList.add(Text("Rua: ${c.longName}"));
+      else if(c.types.contains('sublocality_level_1')) textFieldList.add(Text("Bairro: ${c.longName}"));
+      else if(c.types.contains('administrative_area_level_2')) textFieldList.add(Text("Cidade: ${c.longName}"));
+      else if(c.types.contains('administrative_area_level_1')) textFieldList.add(Text("Estado: ${c.longName}"));
+      else if(c.types.contains('country')) textFieldList.add(Text("Pais: ${c.longName}"));
+    }
+    return Column(children: textFieldList);
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -298,34 +319,33 @@ class _CreateProjectPageState extends State<CreateProjectPage> {
                     name: 'Descrição (Obrigatório)',
                     function: setDescriptionText,
                   ),
-                  CustomTextField(
-                    lines: 1,
-                    length: 30,
-                    name: 'Cidade (Obrigatório)',
-                    function: setCityText,
-                  ),
-                  CustomTextField(
-                    lines: 1,
-                    length: 30,
-                    name: 'Estado (Obrigatório)',
-                    function: setStateText,
-                  ),
+                  RaisedButton(child: Text("ENDEREÇO"), onPressed: () async{
+                    Prediction p = await PlacesAutocomplete.show(
+                      context: context,
+                      apiKey: kGoogleApiKey,
+                      mode: Mode.overlay,
+                      language: "pt",);
+                    addressDetail = await _places.getDetailsByPlaceId(p.placeId);
+                    setState(() {
+                      addressResults = getAddressFields(addressDetail.result.addressComponents);
+                    });
+                  },),
+                  addressResults,
                   Container(
                     padding:
                         EdgeInsets.symmetric(horizontal: 120, vertical: 10),
                     child: RaisedButton(
                       color: Theme.of(context).primaryColor,
                       child: Text("Enviar", style: TextStyle(color: Colors.white),),
-                      onPressed: () {
+                      onPressed: () async{
                         if (_nameText != '' &&
                             _descriptionText != '' &&
-                            _stateText != '' &&
-                            _cityText != '') {
+                            addressDetail != null) {
                           List<File> imageFileList = new List<File>();
                           for (DisplayImage image in _imageList) {
                             imageFileList.add(image.image);
                           }
-                          data.addProject(_nameText, _cityText, _stateText, _descriptionText, _image, _imageList);
+                          data.addProject(_nameText, addressDetail, _descriptionText, _image, _imageList);
                           Navigator.of(context).pop();
                         } else {
                           _showErrorDialog();

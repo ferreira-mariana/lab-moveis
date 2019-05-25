@@ -17,8 +17,7 @@ class AllProjectsPage extends StatefulWidget{
     ),
   );
 
-  final Widget sortProjects =
-  ScopedModelDescendant<DataModel>(builder: (context, child, data) {
+  final Widget sortProjects = ScopedModelDescendant<DataModel>(builder: (context, child, data) {
     List _dropDownItems = ['Nome', 'Cidade', 'Estado'];
 
     List<DropdownMenuItem<String>> getDropDownMenuItems() {
@@ -68,10 +67,10 @@ class _AllProjectsState extends State<AllProjectsPage> with AutomaticKeepAliveCl
     return (item.name
             .toLowerCase()
             .contains(_searchController.text.toLowerCase()) ||
-        item.city
+        item.cidade
             .toLowerCase()
             .contains(_searchController.text.toLowerCase()) ||
-        item.state
+        item.estado
             .toLowerCase()
             .contains(_searchController.text.toLowerCase()));
   }

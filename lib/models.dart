@@ -1,11 +1,11 @@
 import 'dart:io';
-
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:lpdm_proj/create_project_page.dart';
 import 'package:lpdm_proj/project_item.dart';
 import 'package:scoped_model/scoped_model.dart';
 import 'package:firebase_storage/firebase_storage.dart';
+import 'package:google_maps_webservice/places.dart';
 
 class UserModel extends Model {
   String _username;
@@ -74,21 +74,29 @@ class UserModel extends Model {
           for (DocumentSnapshot item in value.documents) {
             if (item.documentID == i) {
               String name;
-              String state;
-              String city;
+              String numero = "";
+              String rua = "";
+              String bairro = "";
+              String cidade = "";
+              String estado = "";
+              String pais = "";
               String description;
-              String imgRef;
+              String thumbRef;
+              List<String> imgRefs;
               List<String> detailImgRefs;
               item.data.forEach((k, v) {
                 if (k == "name") name = v;
-                if (k == "city") city = v;
-                if (k == "state") state = v;
-                if (k == "imageUrl") imgRef = v;
-                if (k == "detailImageUrls") detailImgRefs = List<String>.from(v);
+                if (k == "numero") numero = v;
+                if (k == "rua") rua = v;
+                if (k == "bairro") bairro = v;
+                if (k == "cidade") cidade = v;
+                if (k == "estado") estado = v;
+                if (k == "pais") pais = v;
                 if (k == "description") description = v;
+                if (k == "imageUrl") thumbRef = v.toString();
+                if (k == "detailImageUrls") imgRefs = List<String>.from(v);
               });
-              projList.add(ProjectItem(
-                  name, description, state, city, detailImgRefs, imgRef, item.documentID));
+              projList.add(ProjectItem(name, description, numero, rua, bairro, cidade, estado, pais,  item.documentID, imgRefs, thumbRef));
             }
           }
         });
@@ -139,12 +147,12 @@ class UserModel extends Model {
         break;
       case "Cidade":
         projList.sort((a, b) {
-          return a.city.toLowerCase().compareTo(b.city.toLowerCase());
+          return a.cidade.toLowerCase().compareTo(b.cidade.toLowerCase());
         });
         break;
       case "Estado":
         projList.sort((a, b) {
-          return a.state.toLowerCase().compareTo(b.state.toLowerCase());
+          return a.estado.toLowerCase().compareTo(b.estado.toLowerCase());
         });
         break;
     }
@@ -180,16 +188,24 @@ class DataModel extends Model {
     await query.then((value) {
       for (DocumentSnapshot item in value.documents) {
         String name;
-        String state;
-        String city;
+        String numero = "";
+        String rua = "";
+        String bairro = "";
+        String cidade = "";
+        String estado = "";
+        String pais = "";
         String description;
         String thumbRef;
         List<String> imgRefs;
 
         item.data.forEach((k, v) {
           if (k == "name") name = v;
-          if (k == "city") city = v;
-          if (k == "state") state = v;
+          if (k == "numero") numero = v;
+          if (k == "rua") rua = v;
+          if (k == "bairro") bairro = v;
+          if (k == "cidade") cidade = v;
+          if (k == "estado") estado = v;
+          if (k == "pais") pais = v;
           if (k == "description") description = v;
           if (k == "imageUrl"){
             if(v==null) thumbRef = null;
@@ -198,17 +214,31 @@ class DataModel extends Model {
           if (k == "detailImageUrls") imgRefs = List<String>.from(v);
     
         });
-        projList.add(ProjectItem(
-            name, description, state, city, imgRefs, thumbRef, item.documentID));
+        projList.add(ProjectItem(name, description, numero, rua, bairro, cidade, estado, pais,  item.documentID, imgRefs, thumbRef));
       }
     });
     _updated = true;
     notifyListeners();
   }
 
-  void addProject(String name, String city, String state, String description, File imgMini, List<DisplayImage> imgs) async{
+  void addProject(String name, PlacesDetailsResponse detail, String description, File imgMini, List<DisplayImage> imgs) async{
+    String numero = "";
+    String rua = "";
+    String bairro = "";
+    String cidade = "";
+    String estado = "";
+    String pais = "";
     _updated = false;
     notifyListeners();
+
+    for(AddressComponent c in detail.result.addressComponents){
+      if(c.types.contains('street_number')) numero = c.longName;
+      else if(c.types.contains('route')) rua = c.longName;
+      else if(c.types.contains('sublocality_level_1')) bairro = c.longName;
+      else if(c.types.contains('administrative_area_level_2')) cidade = c.longName;
+      else if(c.types.contains('administrative_area_level_1')) estado = c.longName;
+      else if(c.types.contains('country')) pais = c.longName;
+    }
 
     CollectionReference projectCollection = Firestore.instance.collection("projects");
 
@@ -223,7 +253,7 @@ class DataModel extends Model {
     }else urlMini = null;
     
     List<String> imgUrls = new List<String>();
-    
+
     for(DisplayImage img in imgs){
       storageRef = FirebaseStorage.instance.ref().child(img.image.toString());
       downloadUrl = await storageRef.putFile(img.image).onComplete;
@@ -231,8 +261,12 @@ class DataModel extends Model {
     }
     await projectCollection.add(<String, dynamic> {
       "name" : name,
-      "city" : city,
-      "state" : state,
+      "numero" : numero,
+      "rua" : rua,
+      "bairro" : bairro,
+      "cidade" : cidade,
+      "estado" : estado,
+      "pais" : pais,
       "description" : description,
       "imageUrl" : urlMini,
       "detailImageUrls" : imgUrls
@@ -255,12 +289,12 @@ class DataModel extends Model {
         break;
       case "Cidade":
         projList.sort((a, b) {
-          return a.city.toLowerCase().compareTo(b.city.toLowerCase());
+          return a.cidade.toLowerCase().compareTo(b.cidade.toLowerCase());
         });
         break;
       case "Estado":
         projList.sort((a, b) {
-          return a.state.toLowerCase().compareTo(b.state.toLowerCase());
+          return a.estado.toLowerCase().compareTo(b.estado.toLowerCase());
         });
         break;
     }

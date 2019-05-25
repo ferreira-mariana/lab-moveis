@@ -8,26 +8,41 @@ import 'package:cached_network_image/cached_network_image.dart';
 class ProjectItem extends StatefulWidget {
   final String _name;
   final String _detail;
-  final String _state;
-  final String _city;
+  final String _numero;
+  final String _rua;
+  final String _bairro;
+  final String _cidade;
+  final String _estado;
+  final String _pais;
   final String _projectId;
   final List<String> _imageList;
   final String _miniatureImage;
 
-  ProjectItem(this._name, this._detail, this._state, this._city,
-      this._imageList, this._miniatureImage, this._projectId);
+  ProjectItem(this._name, this._detail, this._numero, this._rua, this._bairro,
+      this._cidade, this._estado, this._pais, this._projectId, this._imageList,
+      this._miniatureImage);
 
   String get name => _name;
 
   String get detail => _detail;
 
-  List<String> get imageList => _imageList;
+  String get numero => _numero;
 
-  String get city => _city;
+  String get rua => _rua;
 
-  String get state => _state;
+  String get bairro => _bairro;
+
+  String get cidade => _cidade;
+
+  String get estado => _estado;
+
+  String get pais => _pais;
 
   String get projectId => _projectId;
+
+  List<String> get imageList => _imageList;
+
+  String get miniatureImage => _miniatureImage;
 
   @override
   State<StatefulWidget> createState() => _ProjectItemState();
@@ -73,8 +88,12 @@ class _ProjectItemState extends State<ProjectItem> {
                           Column(
                             children: <Widget>[
                               Text("Nome: " + widget._name),
-                              Text("Cidade: " + widget._city),
-                              Text("Estado: " + widget._state),
+                              widget._numero != "" ? Text("Numero: " + widget._numero) : Container(),
+                              widget._rua != "" ? Text("Rua: " + widget._rua) : Container(),
+                              widget._bairro != "" ? Text("Bairro: " + widget._bairro) : Container(),
+                              widget._cidade != "" ? Text("Cidade: " + widget._cidade) : Container(),
+                              widget._estado != "" ? Text("Estado: " + widget._estado) : Container(),
+                              widget._pais != "" ? Text("Pais: " + widget._pais) : Container(),
                             ],
                           ),
                         ],
