@@ -1,3 +1,7 @@
+import 'dart:async';
+
+import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:google_maps_webservice/places.dart';
 import 'package:lpdm_proj/models.dart';
 import 'package:photo_view/photo_view.dart';
 import 'package:flutter/material.dart';
@@ -6,6 +10,7 @@ import 'package:flutter_advanced_networkimage/provider.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 
 class ProjectItem extends StatefulWidget {
+  final String _placeid;
   final String _name;
   final String _detail;
   final String _numero;
@@ -18,8 +23,18 @@ class ProjectItem extends StatefulWidget {
   final List<String> _imageList;
   final String _miniatureImage;
 
-  ProjectItem(this._name, this._detail, this._numero, this._rua, this._bairro,
-      this._cidade, this._estado, this._pais, this._projectId, this._imageList,
+  ProjectItem(
+      this._placeid,
+      this._name,
+      this._detail,
+      this._numero,
+      this._rua,
+      this._bairro,
+      this._cidade,
+      this._estado,
+      this._pais,
+      this._projectId,
+      this._imageList,
       this._miniatureImage);
 
   String get name => _name;
@@ -38,6 +53,8 @@ class ProjectItem extends StatefulWidget {
 
   String get pais => _pais;
 
+  String get placeid => _placeid;
+
   String get projectId => _projectId;
 
   List<String> get imageList => _imageList;
@@ -49,7 +66,6 @@ class ProjectItem extends StatefulWidget {
 }
 
 class _ProjectItemState extends State<ProjectItem> {
-
   @override
   Widget build(BuildContext context) {
     return ScopedModelDescendant<UserModel>(
@@ -64,6 +80,7 @@ class _ProjectItemState extends State<ProjectItem> {
                           context,
                           MaterialPageRoute(builder: (context) {
                             return ProjectDetail(
+                                widget._placeid,
                                 widget._name,
                                 widget._detail,
                                 widget._imageList,
@@ -78,9 +95,9 @@ class _ProjectItemState extends State<ProjectItem> {
                           widget._miniatureImage == null
                               ? Icon(Icons.image, size: 80)
                               : CachedNetworkImage(
-                                imageUrl: widget._miniatureImage,
-                                height: 80,
-                                width: 80,
+                                  imageUrl: widget._miniatureImage,
+                                  height: 80,
+                                  width: 80,
                                 ),
                           Padding(
                             padding: EdgeInsets.symmetric(horizontal: 5),
@@ -88,12 +105,24 @@ class _ProjectItemState extends State<ProjectItem> {
                           Column(
                             children: <Widget>[
                               Text("Nome: " + widget._name),
-                              widget._numero != "" ? Text("Numero: " + widget._numero) : Container(),
-                              widget._rua != "" ? Text("Rua: " + widget._rua) : Container(),
-                              widget._bairro != "" ? Text("Bairro: " + widget._bairro) : Container(),
-                              widget._cidade != "" ? Text("Cidade: " + widget._cidade) : Container(),
-                              widget._estado != "" ? Text("Estado: " + widget._estado) : Container(),
-                              widget._pais != "" ? Text("Pais: " + widget._pais) : Container(),
+                              widget._numero != ""
+                                  ? Text("Numero: " + widget._numero)
+                                  : Container(),
+                              widget._rua != ""
+                                  ? Text("Rua: " + widget._rua)
+                                  : Container(),
+                              widget._bairro != ""
+                                  ? Text("Bairro: " + widget._bairro)
+                                  : Container(),
+                              widget._cidade != ""
+                                  ? Text("Cidade: " + widget._cidade)
+                                  : Container(),
+                              widget._estado != ""
+                                  ? Text("Estado: " + widget._estado)
+                                  : Container(),
+                              widget._pais != ""
+                                  ? Text("Pais: " + widget._pais)
+                                  : Container(),
                             ],
                           ),
                         ],
@@ -110,35 +139,71 @@ class _ProjectItemState extends State<ProjectItem> {
 
 //tela dos detalhes de um projeto
 class ProjectDetail extends StatefulWidget {
+  final String _placeid;
   final String _name;
   final String _detail;
   final String _projectId;
   final List<String> _imageList;
   final Function _checkUserSubscription;
 
-  ProjectDetail(this._name, this._detail, this._imageList, this._projectId,
-      this._checkUserSubscription);
+  ProjectDetail(this._placeid, this._name, this._detail, this._imageList,
+      this._projectId, this._checkUserSubscription);
 
   @override
   _ProjectDetailState createState() => new _ProjectDetailState();
 }
 
 class _ProjectDetailState extends State<ProjectDetail> {
+  static const kGoogleApiKey = "AIzaSyCe-T7VrbtVqCLBNrgt1A0kxeTwnqFFKNA";
+  GoogleMapsPlaces _places = GoogleMapsPlaces(apiKey: kGoogleApiKey);
   String _buttonName = 'INSCREVA-SE';
   Color _buttonColor = Colors.blue;
   Color _buttonTextColor = Colors.white;
   Widget subscribeButton;
   bool subscribed;
+  Completer<GoogleMapController> _controller = Completer();
+  LatLng position;
+  CameraPosition _cameraPosition;
+  Set<Marker> markerSet;
 
   @override
   void initState() {
     super.initState();
+    position = LatLng(0,0);
+    _cameraPosition = new CameraPosition(target: position);
     checkSubscription(widget._checkUserSubscription);
+    //initGoogleMap();
+  }
+
+  void initGoogleMap() async {
+    markerSet = new Set<Marker>();
+    print("aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa");
+    print(widget._placeid);
+    var addressDetail = await _places.getDetailsByPlaceId(widget._placeid);
+    print(addressDetail.result.toString());
+    position = LatLng(addressDetail.result.geometry.location.lat,
+        addressDetail.result.geometry.location.lng);
+
+    _cameraPosition = CameraPosition(
+      target: position,
+      zoom: 16.0,
+    );
+
+    markerSet.add(
+      Marker(markerId: MarkerId('0'), position: position),
+    );
+
+    setState(() {
+      markerSet = Set.from(markerSet);
+    });
+
+    final GoogleMapController controller = await _controller.future;
+    controller.animateCamera(CameraUpdate.newCameraPosition(_cameraPosition));
   }
 
   checkSubscription(checkUserSubscription) {
     setState(() {
-      subscribeButton = CircularProgressIndicator(); 
+      subscribeButton = CircularProgressIndicator();
     });
     checkUserSubscription(widget._projectId).then((onValue) {
       subscribed = onValue;
@@ -188,7 +253,8 @@ class _ProjectDetailState extends State<ProjectDetail> {
                             itemBuilder: (BuildContext context, int index) =>
                                 FlatButton(
                                     child: CachedNetworkImage(
-                                      imageUrl: widget._imageList[index],//)//Image.network(
+                                      imageUrl: widget._imageList[
+                                          index], //)//Image.network(
                                       //widget._imageList[index]
                                     ),
                                     onPressed: () {
@@ -197,7 +263,11 @@ class _ProjectDetailState extends State<ProjectDetail> {
                                         MaterialPageRoute(
                                           builder: (context) => Container(
                                                 child: PhotoView(
-                                                  imageProvider: AdvancedNetworkImage(widget._imageList[index], useDiskCache: true),
+                                                  imageProvider:
+                                                      AdvancedNetworkImage(
+                                                          widget._imageList[
+                                                              index],
+                                                          useDiskCache: true),
                                                 ),
                                               ),
                                         ),
@@ -211,6 +281,19 @@ class _ProjectDetailState extends State<ProjectDetail> {
                   child: Text(
                     widget._detail,
                     style: TextStyle(fontSize: 16.0),
+                  ),
+                ),
+                SizedBox(
+                  width: 100,
+                  height: 200,
+                  child: GoogleMap(
+                    markers: markerSet,
+                    mapType: MapType.normal,
+                    initialCameraPosition: _cameraPosition,
+                    onMapCreated: (GoogleMapController controller) {
+                      _controller.complete(controller);
+                      initGoogleMap();
+                    },
                   ),
                 ),
                 Center(
@@ -227,7 +310,9 @@ class _ProjectDetailState extends State<ProjectDetail> {
     return ScopedModelDescendant<UserModel>(
       builder: (context, child, user) => RaisedButton(
             onPressed: () {
-              setState(() {subscribeButton = CircularProgressIndicator();});
+              setState(() {
+                subscribeButton = CircularProgressIndicator();
+              });
               if (!subscribed) {
                 user.subscribeToProject(widget._projectId).then((onValue) {
                   checkSubscription(user.checkSubscription);

@@ -19,10 +19,14 @@ class CreateProjectPage extends StatefulWidget {
 class _CreateProjectPageState extends State<CreateProjectPage> {
   String _nameText = '';
   String _descriptionText = '';
-  String _cityText = '';
-  String _stateText = '';
   File _image;
   List<DisplayImage> _imageList = new List<DisplayImage>();
+
+  @override
+  void initState() {
+    addressDetail = null;
+    addressResults = new Container();
+  }
 
   addImage(File image) {
     if (_imageList.length < 5)
@@ -73,14 +77,6 @@ class _CreateProjectPageState extends State<CreateProjectPage> {
 
   void setDescriptionText(String text) {
     _descriptionText = text;
-  }
-
-  void setCityText(String text) {
-    _cityText = text;
-  }
-
-  void setStateText(String text) {
-    _stateText = text;
   }
 
   void _showErrorDialog() {
@@ -306,7 +302,11 @@ class _CreateProjectPageState extends State<CreateProjectPage> {
                     function: setDescriptionText,
                   ),
                   RaisedButton(
-                    child: Text("ENDEREÇO"),
+                    color: Colors.deepPurple,
+                    child: Text(
+                      "ENDEREÇO (Obrigatório)",
+                      style: TextStyle(color: Colors.white),
+                    ),
                     onPressed: () async {
                       Navigator.push(
                         context,
@@ -474,6 +474,8 @@ class _GoogleMapsViewerState extends State<GoogleMapsViewer> {
       mode: Mode.overlay,
       language: "pt",
     );
+    if(p == null) return;
+    print(p.placeId);
     addressDetail = await _places.getDetailsByPlaceId(p.placeId);
     addressResults = getAddressFields(addressDetail.result.addressComponents);
     position = LatLng(addressDetail.result.geometry.location.lat,
@@ -498,20 +500,52 @@ class _GoogleMapsViewerState extends State<GoogleMapsViewer> {
 
   Widget getAddressFields(List<AddressComponent> result) {
     List<Widget> textFieldList = new List<Widget>();
+    String numero = "";
+    String rua = "";
+    String bairro = "";
+    String cidade = "";
+    String estado = "";
+    String pais = "";
+
     for (AddressComponent c in result) {
-      print(c.types);
       if (c.types.contains('street_number'))
-        textFieldList.add(Text("Numero: ${c.longName}"));
+        numero = c.longName;
       else if (c.types.contains('route'))
-        textFieldList.add(Text("Rua: ${c.longName}"));
+        rua = c.longName;
       else if (c.types.contains('sublocality_level_1'))
-        textFieldList.add(Text("Bairro: ${c.longName}"));
+        bairro = c.longName;
       else if (c.types.contains('administrative_area_level_2'))
-        textFieldList.add(Text("Cidade: ${c.longName}"));
+        cidade = c.longName;
       else if (c.types.contains('administrative_area_level_1'))
-        textFieldList.add(Text("Estado: ${c.longName}"));
-      else if (c.types.contains('country'))
-        textFieldList.add(Text("Pais: ${c.longName}"));
+        estado = c.longName;
+      else if (c.types.contains('country')) pais = c.longName;
+    }
+
+    if (rua != "") {
+      String temp = "";
+      temp += rua;
+      if (numero != "") {
+        temp += ", " + numero;
+      }
+      textFieldList.add(CustomTextBox(temp));
+    }
+    if (bairro != "") {
+      String temp = "";
+      temp += bairro + ", " + cidade;
+      textFieldList.add(CustomTextBox(temp));
+    } else if (cidade != "") {
+      String temp = "";
+      temp += cidade;
+      textFieldList.add(CustomTextBox(temp));
+    }
+    if (estado != "") {
+      String temp = "";
+      temp += estado + " - " + pais;
+      textFieldList.add(CustomTextBox(temp));
+    } else if (pais != "") {
+      String temp = "";
+      temp += pais;
+      textFieldList.add(CustomTextBox(temp));
     }
     return Column(children: textFieldList);
   }
@@ -528,32 +562,71 @@ class _GoogleMapsViewerState extends State<GoogleMapsViewer> {
           getInput();
         },
       ),
-      floatingActionButton: Column(mainAxisAlignment: MainAxisAlignment.end, crossAxisAlignment: CrossAxisAlignment.end, children: <Widget>[
-        FloatingActionButton.extended(
-          heroTag: null,
-          icon: Icon(Icons.map),
-          label: Text("Escolher"),
-          onPressed: getInput,
-        ),
-        Padding(padding: EdgeInsets.symmetric(vertical: 5),),
-        Row(crossAxisAlignment: CrossAxisAlignment.end, mainAxisAlignment: MainAxisAlignment.end, children: <Widget>[
-          FloatingActionButton(
+      floatingActionButton: Column(
+        mainAxisAlignment: MainAxisAlignment.end,
+        crossAxisAlignment: CrossAxisAlignment.end,
+        children: <Widget>[
+          FloatingActionButton.extended(
             heroTag: null,
-            child: Icon(Icons.check),
-            onPressed: () {Navigator.of(context).pop();},
+            icon: Icon(Icons.map),
+            label: Text("Escolher"),
+            onPressed: getInput,
           ),
-          Padding(padding: EdgeInsets.symmetric(horizontal: 10),),
-          FloatingActionButton(
-            heroTag: null,
-            child: Icon(Icons.clear),
-            onPressed: () {
-              addressDetail = null;
-              addressResults = Container();
-              Navigator.of(context).pop();
-            },
+          Padding(
+            padding: EdgeInsets.symmetric(vertical: 5),
           ),
-        ],)
-      ],)
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.end,
+            mainAxisAlignment: MainAxisAlignment.end,
+            children: <Widget>[
+              FloatingActionButton(
+                heroTag: null,
+                child: Icon(Icons.check),
+                onPressed: () {
+                  Navigator.of(context).pop();
+                },
+              ),
+              Padding(
+                padding: EdgeInsets.symmetric(horizontal: 10),
+              ),
+              FloatingActionButton(
+                heroTag: null,
+                child: Icon(Icons.clear),
+                onPressed: () {
+                  addressDetail = null;
+                  addressResults = Container();
+                  Navigator.of(context).pop();
+                },
+              ),
+            ],
+          )
+        ],
+      ),
     );
   }
+}
+
+class CustomTextBox extends StatelessWidget {
+  final String text;
+
+  CustomTextBox(this.text);
+
+  @override
+  Widget build(BuildContext context) => Container(
+        padding: EdgeInsets.fromLTRB(10, 10, 10, 0),
+        child: Container(
+          alignment: Alignment(0, 0),
+          decoration: BoxDecoration(
+            border: Border.all(),
+            borderRadius: BorderRadius.circular(20),
+          ),
+          padding: EdgeInsets.symmetric(horizontal: 20),
+          child: RichText(
+            text: TextSpan(
+              text: text,
+              style: TextStyle(fontSize: 18, color: Colors.black),
+            ),
+          ),
+        ),
+      );
 }

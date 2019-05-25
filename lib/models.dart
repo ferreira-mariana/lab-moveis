@@ -80,6 +80,7 @@ class UserModel extends Model {
               String cidade = "";
               String estado = "";
               String pais = "";
+              String placeid = "";
               String description;
               String thumbRef;
               List<String> imgRefs;
@@ -92,6 +93,7 @@ class UserModel extends Model {
                 if (k == "cidade") cidade = v;
                 if (k == "estado") estado = v;
                 if (k == "pais") pais = v;
+                if (k == "placeid") placeid = v;
                 if (k == "description") description = v;
                 if (k == "imageUrl") {
                   if(v==null) thumbRef = null;
@@ -99,7 +101,7 @@ class UserModel extends Model {
                 }
                 if (k == "detailImageUrls") imgRefs = List<String>.from(v);
               });
-              projList.add(ProjectItem(name, description, numero, rua, bairro, cidade, estado, pais,  item.documentID, imgRefs, thumbRef));
+              projList.add(ProjectItem(placeid, name, description, numero, rua, bairro, cidade, estado, pais,  item.documentID, imgRefs, thumbRef));
             }
           }
         });
@@ -197,6 +199,7 @@ class DataModel extends Model {
         String cidade = "";
         String estado = "";
         String pais = "";
+        String placeid = "";
         String description;
         String thumbRef;
         List<String> imgRefs;
@@ -209,6 +212,7 @@ class DataModel extends Model {
           if (k == "cidade") cidade = v;
           if (k == "estado") estado = v;
           if (k == "pais") pais = v;
+          if (k == 'placeid') placeid = v;
           if (k == "description") description = v;
           if (k == "imageUrl"){
             if(v==null) thumbRef = null;
@@ -217,7 +221,7 @@ class DataModel extends Model {
           if (k == "detailImageUrls") imgRefs = List<String>.from(v);
     
         });
-        projList.add(ProjectItem(name, description, numero, rua, bairro, cidade, estado, pais,  item.documentID, imgRefs, thumbRef));
+        projList.add(ProjectItem(placeid, name, description, numero, rua, bairro, cidade, estado, pais,  item.documentID, imgRefs, thumbRef));
       }
     });
     _updated = true;
@@ -270,6 +274,7 @@ class DataModel extends Model {
       "cidade" : cidade,
       "estado" : estado,
       "pais" : pais,
+      "placeid" : detail.result.placeId,
       "description" : description,
       "imageUrl" : urlMini,
       "detailImageUrls" : imgUrls
