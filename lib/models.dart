@@ -93,7 +93,10 @@ class UserModel extends Model {
                 if (k == "estado") estado = v;
                 if (k == "pais") pais = v;
                 if (k == "description") description = v;
-                if (k == "imageUrl") thumbRef = v.toString();
+                if (k == "imageUrl") {
+                  if(v==null) thumbRef = null;
+                  else thumbRef = v.toString();
+                }
                 if (k == "detailImageUrls") imgRefs = List<String>.from(v);
               });
               projList.add(ProjectItem(name, description, numero, rua, bairro, cidade, estado, pais,  item.documentID, imgRefs, thumbRef));
