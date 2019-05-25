@@ -74,10 +74,10 @@ class _UserProjectsState extends State<UserProjectsPage>
     return (item.name
             .toLowerCase()
             .contains(_searchController.text.toLowerCase()) ||
-        item.city
+        item.cidade
             .toLowerCase()
             .contains(_searchController.text.toLowerCase()) ||
-        item.state
+        item.estado
             .toLowerCase()
             .contains(_searchController.text.toLowerCase()));
   }
