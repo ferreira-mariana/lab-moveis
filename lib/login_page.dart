@@ -19,6 +19,7 @@ class _LoginPageState extends State<LoginPage> {
 
   _signIn() async {
     GoogleSignInAccount googleSignInAccount = await googleSignIn.signIn();
+    if(googleSignInAccount == null) return;
     GoogleSignInAuthentication gSA = await googleSignInAccount.authentication;
 
     final AuthCredential credential = GoogleAuthProvider.getCredential(

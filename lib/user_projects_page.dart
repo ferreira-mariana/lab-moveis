@@ -63,6 +63,7 @@ class UserProjectsPage extends StatefulWidget {
 class _UserProjectsState extends State<UserProjectsPage>
     with AutomaticKeepAliveClientMixin {
   TextEditingController _searchController;
+  int bottomIndex = 0;
 
   @override
   void initState() {
@@ -114,11 +115,44 @@ class _UserProjectsState extends State<UserProjectsPage>
                   ),
                 ),
                 Expanded(
-                  child: user.isUpdated
-                      ? DragAndDropList(
-                          user.projList.length + 1,
+                  child: bottomIndex == 0
+                      ? user.isUpdated
+                          ? DragAndDropList(
+                              user.projList.length + 1,
+                              itemBuilder: (BuildContext context, item) {
+                                if (item == user.projList.length) {
+                                  return new SizedBox(
+                                    height: 80,
+                                    child: Center(
+                                      child: Text("Fim"),
+                                    ),
+                                  );
+                                } else {
+                                  return new SizedBox(
+                                    child: searchItemInList(user.projList[item])
+                                        ? user.projList[item]
+                                        : Container(),
+                                  );
+                                }
+                              },
+                              onDragFinish: (before, after) {
+                                ProjectItem item = user.projList[before];
+                                user.projList.removeAt(before);
+                                user.projList.insert(after, item);
+                              },
+                              canBeDraggedTo: (one, two) {
+                                return two != user.projList.length - 1;
+                              },
+                              canDrag: (item) {
+                                return item != user.projList.length;
+                              },
+                              dragElevation: 8.0,
+                            )
+                          : Center(child: CircularProgressIndicator())
+                      : DragAndDropList(
+                          user.createdProjList.length + 1,
                           itemBuilder: (BuildContext context, item) {
-                            if (item == user.projList.length) {
+                            if (item == user.createdProjList.length) {
                               return new SizedBox(
                                 height: 80,
                                 child: Center(
@@ -127,27 +161,45 @@ class _UserProjectsState extends State<UserProjectsPage>
                               );
                             } else {
                               return new SizedBox(
-                                child: searchItemInList(user.projList[item])
-                                    ? user.projList[item]
-                                    : Container(),
+                                child:
+                                    searchItemInList(user.createdProjList[item])
+                                        ? user.createdProjList[item]
+                                        : Container(),
                               );
                             }
                           },
                           onDragFinish: (before, after) {
-                            ProjectItem item = user.projList[before];
-                            user.projList.removeAt(before);
-                            user.projList.insert(after, item);
+                            ProjectItem item = user.createdProjList[before];
+                            user.createdProjList.removeAt(before);
+                            user.createdProjList.insert(after, item);
                           },
                           canBeDraggedTo: (one, two) {
-                            return two != user.projList.length - 1;
+                            return two != user.createdProjList.length - 1;
                           },
                           canDrag: (item) {
-                            return item != user.projList.length;
+                            return item != user.createdProjList.length;
                           },
                           dragElevation: 8.0,
-                        )
-                      : Center(child: CircularProgressIndicator()),
+                        ),
                 ),
+              ],
+            ),
+            bottomNavigationBar: BottomNavigationBar(
+              currentIndex: bottomIndex,
+              onTap: (int) {
+                setState(() {
+                  bottomIndex = int;
+                });
+              },
+              items: <BottomNavigationBarItem>[
+                BottomNavigationBarItem(
+                    backgroundColor: Colors.deepPurple,
+                    title: Text("Inscritos"),
+                    icon: Icon(Icons.add, size: 0,),),
+                BottomNavigationBarItem(
+                    backgroundColor: Colors.deepPurple,
+                    title: Text("Criados"),
+                    icon: Icon(Icons.add, size: 0,),),
               ],
             ),
           ),

@@ -10,7 +10,7 @@ import 'package:flutter_advanced_networkimage/provider.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 
 class ProjectItem extends StatefulWidget {
-  final String _placeid;
+  final String _placeId;
   final String _name;
   final String _detail;
   final String _numero;
@@ -24,7 +24,7 @@ class ProjectItem extends StatefulWidget {
   final String _miniatureImage;
 
   ProjectItem(
-      this._placeid,
+      this._placeId,
       this._name,
       this._detail,
       this._numero,
@@ -53,7 +53,7 @@ class ProjectItem extends StatefulWidget {
 
   String get pais => _pais;
 
-  String get placeid => _placeid;
+  String get placeid => _placeId;
 
   String get projectId => _projectId;
 
@@ -80,52 +80,93 @@ class _ProjectItemState extends State<ProjectItem> {
                           context,
                           MaterialPageRoute(builder: (context) {
                             return ProjectDetail(
-                                widget._placeid,
+                                widget._placeId,
                                 widget._name,
                                 widget._detail,
                                 widget._imageList,
                                 widget._projectId,
-                                user.checkSubscription);
+                                user.checkSubscription,
+                                user.checkCreation);
                           }),
                         );
                       },
-                      child: //Padding(
-                          Row(
-                        children: <Widget>[
-                          widget._miniatureImage == null
-                              ? Icon(Icons.image, size: 80)
-                              : CachedNetworkImage(
-                                  imageUrl: widget._miniatureImage,
-                                  height: 80,
-                                  width: 80,
+                      child: SingleChildScrollView(
+                        child: Row(
+                          children: <Widget>[
+                            widget._miniatureImage == null
+                                ? Icon(Icons.image, size: 80)
+                                : CachedNetworkImage(
+                                    placeholder: (context, string) =>
+                                        CircularProgressIndicator(),
+                                    fadeInDuration: Duration(seconds: 3),
+                                    fadeOutDuration: Duration(seconds: 2),
+                                    imageUrl: widget._miniatureImage,
+                                    height: 80,
+                                    width: 80,
+                                  ),
+                            Padding(
+                              padding: EdgeInsets.symmetric(horizontal: 5),
+                            ),
+                            Expanded(
+                              child: SingleChildScrollView(
+                                scrollDirection: Axis.horizontal,
+                                child: Container(
+                                  child: Column(
+                                    children: <Widget>[
+                                      Text(
+                                        "Nome: " + widget._name,
+                                        overflow: TextOverflow.fade,
+                                        softWrap: false,
+                                      ),
+                                      widget._numero != ""
+                                          ? Text(
+                                              "Numero: " + widget._numero,
+                                              overflow: TextOverflow.fade,
+                                              softWrap: false,
+                                            )
+                                          : Container(),
+                                      widget._rua != ""
+                                          ? Text(
+                                              "Rua: " + widget._rua,
+                                              overflow: TextOverflow.fade,
+                                              softWrap: false,
+                                            )
+                                          : Container(),
+                                      widget._bairro != ""
+                                          ? Text(
+                                              "Bairro: " + widget._bairro,
+                                              overflow: TextOverflow.fade,
+                                              softWrap: false,
+                                            )
+                                          : Container(),
+                                      widget._cidade != ""
+                                          ? Text(
+                                              "Cidade: " + widget._cidade,
+                                              overflow: TextOverflow.fade,
+                                              softWrap: false,
+                                            )
+                                          : Container(),
+                                      widget._estado != ""
+                                          ? Text(
+                                              "Estado: " + widget._estado,
+                                              overflow: TextOverflow.fade,
+                                              softWrap: false,
+                                            )
+                                          : Container(),
+                                      widget._pais != ""
+                                          ? Text(
+                                              "Pais: " + widget._pais,
+                                              overflow: TextOverflow.fade,
+                                              softWrap: false,
+                                            )
+                                          : Container(),
+                                    ],
+                                  ),
                                 ),
-                          Padding(
-                            padding: EdgeInsets.symmetric(horizontal: 5),
-                          ),
-                          Column(
-                            children: <Widget>[
-                              Text("Nome: " + widget._name),
-                              widget._numero != ""
-                                  ? Text("Numero: " + widget._numero)
-                                  : Container(),
-                              widget._rua != ""
-                                  ? Text("Rua: " + widget._rua)
-                                  : Container(),
-                              widget._bairro != ""
-                                  ? Text("Bairro: " + widget._bairro)
-                                  : Container(),
-                              widget._cidade != ""
-                                  ? Text("Cidade: " + widget._cidade)
-                                  : Container(),
-                              widget._estado != ""
-                                  ? Text("Estado: " + widget._estado)
-                                  : Container(),
-                              widget._pais != ""
-                                  ? Text("Pais: " + widget._pais)
-                                  : Container(),
-                            ],
-                          ),
-                        ],
+                              ),
+                            ),
+                          ],
+                        ),
                       ),
                     ),
                   ),
@@ -139,15 +180,16 @@ class _ProjectItemState extends State<ProjectItem> {
 
 //tela dos detalhes de um projeto
 class ProjectDetail extends StatefulWidget {
-  final String _placeid;
+  final String _placeId;
   final String _name;
   final String _detail;
   final String _projectId;
   final List<String> _imageList;
   final Function _checkUserSubscription;
+  final Function _checkUserCreation;
 
-  ProjectDetail(this._placeid, this._name, this._detail, this._imageList,
-      this._projectId, this._checkUserSubscription);
+  ProjectDetail(this._placeId, this._name, this._detail, this._imageList,
+      this._projectId, this._checkUserSubscription, this._checkUserCreation);
 
   @override
   _ProjectDetailState createState() => new _ProjectDetailState();
@@ -161,6 +203,7 @@ class _ProjectDetailState extends State<ProjectDetail> {
   Color _buttonTextColor = Colors.white;
   Widget subscribeButton;
   bool subscribed;
+  bool creator = false;
   Completer<GoogleMapController> _controller = Completer();
   LatLng position;
   CameraPosition _cameraPosition;
@@ -169,18 +212,16 @@ class _ProjectDetailState extends State<ProjectDetail> {
   @override
   void initState() {
     super.initState();
-    position = LatLng(0,0);
+    position = LatLng(0, 0);
     _cameraPosition = new CameraPosition(target: position);
     checkSubscription(widget._checkUserSubscription);
+    checkCreation(widget._checkUserCreation);
     //initGoogleMap();
   }
 
   void initGoogleMap() async {
     markerSet = new Set<Marker>();
-    print("aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa");
-    print(widget._placeid);
-    var addressDetail = await _places.getDetailsByPlaceId(widget._placeid);
-    print(addressDetail.result.toString());
+    var addressDetail = await _places.getDetailsByPlaceId(widget._placeId);
     position = LatLng(addressDetail.result.geometry.location.lat,
         addressDetail.result.geometry.location.lng);
 
@@ -201,6 +242,14 @@ class _ProjectDetailState extends State<ProjectDetail> {
     controller.animateCamera(CameraUpdate.newCameraPosition(_cameraPosition));
   }
 
+  checkCreation(checkUserCreation) {
+    checkUserCreation(widget._projectId).then((onValue) {
+      setState(() {
+        creator = onValue;
+      });
+    });
+  }
+
   checkSubscription(checkUserSubscription) {
     setState(() {
       subscribeButton = CircularProgressIndicator();
@@ -213,7 +262,6 @@ class _ProjectDetailState extends State<ProjectDetail> {
           _buttonColor = Colors.deepPurpleAccent;
           _buttonTextColor = Colors.white;
         } else {
-          //adiciona o projeto aos inscritos
           _buttonName = 'INSCRITO';
           _buttonColor = Colors.grey;
           _buttonTextColor = Colors.grey[700];
@@ -226,8 +274,36 @@ class _ProjectDetailState extends State<ProjectDetail> {
   @override
   Widget build(BuildContext context) {
     return ScopedModelDescendant<UserModel>(
-      builder: (context, child, user) => Scaffold(
+      builder: (context, child, user) => ScopedModelDescendant<DataModel>(
+      builder: (context, child, data) => Scaffold(
             appBar: AppBar(
+              actions: <Widget>[
+                creator == true ? FlatButton(
+                  child: Icon(
+                    Icons.delete,
+                    color: Colors.white,
+                  ),
+                  onPressed: () {
+                    showDialog(context: context, builder: (context){
+                      return AlertDialog(
+                        actions: <Widget>[
+                          FlatButton(
+                            onPressed: () {
+                              Navigator.of(context).pop();
+                            },
+                            child: Text("Ok"),
+                          )
+                        ],
+                        title: Text("Não implementado"),
+                        content: Text("A exclusão de projetos ainda não funciona pois não sei como fazer deletar o projeto de todos os usuários inscritos"),
+                      );
+                    });
+                    /*data.deleteProject(widget._projectId);
+                    user.updateUserProjects();
+                    Navigator.of(context).pop();*/
+                  },
+                ) : Container(),
+              ],
               title: Text(widget._name),
             ),
             body: ListView(
@@ -252,27 +328,28 @@ class _ProjectDetailState extends State<ProjectDetail> {
                             itemCount: widget._imageList.length,
                             itemBuilder: (BuildContext context, int index) =>
                                 FlatButton(
-                                    child: CachedNetworkImage(
-                                      imageUrl: widget._imageList[
-                                          index], //)//Image.network(
-                                      //widget._imageList[index]
-                                    ),
-                                    onPressed: () {
-                                      Navigator.push(
-                                        context,
-                                        MaterialPageRoute(
-                                          builder: (context) => Container(
-                                                child: PhotoView(
-                                                  imageProvider:
-                                                      AdvancedNetworkImage(
-                                                          widget._imageList[
-                                                              index],
-                                                          useDiskCache: true),
-                                                ),
+                                  child: CachedNetworkImage(
+                                    imageUrl: widget
+                                        ._imageList[index], //)//Image.network(
+                                    //widget._imageList[index]
+                                  ),
+                                  onPressed: () {
+                                    Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder: (context) => Container(
+                                              child: PhotoView(
+                                                imageProvider:
+                                                    AdvancedNetworkImage(
+                                                        widget
+                                                            ._imageList[index],
+                                                        useDiskCache: true),
                                               ),
-                                        ),
-                                      );
-                                    }),
+                                            ),
+                                      ),
+                                    );
+                                  },
+                                ),
                           ),
                         ),
                 ),
@@ -302,7 +379,7 @@ class _ProjectDetailState extends State<ProjectDetail> {
               ],
             ),
           ),
-    );
+      ),);
   }
 
   //botao para inscrever-se no projeto

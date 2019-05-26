@@ -1,5 +1,6 @@
 import 'dart:io';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:lpdm_proj/create_project_page.dart';
 import 'package:lpdm_proj/project_item.dart';
@@ -14,6 +15,7 @@ class UserModel extends Model {
   String _imgUrl;
   bool _updated = false;
   List<ProjectItem> _projList = new List<ProjectItem>();
+  List<ProjectItem> _createdProjList = new List<ProjectItem>();
 
   String get username => _username;
 
@@ -29,7 +31,6 @@ class UserModel extends Model {
     notifyListeners();
   }
 
-
   String get imgUrl => _imgUrl;
 
   set imgUrl(String value) {
@@ -41,6 +42,8 @@ class UserModel extends Model {
 
   List<ProjectItem> get projList => _projList;
 
+  List<ProjectItem> get createdProjList => _createdProjList;
+
   createUserDocument() async{
     _updated = false;
     notifyListeners();
@@ -50,6 +53,8 @@ class UserModel extends Model {
       if(!onValue.exists) {
         await userProjects.setData(<String, dynamic> {
           "projects" : new List<String>(),
+          "created_projects" : new List<String>(),
+          "bio" : "",
         });
       }
     });
@@ -62,50 +67,53 @@ class UserModel extends Model {
     notifyListeners();
 
     List<String> projects;
+    List<String> createdProjects;
     DocumentReference userDocument = Firestore.instance.collection("users").document(_uid);
     await userDocument.get().then((onValue) async {
       projects = List.from(onValue['projects']);
+      createdProjects = List.from(onValue['created_projects']);
       projList.clear();
-      for (String i in projects) {
-        CollectionReference projectCollection = Firestore.instance.collection("projects");
-        Future<QuerySnapshot> query = projectCollection.getDocuments();
+      createdProjList.clear();
+      CollectionReference projectCollection = Firestore.instance.collection("projects");
+      Future<QuerySnapshot> query = projectCollection.getDocuments();
 
-        await query.then((value) {
-          for (DocumentSnapshot item in value.documents) {
-            if (item.documentID == i) {
-              String name;
-              String numero = "";
-              String rua = "";
-              String bairro = "";
-              String cidade = "";
-              String estado = "";
-              String pais = "";
-              String placeid = "";
-              String description;
-              String thumbRef;
-              List<String> imgRefs;
-              List<String> detailImgRefs;
-              item.data.forEach((k, v) {
-                if (k == "name") name = v;
-                if (k == "numero") numero = v;
-                if (k == "rua") rua = v;
-                if (k == "bairro") bairro = v;
-                if (k == "cidade") cidade = v;
-                if (k == "estado") estado = v;
-                if (k == "pais") pais = v;
-                if (k == "placeid") placeid = v;
-                if (k == "description") description = v;
-                if (k == "imageUrl") {
-                  if(v==null) thumbRef = null;
-                  else thumbRef = v.toString();
-                }
-                if (k == "detailImageUrls") imgRefs = List<String>.from(v);
-              });
+      await query.then((value) {
+        for (DocumentSnapshot item in value.documents) {
+          if (projects.contains(item.documentID) || createdProjects.contains(item.documentID)) {
+            String name;
+            String numero = "";
+            String rua = "";
+            String bairro = "";
+            String cidade = "";
+            String estado = "";
+            String pais = "";
+            String placeid = "";
+            String description;
+            String thumbRef;
+            List<String> imgRefs;
+            item.data.forEach((k, v) {
+              if (k == "name") name = v;
+              if (k == "numero") numero = v;
+              if (k == "rua") rua = v;
+              if (k == "bairro") bairro = v;
+              if (k == "cidade") cidade = v;
+              if (k == "estado") estado = v;
+              if (k == "pais") pais = v;
+              if (k == "placeid") placeid = v;
+              if (k == "description") description = v;
+              if (k == "imageUrl") {
+                if(v==null) thumbRef = null;
+                else thumbRef = v.toString();
+              }
+              if (k == "detailImageUrls") imgRefs = List<String>.from(v);
+            });
+            if (projects.contains(item.documentID))
               projList.add(ProjectItem(placeid, name, description, numero, rua, bairro, cidade, estado, pais,  item.documentID, imgRefs, thumbRef));
-            }
+            if (createdProjects.contains(item.documentID))
+              createdProjList.add(ProjectItem(placeid, name, description, numero, rua, bairro, cidade, estado, pais,  item.documentID, imgRefs, thumbRef));
           }
-        });
-      }
+        }
+      });
     });
     _updated = true;
     notifyListeners();
@@ -130,10 +138,16 @@ class UserModel extends Model {
     DocumentReference userDocument = Firestore.instance.collection("users").document(_uid);
     return await userDocument.get().then((onValue) async {
       projects = List.from(onValue['projects']);
-      for (String i in projects) {
-        if(i == proj) return Future.value(true);
-      }
-      return Future.value(false);
+      return(projects.contains(proj));
+    });
+  }
+
+  Future<bool> checkCreation(String proj) async{
+    List<String> projects;
+    DocumentReference userDocument = Firestore.instance.collection("users").document(_uid);
+    return await userDocument.get().then((onValue) async {
+      projects = List.from(onValue['created_projects']);
+      return Future.value(projects.contains(proj));
     });
   }
 
@@ -225,10 +239,11 @@ class DataModel extends Model {
       }
     });
     _updated = true;
+    _sortList();
     notifyListeners();
   }
 
-  void addProject(String name, PlacesDetailsResponse detail, String description, File imgMini, List<DisplayImage> imgs) async{
+  Future<String> addProject(String name, PlacesDetailsResponse detail, String description, File imgMini, List<DisplayImage> imgs, String uid) async{
     String numero = "";
     String rua = "";
     String bairro = "";
@@ -266,7 +281,8 @@ class DataModel extends Model {
       downloadUrl = await storageRef.putFile(img.image).onComplete;
       imgUrls.add(await downloadUrl.ref.getDownloadURL());
     }
-    await projectCollection.add(<String, dynamic> {
+
+    DocumentReference ref = await projectCollection.add(<String, dynamic> {
       "name" : name,
       "numero" : numero,
       "rua" : rua,
@@ -279,8 +295,23 @@ class DataModel extends Model {
       "imageUrl" : urlMini,
       "detailImageUrls" : imgUrls
     });
+
+    DocumentReference userProjects = Firestore.instance.collection("users").document(uid);
+    List<String> temp = new List<String>();
+    temp.add(ref.documentID);
+    await userProjects.updateData({'created_projects': FieldValue.arrayUnion(temp)});
+
     updateProjects();
+
+    return ref.documentID;
   }
+
+  /*Future<void> deleteProject(String proj) async{  //Não remove referência de inscrição dos usuários no projeto excluido. Melhorar.
+    DocumentReference project = Firestore.instance.collection("projects").document(proj);
+    project.delete();
+
+    updateProjects();
+  }*/
 
   void sort(String sort) {
     _sort = sort;

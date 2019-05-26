@@ -193,158 +193,187 @@ class _CreateProjectPageState extends State<CreateProjectPage> {
   @override
   Widget build(BuildContext context) {
     return ScopedModelDescendant<DataModel>(
-      builder: (context, child, data) => Scaffold(
-            appBar: AppBar(
-              title: Text('Criação de Projeto'),
-            ),
-            body: SingleChildScrollView(
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: <Widget>[
-                  Padding(
-                    padding: EdgeInsets.fromLTRB(0, 10, 0, 0),
+      builder: (context, child, data) => ScopedModelDescendant<UserModel>(
+            builder: (context, child, user) => Scaffold(
+                  appBar: AppBar(
+                    title: Text('Criação de Projeto'),
                   ),
-                  Column(
-                    children: <Widget>[
-                      Text("Selecione imagens para o projeto"),
-                      Padding(
-                        padding: EdgeInsets.symmetric(vertical: 10),
-                      ),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: <Widget>[
-                          Text(_imageList.length.toString() + "/5"),
-                          NewImageButton(_imageSourceSelectorDialog, _imageList,
-                              _maxImagesErrorDialog),
-                        ],
-                      ),
-                      _imageList.length > 0
-                          ? Container(
-                              //decoration: BoxDecoration(border: Border.all()),
-                              margin: EdgeInsets.all(5),
-                              child: SizedBox(
-                                height: 150,
-                                child: ListView.builder(
-                                  physics: ClampingScrollPhysics(),
-                                  shrinkWrap: true,
-                                  scrollDirection: Axis.horizontal,
-                                  itemCount: _imageList.length,
-                                  itemBuilder:
-                                      (BuildContext context, int index) =>
-                                          _imageList[index],
-                                ),
-                              ),
-                            )
-                          : Container(),
-                    ],
-                  ),
-                  Padding(
-                    padding: EdgeInsets.fromLTRB(0, 10, 0, 0),
-                  ),
-                  Column(
-                    children: <Widget>[
-                      Text("Selecione uma miniatura"),
-                      Padding(
-                        padding: EdgeInsets.fromLTRB(0, 10, 0, 0),
-                      ),
-                      Container(
-                        decoration: BoxDecoration(
-                          border: Border.all(),
-                          borderRadius: BorderRadius.circular(20),
+                  body: SingleChildScrollView(
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: <Widget>[
+                        Padding(
+                          padding: EdgeInsets.fromLTRB(0, 10, 0, 0),
                         ),
-                        margin: EdgeInsets.symmetric(horizontal: 70),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
+                        Column(
                           children: <Widget>[
-                            _image != null
-                                ? Image(
-                                    image: FileImage(_image),
-                                    height: 80,
-                                    width: 80,
+                            Text("Selecione imagens para o projeto"),
+                            Padding(
+                              padding: EdgeInsets.symmetric(vertical: 10),
+                            ),
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: <Widget>[
+                                Text(_imageList.length.toString() + "/5"),
+                                NewImageButton(_imageSourceSelectorDialog,
+                                    _imageList, _maxImagesErrorDialog),
+                              ],
+                            ),
+                            _imageList.length > 0
+                                ? Container(
+                                    //decoration: BoxDecoration(border: Border.all()),
+                                    margin: EdgeInsets.all(5),
+                                    child: SizedBox(
+                                      height: 150,
+                                      child: ListView.builder(
+                                        physics: ClampingScrollPhysics(),
+                                        shrinkWrap: true,
+                                        scrollDirection: Axis.horizontal,
+                                        itemCount: _imageList.length,
+                                        itemBuilder:
+                                            (BuildContext context, int index) =>
+                                                _imageList[index],
+                                      ),
+                                    ),
                                   )
-                                : Icon(
-                                    Icons.image,
-                                    size: 80,
-                                  ),
-                            FlatButton(
-                              child: SizedBox(
-                                width: 50,
-                                height: 50,
-                                child: DecoratedBox(
-                                  decoration: BoxDecoration(
-                                      border: Border.all(),
-                                      borderRadius: BorderRadius.circular(20)),
-                                  child: Icon(Icons.add),
-                                ),
+                                : Container(),
+                          ],
+                        ),
+                        Padding(
+                          padding: EdgeInsets.fromLTRB(0, 10, 0, 0),
+                        ),
+                        Column(
+                          children: <Widget>[
+                            Text("Selecione uma miniatura"),
+                            Padding(
+                              padding: EdgeInsets.fromLTRB(0, 10, 0, 0),
+                            ),
+                            Container(
+                              decoration: BoxDecoration(
+                                border: Border.all(),
+                                borderRadius: BorderRadius.circular(20),
                               ),
-                              onPressed: () {
-                                _image == null
-                                    ? _imageSourceSelectorDialog(
-                                        true, true, null)
-                                    : _changeImageDialog(true, null);
-                              },
+                              margin: EdgeInsets.symmetric(horizontal: 70),
+                              child: Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: <Widget>[
+                                  _image != null
+                                      ? Image(
+                                          image: FileImage(_image),
+                                          height: 80,
+                                          width: 80,
+                                        )
+                                      : Icon(
+                                          Icons.image,
+                                          size: 80,
+                                        ),
+                                  FlatButton(
+                                    child: SizedBox(
+                                      width: 50,
+                                      height: 50,
+                                      child: DecoratedBox(
+                                        decoration: BoxDecoration(
+                                            border: Border.all(),
+                                            borderRadius:
+                                                BorderRadius.circular(20)),
+                                        child: Icon(Icons.add),
+                                      ),
+                                    ),
+                                    onPressed: () {
+                                      _image == null
+                                          ? _imageSourceSelectorDialog(
+                                              true, true, null)
+                                          : _changeImageDialog(true, null);
+                                    },
+                                  ),
+                                ],
+                              ),
                             ),
                           ],
                         ),
-                      ),
-                    ],
-                  ),
-                  CustomTextField(
-                    lines: 1,
-                    length: 30,
-                    name: 'Nome (Obrigatório)',
-                    function: setNameText,
-                  ),
-                  CustomTextField(
-                    lines: 10,
-                    length: 300,
-                    name: 'Descrição (Obrigatório)',
-                    function: setDescriptionText,
-                  ),
-                  RaisedButton(
-                    color: Colors.deepPurple,
-                    child: Text(
-                      "ENDEREÇO (Obrigatório)",
-                      style: TextStyle(color: Colors.white),
+                        CustomTextField(
+                          lines: 1,
+                          length: 30,
+                          name: 'Nome (Obrigatório)',
+                          function: setNameText,
+                        ),
+                        CustomTextField(
+                          lines: 10,
+                          length: 300,
+                          name: 'Descrição (Obrigatório)',
+                          function: setDescriptionText,
+                        ),
+                        RaisedButton(
+                          color: Colors.deepPurple,
+                          child: Text(
+                            "ENDEREÇO (Obrigatório)",
+                            style: TextStyle(color: Colors.white),
+                          ),
+                          onPressed: () async {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (context) => GoogleMapsViewer()),
+                            );
+                          },
+                        ),
+                        addressResults,
+                        Container(
+                          padding: EdgeInsets.symmetric(
+                              horizontal: 120, vertical: 10),
+                          child: RaisedButton(
+                            color: Theme.of(context).primaryColor,
+                            child: Text(
+                              "Enviar",
+                              style: TextStyle(color: Colors.white),
+                            ),
+                            onPressed: () async {
+                              if (_nameText != '' &&
+                                  _descriptionText != '' &&
+                                  addressDetail != null) {
+                                List<File> imageFileList = new List<File>();
+                                for (DisplayImage image in _imageList) {
+                                  imageFileList.add(image.image);
+                                }
+                                String projId = await data.addProject(_nameText, addressDetail,
+                                    _descriptionText, _image, _imageList, user.uid);
+                                showDialog(
+                                  context: context,
+                                  builder: (BuildContext innerContext) {
+                                    return AlertDialog(
+                                      actions: <Widget>[
+                                        FlatButton(
+                                          onPressed: () {
+                                            user.updateUserProjects();
+                                            Navigator.of(context).pop();
+                                            Navigator.of(context).pop();
+                                          },
+                                          child: Text("Não"),
+                                        ),
+                                        FlatButton(
+                                          onPressed: () {
+                                            user.subscribeToProject(projId);
+                                            Navigator.of(context).pop();
+                                            Navigator.of(context).pop();
+                                          },
+                                          child: Text("Sim"),
+                                        ),
+                                      ],
+                                      title: Text("Responda"),
+                                      content: Text("Deseja se inscrever no projeto criado?"),
+                                    );
+                                  },
+                                );
+                              } else {
+                                _showErrorDialog();
+                              }
+                            },
+                          ),
+                        ),
+                      ],
                     ),
-                    onPressed: () async {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                            builder: (context) => GoogleMapsViewer()),
-                      );
-                    },
                   ),
-                  addressResults,
-                  Container(
-                    padding:
-                        EdgeInsets.symmetric(horizontal: 120, vertical: 10),
-                    child: RaisedButton(
-                      color: Theme.of(context).primaryColor,
-                      child: Text(
-                        "Enviar",
-                        style: TextStyle(color: Colors.white),
-                      ),
-                      onPressed: () async {
-                        if (_nameText != '' &&
-                            _descriptionText != '' &&
-                            addressDetail != null) {
-                          List<File> imageFileList = new List<File>();
-                          for (DisplayImage image in _imageList) {
-                            imageFileList.add(image.image);
-                          }
-                          data.addProject(_nameText, addressDetail,
-                              _descriptionText, _image, _imageList);
-                          Navigator.of(context).pop();
-                        } else {
-                          _showErrorDialog();
-                        }
-                      },
-                    ),
-                  ),
-                ],
-              ),
-            ),
+                ),
           ),
     );
   }
@@ -474,7 +503,7 @@ class _GoogleMapsViewerState extends State<GoogleMapsViewer> {
       mode: Mode.overlay,
       language: "pt",
     );
-    if(p == null) return;
+    if (p == null) return;
     print(p.placeId);
     addressDetail = await _places.getDetailsByPlaceId(p.placeId);
     addressResults = getAddressFields(addressDetail.result.addressComponents);
