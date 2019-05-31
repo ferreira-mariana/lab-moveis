@@ -3,6 +3,7 @@ import 'package:lpdm_proj/create_project_page.dart';
 import 'package:lpdm_proj/models.dart';
 import 'package:lpdm_proj/project_item.dart';
 import 'package:scoped_model/scoped_model.dart';
+import 'package:lpdm_proj/custom_route.dart';
 
 class AllProjectsPage extends StatefulWidget{
   final Widget refreshProjects = ScopedModelDescendant<DataModel>(
@@ -86,7 +87,7 @@ class _AllProjectsState extends State<AllProjectsPage> with AutomaticKeepAliveCl
               onPressed: () {
                 Navigator.push(
                   context,
-                  MaterialPageRoute(builder: (context) => CreateProjectPage()),
+                  CustomRoute(builder: (context) => CreateProjectPage()),
                 );
               },
               child: Icon(

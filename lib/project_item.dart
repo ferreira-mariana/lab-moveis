@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'dart:math' as math;
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:google_maps_webservice/places.dart';
 import 'package:lpdm_proj/models.dart';
@@ -8,6 +9,7 @@ import 'package:flutter/material.dart';
 import 'package:scoped_model/scoped_model.dart';
 import 'package:flutter_advanced_networkimage/provider.dart';
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:lpdm_proj/custom_route.dart';
 
 class ProjectItem extends StatefulWidget {
   final String _placeid;
@@ -78,7 +80,7 @@ class _ProjectItemState extends State<ProjectItem> {
                       onPressed: () {
                         Navigator.push(
                           context,
-                          MaterialPageRoute(builder: (context) {
+                          CustomRoute(builder: (context) {
                             return ProjectDetail(
                                 widget._placeid,
                                 widget._name,
@@ -158,158 +160,227 @@ class ProjectDetail extends StatefulWidget {
   _ProjectDetailState createState() => new _ProjectDetailState();
 }
 
-class _ProjectDetailState extends State<ProjectDetail> {
-  String _buttonName = 'INSCREVA-SE';
-  Color _buttonColor = Colors.blue;
-  Color _buttonTextColor = Colors.white;
-  Widget subscribeButton;
-  bool subscribed;
+class _ProjectDetailState extends State<ProjectDetail> with TickerProviderStateMixin{
+  bool subscribed = false;
+  AnimationController _controle;
 
   @override
   void initState() {
     super.initState();
     checkSubscription(widget._checkUserSubscription);
     //initGoogleMap();
+    _controle = AnimationController(
+      vsync: this,
+      duration: Duration(milliseconds: 200)
+    );
   }
 
   checkSubscription(checkUserSubscription) {
-    setState(() {
-      subscribeButton = CircularProgressIndicator();
-    });
     checkUserSubscription(widget._projectId).then((onValue) {
       subscribed = onValue;
-      setState(() {
-        if (!subscribed) {
-          _buttonName = 'INSCREVA-SE';
-          _buttonColor = Colors.deepPurpleAccent;
-          _buttonTextColor = Colors.white;
-        } else {
-          _buttonName = 'INSCRITO';
-          _buttonColor = Colors.grey;
-          _buttonTextColor = Colors.grey[700];
-        }
-        subscribeButton = _subscribeButton();
-      });
     });
   }
 
   @override
   Widget build(BuildContext context) {
     return ScopedModelDescendant<UserModel>(
-      builder: (context, child, user) => Scaffold(
-            appBar: AppBar(
-              title: Text(widget._name),
-            ),
-            body: ListView(
-              children: <Widget>[
-                Container(
-                  decoration: BoxDecoration(
-                    shape: BoxShape.rectangle,
-                    border: Border.all(),
-                  ),
-                  child: widget._imageList == null ||
-                          widget._imageList.length == 0
-                      ? Icon(
-                          Icons.image,
-                          size: 240,
-                        )
-                      : SizedBox(
-                          height: 200,
-                          child: ListView.builder(
-                            physics: ClampingScrollPhysics(),
-                            shrinkWrap: true,
-                            scrollDirection: Axis.horizontal,
-                            itemCount: widget._imageList.length,
-                            itemBuilder: (BuildContext context, int index) =>
-                                FlatButton(
-                                    child: CachedNetworkImage(
-                                      imageUrl: widget._imageList[
-                                          index], //)//Image.network(
-                                      //widget._imageList[index]
-                                    ),
-                                    onPressed: () {
-                                      Navigator.push(
-                                        context,
-                                        MaterialPageRoute(
-                                          builder: (context) => Container(
+        builder: (context, child, user) => Scaffold(
+          body: CustomScrollView(slivers: <Widget>[
+            SliverAppBar(
+                expandedHeight: 250.0,
+                pinned: true,
+                flexibleSpace: FlexibleSpaceBar(
+                    title: Text(widget._name),
+                    background: ListView(
+                        children: <Widget>[
+                          Container(
+                            decoration: BoxDecoration(
+                              shape: BoxShape.rectangle,
+                            ),
+                            child: widget._imageList == null ||
+                                widget._imageList.length == 0
+                                ? Center(
+                                child: Container(
+                                  height: 250,
+                                  decoration: BoxDecoration(
+                                      shape: BoxShape.rectangle,
+                                      image: DecorationImage(
+                                          fit: BoxFit.cover,
+                                          image: AssetImage(
+                                            'assets/default.jpg',
+                                          )
+                                      )
+                                  ),
+                                )
+                            )
+                                : SizedBox(
+                              height: 250,
+                              width: 350,
+                              child:
+                              ListView.builder(
+                                physics: ClampingScrollPhysics(),
+                                shrinkWrap: true,
+                                scrollDirection: Axis.horizontal,
+                                itemCount: widget._imageList.length,
+                                itemBuilder: (BuildContext context, int index) =>
+                                    FlatButton(
+                                        child: Container(
+                                          width: 350,
+                                          decoration: BoxDecoration(
+                                              border: Border.all(),
+                                              image: DecorationImage(
+                                                  fit: BoxFit.cover,
+                                                  image: CachedNetworkImageProvider(
+                                                    widget._imageList[
+                                                    index],
+                                                  )
+                                              )
+                                          ),
+                                        ),
+                                        onPressed: () {
+                                          Navigator.push(
+                                            context,
+                                            CustomRoute(
+                                              builder: (context) => Container(
                                                 child: PhotoView(
                                                   imageProvider:
-                                                      AdvancedNetworkImage(
-                                                          widget._imageList[
-                                                              index],
-                                                          useDiskCache: true),
+                                                  AdvancedNetworkImage(
+                                                      widget._imageList[
+                                                      index],
+                                                      useDiskCache: true
+                                                  ),
                                                 ),
                                               ),
-                                        ),
-                                      );
-                                    }),
-                          ),
-                        ),
-                ),
-                Container(
-                  padding: EdgeInsets.fromLTRB(20, 20, 20, 40),
-                  child: Text(
-                    widget._detail,
-                    style: TextStyle(fontSize: 16.0),
-                  ),
-                ),
-                Center(
-                  child: RaisedButton(
-                      color: Colors.deepPurple,
-                      child: Text(
-                        "Ver no mapa",
-                        style: TextStyle(color: Colors.white),
-                      ),
-                      onPressed: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(builder: (context) {
-                            return GoogleMapView(
-                              widget._placeid,
-                            );
-                          }),
-                        );
-                      }),
-                ),
-                Center(
-                  child: subscribeButton,
-                ),
-              ],
+                                            ),
+                                          );
+                                        }
+                                    ),
+                              ),
+                            ),
+                          )
+                        ]
+                    )
+                )
             ),
-          ),
+            SliverList(delegate: SliverChildListDelegate([
+              Container(
+                padding: EdgeInsets.fromLTRB(20, 20, 20, 40),
+                child: Text(
+                  widget._detail,
+                  style: TextStyle(fontSize: 16.0),
+                ),
+              ),
+              Center(
+                child: RaisedButton(
+                    color: Colors.deepPurple,
+                    child: Text(
+                      "Ver no mapa",
+                      style: TextStyle(color: Colors.white),
+                    ),
+                    onPressed: () {
+                      Navigator.push(
+                        context,
+                        CustomRoute(builder: (context) {
+                          return GoogleMapView(
+                            widget._placeid,
+                          );
+                        }),
+                      );
+                    }
+                ),
+              ),
+            ],),)
+          ]),
+          floatingActionButton: _customFloatingActionButton(),
+        )
     );
   }
 
   //botao para inscrever-se no projeto
-  Widget _subscribeButton() {
+  Widget _customFloatingActionButton() {
     return ScopedModelDescendant<UserModel>(
-      builder: (context, child, user) => RaisedButton(
-            onPressed: () {
-              setState(() {
-                subscribeButton = CircularProgressIndicator();
-              });
-              if (!subscribed) {
-                user.subscribeToProject(widget._projectId).then((onValue) {
-                  checkSubscription(user.checkSubscription);
-                });
-              } else {
-                List<String> temp = [widget._projectId];
-                user.unsubscribeToProjects(temp).then((onValue) {
-                  checkSubscription(user.checkSubscription);
-                });
-              }
-            },
-            color: _buttonColor,
-            textColor: _buttonTextColor,
-            padding: const EdgeInsets.all(15.0),
-            child: Text(
-              _buttonName,
-              style: TextStyle(fontSize: 16.0, fontWeight: FontWeight.bold),
-            ),
-          ),
-    );
-  } //_subscribeButton
+        builder: (context, child, user) => Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Container (
+                  height: 70.0,
+                  width: 56.0,
+                  alignment: FractionalOffset.topCenter,
+                  child: ScaleTransition(
+                      scale: CurvedAnimation(
+                          parent: _controle,
+                          curve: Interval(0.0, 1.0, curve: Curves.easeOut)
+                      ),
+                      child: FloatingActionButton(
+                        backgroundColor: Theme.of(context).cardColor,
+                        heroTag: 'extra',
+                        mini: true,
+                        onPressed: () {},
+                        child: Icon(Icons.clear, color: Colors.black),
+                      )
+                  )
+              ),
 
+              Container (
+                  height: 70.0,
+                  width: 56.0,
+                  alignment: FractionalOffset.topCenter,
+                  child: ScaleTransition (
+                    scale: CurvedAnimation(
+                        parent: _controle,
+                        curve: Interval(0.0, 0.5, curve: Curves.easeOut)
+                    ),
+                    child: FloatingActionButton(
+                        backgroundColor: Theme.of(context).cardColor,
+                        heroTag: 'inscricao',
+                        mini: true,
+                        onPressed: () {///*
+                          if (!subscribed) {
+                            user.subscribeToProject(widget._projectId).then((onValue) {
+                              checkSubscription(user.checkSubscription);
+                            });
+                          } else {
+                            List<String> temp = [widget._projectId];
+                            user.unsubscribeToProjects(temp).then((onValue) {
+                              checkSubscription(user.checkSubscription);
+                            });
+                          }
+//*/
+                        },
+                        child: Icon(
+                            subscribed
+                                ? Icons.favorite
+                                : Icons.favorite_border,
+                            color: Colors.red)
+                    ),
+                  )
+              ),
+              Container (
+                  child: FloatingActionButton(
+                      heroTag: 'opcoes',
+                      onPressed: () {
+                        if (_controle.isDismissed) {
+                          _controle.forward();
+                        } else {
+                          _controle.reverse();
+                        }
+                      },
+                      child: AnimatedBuilder(
+                        animation: _controle,
+                        builder: (BuildContext context, Widget child) {
+                          return Transform(
+                              alignment: FractionalOffset.center,
+                              transform: Matrix4.rotationZ(_controle.value * 0.5 * math.pi),
+                              child: Icon(_controle.isDismissed ? Icons.more_vert : Icons.close)
+                          );
+                        },
+                      )
+                  )
+              )
+            ]
+        )
+    );
+  }
 }
 
 class GoogleMapView extends StatefulWidget {

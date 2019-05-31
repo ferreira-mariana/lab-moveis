@@ -7,6 +7,7 @@ import 'package:scoped_model/scoped_model.dart';
 import 'package:flutter_google_places/flutter_google_places.dart';
 import 'package:google_maps_webservice/places.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:lpdm_proj/custom_route.dart';
 
 PlacesDetailsResponse addressDetail = null;
 Widget addressResults = new Container();
@@ -297,7 +298,7 @@ class _CreateProjectPageState extends State<CreateProjectPage> {
                   ),
                   CustomTextField(
                     lines: 10,
-                    length: 300,
+                    length: 1000,
                     name: 'Descrição (Obrigatório)',
                     function: setDescriptionText,
                   ),
@@ -310,7 +311,7 @@ class _CreateProjectPageState extends State<CreateProjectPage> {
                     onPressed: () async {
                       Navigator.push(
                         context,
-                        MaterialPageRoute(
+                        CustomRoute(
                             builder: (context) => GoogleMapsViewer()),
                       );
                     },
