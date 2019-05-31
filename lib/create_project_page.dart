@@ -475,7 +475,6 @@ class _GoogleMapsViewerState extends State<GoogleMapsViewer> {
       language: "pt",
     );
     if(p == null) return;
-    print(p.placeId);
     addressDetail = await _places.getDetailsByPlaceId(p.placeId);
     addressResults = getAddressFields(addressDetail.result.addressComponents);
     position = LatLng(addressDetail.result.geometry.location.lat,

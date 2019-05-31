@@ -89,8 +89,7 @@ class _ProjectItemState extends State<ProjectItem> {
                           }),
                         );
                       },
-                      child: //Padding(
-                          Row(
+                      child: Row(
                         children: <Widget>[
                           widget._miniatureImage == null
                               ? Icon(Icons.image, size: 80)
@@ -102,28 +101,34 @@ class _ProjectItemState extends State<ProjectItem> {
                           Padding(
                             padding: EdgeInsets.symmetric(horizontal: 5),
                           ),
-                          Column(
-                            children: <Widget>[
-                              Text("Nome: " + widget._name),
-                              widget._numero != ""
-                                  ? Text("Numero: " + widget._numero)
-                                  : Container(),
-                              widget._rua != ""
-                                  ? Text("Rua: " + widget._rua)
-                                  : Container(),
-                              widget._bairro != ""
-                                  ? Text("Bairro: " + widget._bairro)
-                                  : Container(),
-                              widget._cidade != ""
-                                  ? Text("Cidade: " + widget._cidade)
-                                  : Container(),
-                              widget._estado != ""
-                                  ? Text("Estado: " + widget._estado)
-                                  : Container(),
-                              widget._pais != ""
-                                  ? Text("Pais: " + widget._pais)
-                                  : Container(),
-                            ],
+                          Expanded(
+                            child: SingleChildScrollView(
+                              scrollDirection: Axis.horizontal,
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: <Widget>[
+                                  Text("Nome: " + widget._name),
+                                  widget._numero != ""
+                                      ? Text("Numero: " + widget._numero)
+                                      : Container(),
+                                  widget._rua != ""
+                                      ? Text("Rua: " + widget._rua)
+                                      : Container(),
+                                  widget._bairro != ""
+                                      ? Text("Bairro: " + widget._bairro)
+                                      : Container(),
+                                  widget._cidade != ""
+                                      ? Text("Cidade: " + widget._cidade)
+                                      : Container(),
+                                  widget._estado != ""
+                                      ? Text("Estado: " + widget._estado)
+                                      : Container(),
+                                  widget._pais != ""
+                                      ? Text("Pais: " + widget._pais)
+                                      : Container(),
+                                ],
+                              ),
+                            ),
                           ),
                         ],
                       ),
@@ -154,51 +159,17 @@ class ProjectDetail extends StatefulWidget {
 }
 
 class _ProjectDetailState extends State<ProjectDetail> {
-  static const kGoogleApiKey = "AIzaSyCe-T7VrbtVqCLBNrgt1A0kxeTwnqFFKNA";
-  GoogleMapsPlaces _places = GoogleMapsPlaces(apiKey: kGoogleApiKey);
   String _buttonName = 'INSCREVA-SE';
   Color _buttonColor = Colors.blue;
   Color _buttonTextColor = Colors.white;
   Widget subscribeButton;
   bool subscribed;
-  Completer<GoogleMapController> _controller = Completer();
-  LatLng position;
-  CameraPosition _cameraPosition;
-  Set<Marker> markerSet;
 
   @override
   void initState() {
     super.initState();
-    position = LatLng(0,0);
-    _cameraPosition = new CameraPosition(target: position);
     checkSubscription(widget._checkUserSubscription);
     //initGoogleMap();
-  }
-
-  void initGoogleMap() async {
-    markerSet = new Set<Marker>();
-    print("aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa");
-    print(widget._placeid);
-    var addressDetail = await _places.getDetailsByPlaceId(widget._placeid);
-    print(addressDetail.result.toString());
-    position = LatLng(addressDetail.result.geometry.location.lat,
-        addressDetail.result.geometry.location.lng);
-
-    _cameraPosition = CameraPosition(
-      target: position,
-      zoom: 16.0,
-    );
-
-    markerSet.add(
-      Marker(markerId: MarkerId('0'), position: position),
-    );
-
-    setState(() {
-      markerSet = Set.from(markerSet);
-    });
-
-    final GoogleMapController controller = await _controller.future;
-    controller.animateCamera(CameraUpdate.newCameraPosition(_cameraPosition));
   }
 
   checkSubscription(checkUserSubscription) {
@@ -213,7 +184,6 @@ class _ProjectDetailState extends State<ProjectDetail> {
           _buttonColor = Colors.deepPurpleAccent;
           _buttonTextColor = Colors.white;
         } else {
-          //adiciona o projeto aos inscritos
           _buttonName = 'INSCRITO';
           _buttonColor = Colors.grey;
           _buttonTextColor = Colors.grey[700];
@@ -283,18 +253,23 @@ class _ProjectDetailState extends State<ProjectDetail> {
                     style: TextStyle(fontSize: 16.0),
                   ),
                 ),
-                SizedBox(
-                  width: 100,
-                  height: 200,
-                  child: GoogleMap(
-                    markers: markerSet,
-                    mapType: MapType.normal,
-                    initialCameraPosition: _cameraPosition,
-                    onMapCreated: (GoogleMapController controller) {
-                      _controller.complete(controller);
-                      initGoogleMap();
-                    },
-                  ),
+                Center(
+                  child: RaisedButton(
+                      color: Colors.deepPurple,
+                      child: Text(
+                        "Ver no mapa",
+                        style: TextStyle(color: Colors.white),
+                      ),
+                      onPressed: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(builder: (context) {
+                            return GoogleMapView(
+                              widget._placeid,
+                            );
+                          }),
+                        );
+                      }),
                 ),
                 Center(
                   child: subscribeButton,
@@ -335,4 +310,61 @@ class _ProjectDetailState extends State<ProjectDetail> {
     );
   } //_subscribeButton
 
+}
+
+class GoogleMapView extends StatefulWidget {
+  final String _placeid;
+
+  GoogleMapView(this._placeid);
+
+  @override
+  State<StatefulWidget> createState() => _GoogleMapViewState();
+}
+
+class _GoogleMapViewState extends State<GoogleMapView> {
+  static const kGoogleApiKey = "AIzaSyCe-T7VrbtVqCLBNrgt1A0kxeTwnqFFKNA";
+  GoogleMapsPlaces _places = GoogleMapsPlaces(apiKey: kGoogleApiKey);
+  Completer<GoogleMapController> _controller = Completer();
+  LatLng position;
+  CameraPosition _cameraPosition = CameraPosition(target: LatLng(0, 0));
+  Set<Marker> markerSet;
+
+  void initGoogleMap() async {
+    markerSet = new Set<Marker>();
+    var addressDetail = await _places.getDetailsByPlaceId(widget._placeid);
+    position = LatLng(addressDetail.result.geometry.location.lat,
+        addressDetail.result.geometry.location.lng);
+
+    _cameraPosition = CameraPosition(
+      target: position,
+      zoom: 16.0,
+    );
+
+    markerSet.add(
+      Marker(markerId: MarkerId('0'), position: position),
+    );
+
+    setState(() => markerSet = Set.from(markerSet));
+
+    final GoogleMapController controller = await _controller.future;
+    controller.animateCamera(CameraUpdate.newCameraPosition(_cameraPosition));
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: Text("Mapa"),
+      ),
+      body: GoogleMap(
+        markers: markerSet,
+        mapType: MapType.normal,
+        initialCameraPosition: _cameraPosition,
+        onMapCreated: (GoogleMapController controller) {
+          _controller.complete(controller);
+          initGoogleMap();
+        },
+      ),
+    );
+  }
 }
