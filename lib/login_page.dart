@@ -4,6 +4,7 @@ import 'package:lpdm_proj/main.dart';
 import 'package:scoped_model/scoped_model.dart';
 import 'models.dart';
 import 'package:flutter/material.dart';
+import 'package:lpdm_proj/custom_route.dart';
 
 class LoginPage extends StatefulWidget {
   final UserModel user;
@@ -33,7 +34,7 @@ class _LoginPageState extends State<LoginPage> {
       widget.user.imgUrl = user.photoUrl;
       await widget.user.createUserDocument();
       Navigator.pushReplacement(
-          context, MaterialPageRoute(builder: (context) => HomeScreen()));
+          context, CustomRoute(builder: (context) => HomeScreen()));
     } else {
       setState(() {
         loading = false;
@@ -66,7 +67,7 @@ class _LoginPageState extends State<LoginPage> {
     googleSignIn.signOut();
 
     Navigator.pushReplacement(
-        context, MaterialPageRoute(builder: (context) => HomeScreen()));
+        context, CustomRoute(builder: (context) => HomeScreen()));
   }
 
   build(context) {

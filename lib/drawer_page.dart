@@ -6,6 +6,7 @@ import 'package:lpdm_proj/models.dart';
 import 'package:lpdm_proj/profile_page.dart';
 import 'package:scoped_model/scoped_model.dart';
 import 'models.dart';
+import 'package:lpdm_proj/custom_route.dart';
 
 class Item {
   String nome;
@@ -32,14 +33,14 @@ class _SideMenuState extends State<SideMenu> {
       switch(index){
         case 0:
           Navigator.push(
-              context, MaterialPageRoute(builder: (context) => ProfilePage()));
+              context, CustomRoute(builder: (context) => ProfilePage()));
           break;
         case 1:
-          Navigator.push(context, MaterialPageRoute(builder: (context) => ConfigPage()));
+          Navigator.push(context, CustomRoute(builder: (context) => ConfigPage()));
           break;
         case 2:
           await FirebaseAuth.instance.signOut();
-          Navigator.pushReplacement(context, new MaterialPageRoute(builder: (context) => MyApp()));
+          Navigator.pushReplacement(context, new CustomRoute(builder: (context) => MyApp()));
       }
       setState((){
         _selectedDrawerIndex = index;

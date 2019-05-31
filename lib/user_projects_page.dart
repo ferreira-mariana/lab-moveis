@@ -4,6 +4,7 @@ import 'package:lpdm_proj/delete_project_page.dart';
 import 'package:lpdm_proj/models.dart';
 import 'package:lpdm_proj/project_item.dart';
 import 'package:scoped_model/scoped_model.dart';
+import 'package:lpdm_proj/custom_route.dart';
 
 class UserProjectsPage extends StatefulWidget {
   final Widget deleteProjects = ScopedModelDescendant<UserModel>(
@@ -15,7 +16,7 @@ class UserProjectsPage extends StatefulWidget {
           onPressed: () {
             Navigator.push(
                 context,
-                MaterialPageRoute(
+                CustomRoute(
                   builder: (context) => DeleteProjectPage(user.projList),
                 ));
           },
