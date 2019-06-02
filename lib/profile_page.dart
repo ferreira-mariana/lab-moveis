@@ -13,13 +13,17 @@ class ProfilePage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    String nProjsInscritos;
+    
+    String textProjsInscritos;
+    String numberProjsInscritos = projects.length.toString();
     if(projects.length <= 1){
-      nProjsInscritos = "projeto inscrito";
+      textProjsInscritos = "projeto inscrito";
+      if(projects.length == 0) numberProjsInscritos = "nenhum";
     }
     else{
-      nProjsInscritos = "projetos inscritos";
+      textProjsInscritos = "projetos inscritos";
     }
+    
 
     return ScopedModelDescendant<UserModel>(
       builder: (context, child, user) => Scaffold(
@@ -42,12 +46,12 @@ class ProfilePage extends StatelessWidget {
                           ),
                           RichText(
                             text: TextSpan(
-                              text: user.projList.length.toString(),
+                              text: numberProjsInscritos,
                               style: TextStyle(
                                   color: Colors.grey[700], fontSize: 16),
                               children: <TextSpan>[
                                 TextSpan(
-                                    text: ' ' + nProjsInscritos,
+                                    text: ' ' + textProjsInscritos,
                                     style: TextStyle(color: Colors.grey[700])),
                               ],
                             ),
