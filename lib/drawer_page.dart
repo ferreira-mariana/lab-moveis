@@ -66,6 +66,17 @@ class _SideMenuState extends State<SideMenu> {
         onTap: () => changePages(i, widget.projects),
       ));
     }
+
+    String textProjsInscritos;
+    String numberProjsInscritos = widget.projects.length.toString();
+    if(widget.projects.length <= 1){
+      textProjsInscritos = "projeto inscrito";
+      if(widget.projects.length == 0) numberProjsInscritos = "nenhum";
+    }
+    else{
+      textProjsInscritos = "projetos inscritos";
+    }
+    
     return ScopedModelDescendant<UserModel>(
         builder: (context, child, user) => Drawer(
               child: ListView(children: <Widget>[
@@ -85,10 +96,10 @@ class _SideMenuState extends State<SideMenu> {
                               Padding(padding: EdgeInsets.only(bottom: 8.0)),
                               Text.rich(
                                 TextSpan(
-                                  text: user.projList.length.toString(), style: TextStyle(fontSize: 14),
+                                  text: numberProjsInscritos, style: TextStyle(fontSize: 14),
                                   children: <TextSpan>[
                                     TextSpan(
-                                        text: ' projetos inscritos',
+                                        text: " " + textProjsInscritos,
                                         style: TextStyle(fontSize: 15)),
                                   ],
                                 ),
