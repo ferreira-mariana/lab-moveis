@@ -4,26 +4,23 @@ import 'models.dart';
 import 'package:scoped_model/scoped_model.dart';
 
 class ProfilePage extends StatelessWidget {
-
   List<ProjectItem> projects; //atributo
 
-  ProfilePage(List<ProjectItem> p){ //construtor
+  ProfilePage(List<ProjectItem> p) {
+    //construtor
     this.projects = p;
   }
 
   @override
   Widget build(BuildContext context) {
-    
     String textProjsInscritos;
     String numberProjsInscritos = projects.length.toString();
-    if(projects.length <= 1){
+    if (projects.length <= 1) {
       textProjsInscritos = "projeto inscrito";
-      if(projects.length == 0) numberProjsInscritos = "nenhum";
-    }
-    else{
+      if (projects.length == 0) numberProjsInscritos = "nenhum";
+    } else {
       textProjsInscritos = "projetos inscritos";
     }
-    
 
     return ScopedModelDescendant<UserModel>(
       builder: (context, child, user) => Scaffold(
@@ -44,17 +41,13 @@ class ProfilePage extends StatelessWidget {
                             textAlign: TextAlign.left,
                             style: TextStyle(fontSize: 20.0),
                           ),
-                          RichText(
-                            text: TextSpan(
-                              text: numberProjsInscritos,
+                          Padding(
+                            padding: EdgeInsets.symmetric(vertical: 10.0),
+                            child: Text(
+                              numberProjsInscritos + " " + textProjsInscritos,
                               style: TextStyle(
                                   color: Colors.grey[700], fontSize: 16),
-                              children: <TextSpan>[
-                                TextSpan(
-                                    text: ' ' + textProjsInscritos,
-                                    style: TextStyle(color: Colors.grey[700])),
-                              ],
-                            ),
+                              )
                           ),
                         ],
                       ),
@@ -64,7 +57,9 @@ class ProfilePage extends StatelessWidget {
                         fit: BoxFit.contain,
                         child: Padding(
                           padding: EdgeInsets.only(left: 20.0),
-                          child: CircleAvatar(backgroundImage: NetworkImage(user.imgUrl),),
+                          child: CircleAvatar(
+                            backgroundImage: NetworkImage(user.imgUrl),
+                          ),
                         ),
                       ),
                     ),

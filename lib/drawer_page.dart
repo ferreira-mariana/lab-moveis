@@ -94,16 +94,7 @@ class _SideMenuState extends State<SideMenu> {
                             children: <Widget>[
                               Text(user.username),
                               Padding(padding: EdgeInsets.only(bottom: 8.0)),
-                              Text.rich(
-                                TextSpan(
-                                  text: numberProjsInscritos, style: TextStyle(fontSize: 14),
-                                  children: <TextSpan>[
-                                    TextSpan(
-                                        text: " " + textProjsInscritos,
-                                        style: TextStyle(fontSize: 15)),
-                                  ],
-                                ),
-                              ),
+                              Text(numberProjsInscritos + " " + textProjsInscritos, style: TextStyle(fontSize: 14)),
                             ],
                           ),
                         ),
