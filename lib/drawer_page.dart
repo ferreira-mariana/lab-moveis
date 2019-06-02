@@ -7,6 +7,7 @@ import 'package:lpdm_proj/profile_page.dart';
 import 'package:scoped_model/scoped_model.dart';
 import 'models.dart';
 import 'package:lpdm_proj/custom_route.dart';
+import 'project_item.dart';
 
 class Item {
   String nome;
@@ -20,6 +21,12 @@ class SideMenu extends StatefulWidget {
     new Item("Sair")
   ];
 
+  List<ProjectItem> projects; //atributo
+
+  SideMenu(List<ProjectItem> projList){ //construtor
+    this.projects = projList;
+  }
+
   @override
   State<StatefulWidget> createState() {
     return new _SideMenuState();
@@ -29,11 +36,11 @@ class SideMenu extends StatefulWidget {
 class _SideMenuState extends State<SideMenu> {
   int _selectedDrawerIndex = 0;
 
-    changePages(int index) async{
+    changePages(int index, List<ProjectItem>projects) async{
       switch(index){
         case 0:
           Navigator.push(
-              context, CustomRoute(builder: (context) => ProfilePage()));
+              context, CustomRoute(builder: (context) => ProfilePage(projects)));
           break;
         case 1:
           Navigator.push(context, CustomRoute(builder: (context) => ConfigPage()));
@@ -56,7 +63,7 @@ class _SideMenuState extends State<SideMenu> {
       drawerOptions.add(new ListTile(
         title: new Text(d.nome),
         selected: i == _selectedDrawerIndex,
-        onTap: () => changePages(i),
+        onTap: () => changePages(i, widget.projects),
       ));
     }
     return ScopedModelDescendant<UserModel>(

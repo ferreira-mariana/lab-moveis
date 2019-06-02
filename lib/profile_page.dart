@@ -1,10 +1,26 @@
 import 'package:flutter/material.dart';
+import 'package:lpdm_proj/project_item.dart';
 import 'models.dart';
 import 'package:scoped_model/scoped_model.dart';
 
 class ProfilePage extends StatelessWidget {
+
+  List<ProjectItem> projects; //atributo
+
+  ProfilePage(List<ProjectItem> p){ //construtor
+    this.projects = p;
+  }
+
   @override
   Widget build(BuildContext context) {
+    String nProjsInscritos;
+    if(projects.length <= 1){
+      nProjsInscritos = "projeto inscrito";
+    }
+    else{
+      nProjsInscritos = "projetos inscritos";
+    }
+
     return ScopedModelDescendant<UserModel>(
       builder: (context, child, user) => Scaffold(
           appBar: AppBar(
@@ -31,7 +47,7 @@ class ProfilePage extends StatelessWidget {
                                   color: Colors.grey[700], fontSize: 16),
                               children: <TextSpan>[
                                 TextSpan(
-                                    text: ' projetos inscritos',
+                                    text: ' ' + nProjsInscritos,
                                     style: TextStyle(color: Colors.grey[700])),
                               ],
                             ),
