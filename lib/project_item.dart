@@ -161,7 +161,7 @@ class ProjectDetail extends StatefulWidget {
 }
 
 class _ProjectDetailState extends State<ProjectDetail> with TickerProviderStateMixin{
-  bool subscribed = false;
+  bool subscribed;
   AnimationController _controle;
 
   @override
@@ -177,7 +177,7 @@ class _ProjectDetailState extends State<ProjectDetail> with TickerProviderStateM
 
   checkSubscription(checkUserSubscription) {
     checkUserSubscription(widget._projectId).then((onValue) {
-      subscribed = onValue;
+      setState(() {subscribed = onValue;});
     });
   }
 
@@ -334,7 +334,8 @@ class _ProjectDetailState extends State<ProjectDetail> with TickerProviderStateM
                         backgroundColor: Theme.of(context).cardColor,
                         heroTag: 'inscricao',
                         mini: true,
-                        onPressed: () {///*
+                        onPressed: () {
+                          if(subscribed == null) return;
                           if (!subscribed) {
                             user.subscribeToProject(widget._projectId).then((onValue) {
                               checkSubscription(user.checkSubscription);
@@ -345,9 +346,10 @@ class _ProjectDetailState extends State<ProjectDetail> with TickerProviderStateM
                               checkSubscription(user.checkSubscription);
                             });
                           }
-//*/
+                          setState((){subscribed = null;});
                         },
-                        child: Icon(
+                        child: subscribed == null ? CircularProgressIndicator(valueColor: new AlwaysStoppedAnimation<Color>(Colors.red))
+                            : Icon(
                             subscribed
                                 ? Icons.favorite
                                 : Icons.favorite_border,
