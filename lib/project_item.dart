@@ -160,7 +160,8 @@ class ProjectDetail extends StatefulWidget {
   _ProjectDetailState createState() => new _ProjectDetailState();
 }
 
-class _ProjectDetailState extends State<ProjectDetail> with TickerProviderStateMixin{
+class _ProjectDetailState extends State<ProjectDetail>
+    with TickerProviderStateMixin {
   bool subscribed;
   AnimationController _controle;
 
@@ -169,114 +170,142 @@ class _ProjectDetailState extends State<ProjectDetail> with TickerProviderStateM
     super.initState();
     checkSubscription(widget._checkUserSubscription);
     //initGoogleMap();
-    _controle = AnimationController(
-      vsync: this,
-      duration: Duration(milliseconds: 200)
-    );
+    _controle =
+        AnimationController(vsync: this, duration: Duration(milliseconds: 200));
   }
 
   checkSubscription(checkUserSubscription) {
     checkUserSubscription(widget._projectId).then((onValue) {
-      setState(() {subscribed = onValue;});
+      setState(() {
+        subscribed = onValue;
+      });
     });
   }
 
   @override
   Widget build(BuildContext context) {
     return ScopedModelDescendant<UserModel>(
-        builder: (context, child, user) => Scaffold(
-          body: CustomScrollView(slivers: <Widget>[
-            SliverAppBar(
-                expandedHeight: 250.0,
-                pinned: true,
-                flexibleSpace: FlexibleSpaceBar(
+      builder: (context, child, user) => Scaffold(
+            body: CustomScrollView(
+              slivers: <Widget>[
+                SliverAppBar(
+                  expandedHeight: 250.0,
+                  pinned: true,
+                  flexibleSpace: FlexibleSpaceBar(
                     title: Text(widget._name),
                     background: ListView(
-                        children: <Widget>[
-                          Container(
-                            decoration: BoxDecoration(
-                              shape: BoxShape.rectangle,
-                            ),
-                            child: widget._imageList == null ||
-                                widget._imageList.length == 0
-                                ? Center(
-                                child: Container(
-                                  height: 250,
-                                  decoration: BoxDecoration(
+                      children: <Widget>[
+                        Container(
+                          decoration: BoxDecoration(
+                            shape: BoxShape.rectangle,
+                          ),
+                          child: widget._imageList == null ||
+                                  widget._imageList.length == 0
+                              ? Center(
+                                  child: Container(
+                                    height: 250,
+                                    decoration: BoxDecoration(
                                       shape: BoxShape.rectangle,
                                       image: DecorationImage(
-                                          fit: BoxFit.cover,
-                                          image: AssetImage(
-                                            'assets/default.jpg',
-                                          )
-                                      )
+                                        fit: BoxFit.cover,
+                                        image: AssetImage(
+                                          'assets/default.jpg',
+                                        ),
+                                      ),
+                                    ),
                                   ),
                                 )
-                            )
-                                : SizedBox(
-                              height: 250,
-                              width: 350,
-                              child:
-                              ListView.builder(
-                                physics: ClampingScrollPhysics(),
-                                shrinkWrap: true,
-                                scrollDirection: Axis.horizontal,
-                                itemCount: widget._imageList.length,
-                                itemBuilder: (BuildContext context, int index) =>
-                                    FlatButton(
-                                        child: Container(
-                                          width: 350,
-                                          decoration: BoxDecoration(
-                                              border: Border.all(),
-                                              image: DecorationImage(
-                                                  fit: BoxFit.cover,
-                                                  image: CachedNetworkImageProvider(
-                                                    widget._imageList[
-                                                    index],
-                                                  )
-                                              )
-                                          ),
-                                        ),
-                                        onPressed: () {
-                                          Navigator.push(
-                                            context,
-                                            CustomRoute(
-                                              builder: (context) => Container(
-                                                child: PhotoView(
-                                                  imageProvider:
-                                                  AdvancedNetworkImage(
-                                                      widget._imageList[
-                                                      index],
-                                                      useDiskCache: true
+                              : SizedBox(
+                                  height: 250,
+                                  width: 350,
+                                  child: Center(
+                                    child: ListView.builder(
+                                      physics: ClampingScrollPhysics(),
+                                      shrinkWrap: true,
+                                      scrollDirection: Axis.horizontal,
+                                      itemCount: widget._imageList.length,
+                                      itemBuilder: (BuildContext context,
+                                              int index) =>
+                                          InkWell(
+                                              child: Container(
+                                                width: widget._imageList.length == 1
+                                                        ? MediaQuery.of(context).size.width
+                                                        : 350,
+                                                decoration: BoxDecoration(
+                                                  shape: BoxShape.rectangle,
+                                                  border: Border.all(width: 3),
+                                                  image: DecorationImage(
+                                                    fit: BoxFit.cover,
+                                                    image:
+                                                        CachedNetworkImageProvider(
+                                                      widget._imageList[index],
+                                                    ),
                                                   ),
                                                 ),
                                               ),
-                                            ),
-                                          );
-                                        }
+                                              onTap: () {
+                                                Navigator.push(
+                                                  context,
+                                                  CustomRoute(
+                                                    builder:
+                                                        (context) => Container(
+                                                              child: PhotoView(
+                                                                imageProvider: AdvancedNetworkImage(
+                                                                    widget._imageList[
+                                                                        index],
+                                                                    useDiskCache:
+                                                                        true),
+                                                              ),
+                                                            ),
+                                                  ),
+                                                );
+                                              }),
                                     ),
-                              ),
-                            ),
-                          )
-                        ]
-                    )
-                )
-            ),
-            SliverList(delegate: SliverChildListDelegate([
-              Container(
-                padding: EdgeInsets.fromLTRB(20, 20, 20, 40),
-                child: Text(
-                  widget._detail,
-                  style: TextStyle(fontSize: 16.0),
-                ),
-              ),
-              Center(
-                child: RaisedButton(
-                    color: Colors.deepPurple,
-                    child: Text(
-                      "Ver no mapa",
-                      style: TextStyle(color: Colors.white),
+                                  ),
+                                ),
+                        )
+                      ],
                     ),
+                  ),
+                ),
+                SliverList(
+                  delegate: SliverChildListDelegate(
+                    [
+                      Container(
+                        padding: EdgeInsets.fromLTRB(20, 20, 20, 40),
+                        child: Text(
+                          widget._detail,
+                          style: TextStyle(fontSize: 16.0),
+                        ),
+                      ),
+                    ],
+                  ),
+                )
+              ],
+            ),
+            floatingActionButton: _customFloatingActionButton(),
+          ),
+    );
+  }
+
+  //botao para inscrever-se no projeto
+  Widget _customFloatingActionButton() {
+    return ScopedModelDescendant<UserModel>(
+      builder: (context, child, user) => Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Container(
+                height: 70.0,
+                width: 56.0,
+                alignment: FractionalOffset.topCenter,
+                child: ScaleTransition(
+                  scale: CurvedAnimation(
+                      parent: _controle,
+                      curve: Interval(0.0, 1.0, curve: Curves.easeOut)),
+                  child: FloatingActionButton(
+                    backgroundColor: Theme.of(context).cardColor,
+                    heroTag: 'extra',
+                    mini: true,
                     onPressed: () {
                       Navigator.push(
                         context,
@@ -286,101 +315,78 @@ class _ProjectDetailState extends State<ProjectDetail> with TickerProviderStateM
                           );
                         }),
                       );
-                    }
+                    },
+                    child: Icon(Icons.map, color: Colors.black),
+                  ),
                 ),
               ),
-            ],),)
-          ]),
-          floatingActionButton: _customFloatingActionButton(),
-        )
-    );
-  }
-
-  //botao para inscrever-se no projeto
-  Widget _customFloatingActionButton() {
-    return ScopedModelDescendant<UserModel>(
-        builder: (context, child, user) => Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Container (
-                  height: 70.0,
-                  width: 56.0,
-                  alignment: FractionalOffset.topCenter,
-                  child: ScaleTransition(
-                      scale: CurvedAnimation(
-                          parent: _controle,
-                          curve: Interval(0.0, 1.0, curve: Curves.easeOut)
-                      ),
-                      child: FloatingActionButton(
-                        backgroundColor: Theme.of(context).cardColor,
-                        heroTag: 'extra',
-                        mini: true,
-                        onPressed: () {},
-                        child: Icon(Icons.clear, color: Colors.black),
-                      )
-                  )
-              ),
-
-              Container (
-                  height: 70.0,
-                  width: 56.0,
-                  alignment: FractionalOffset.topCenter,
-                  child: ScaleTransition (
-                    scale: CurvedAnimation(
-                        parent: _controle,
-                        curve: Interval(0.0, 0.5, curve: Curves.easeOut)
-                    ),
-                    child: FloatingActionButton(
-                        backgroundColor: Theme.of(context).cardColor,
-                        heroTag: 'inscricao',
-                        mini: true,
-                        onPressed: () {
-                          if(subscribed == null) return;
-                          if (!subscribed) {
-                            user.subscribeToProject(widget._projectId).then((onValue) {
-                              checkSubscription(user.checkSubscription);
-                            });
-                          } else {
-                            List<String> temp = [widget._projectId];
-                            user.unsubscribeToProjects(temp).then((onValue) {
-                              checkSubscription(user.checkSubscription);
-                            });
-                          }
-                          setState((){subscribed = null;});
-                        },
-                        child: subscribed == null ? CircularProgressIndicator(valueColor: new AlwaysStoppedAnimation<Color>(Colors.red))
-                            : Icon(
-                            subscribed
-                                ? Icons.favorite
-                                : Icons.favorite_border,
-                            color: Colors.red)
-                    ),
-                  )
-              ),
-              Container (
+              Container(
+                height: 70.0,
+                width: 56.0,
+                alignment: FractionalOffset.topCenter,
+                child: ScaleTransition(
+                  scale: CurvedAnimation(
+                      parent: _controle,
+                      curve: Interval(0.0, 0.5, curve: Curves.easeOut)),
                   child: FloatingActionButton(
-                      heroTag: 'opcoes',
+                      backgroundColor: Theme.of(context).cardColor,
+                      heroTag: 'inscricao',
+                      mini: true,
                       onPressed: () {
-                        if (_controle.isDismissed) {
-                          _controle.forward();
+                        if (subscribed == null) return;
+                        if (!subscribed) {
+                          user
+                              .subscribeToProject(widget._projectId)
+                              .then((onValue) {
+                            checkSubscription(user.checkSubscription);
+                          });
                         } else {
-                          _controle.reverse();
+                          List<String> temp = [widget._projectId];
+                          user.unsubscribeToProjects(temp).then((onValue) {
+                            checkSubscription(user.checkSubscription);
+                          });
                         }
+                        setState(() {
+                          subscribed = null;
+                        });
                       },
-                      child: AnimatedBuilder(
-                        animation: _controle,
-                        builder: (BuildContext context, Widget child) {
-                          return Transform(
-                              alignment: FractionalOffset.center,
-                              transform: Matrix4.rotationZ(_controle.value * 0.5 * math.pi),
-                              child: Icon(_controle.isDismissed ? Icons.more_vert : Icons.close)
-                          );
-                        },
-                      )
-                  )
+                      child: subscribed == null
+                          ? CircularProgressIndicator(
+                              valueColor:
+                                  new AlwaysStoppedAnimation<Color>(Colors.red))
+                          : Icon(
+                              subscribed
+                                  ? Icons.favorite
+                                  : Icons.favorite_border,
+                              color: Colors.red)),
+                ),
+              ),
+              Container(
+                child: FloatingActionButton(
+                  heroTag: 'opcoes',
+                  onPressed: () {
+                    if (_controle.isDismissed) {
+                      _controle.forward();
+                    } else {
+                      _controle.reverse();
+                    }
+                  },
+                  child: AnimatedBuilder(
+                    animation: _controle,
+                    builder: (BuildContext context, Widget child) {
+                      return Transform(
+                          alignment: FractionalOffset.center,
+                          transform: Matrix4.rotationZ(
+                              _controle.value * 0.5 * math.pi),
+                          child: Icon(_controle.isDismissed
+                              ? Icons.more_vert
+                              : Icons.close));
+                    },
+                  ),
+                ),
               )
-            ]
-        )
+            ],
+          ),
     );
   }
 }
