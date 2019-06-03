@@ -15,7 +15,7 @@ class Item {
 }
 
 class SideMenu extends StatefulWidget {
-  final items = [
+  final List<Item> items = [ //atributo
     new Item("Perfil"),
     new Item("Configurações"),
     new Item("Sair")

@@ -1,9 +1,11 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:lpdm_proj/project_item.dart';
 import 'models.dart';
 import 'package:scoped_model/scoped_model.dart';
 
-class ProfilePage extends StatelessWidget {
+class ProfilePage extends StatefulWidget {
   List<ProjectItem> projects; //atributo
 
   ProfilePage(List<ProjectItem> p) {
@@ -12,12 +14,20 @@ class ProfilePage extends StatelessWidget {
   }
 
   @override
+  State<StatefulWidget> createState(){
+    return new _ProfilePageState();
+  }
+}
+
+class _ProfilePageState extends State<ProfilePage>{
+
+  @override
   Widget build(BuildContext context) {
     String textProjsInscritos;
-    String numberProjsInscritos = projects.length.toString();
-    if (projects.length <= 1) {
+    String numberProjsInscritos = widget.projects.length.toString();
+    if (widget.projects.length <= 1) {
       textProjsInscritos = "projeto inscrito";
-      if (projects.length == 0) numberProjsInscritos = "nenhum";
+      if (widget.projects.length == 0) numberProjsInscritos = "nenhum";
     } else {
       textProjsInscritos = "projetos inscritos";
     }
