@@ -21,12 +21,6 @@ class SideMenu extends StatefulWidget {
     new Item("Sair")
   ];
 
-  List<ProjectItem> projects; //atributo
-
-  SideMenu(List<ProjectItem> projList){ //construtor
-    this.projects = projList;
-  }
-
   @override
   State<StatefulWidget> createState() {
     return new _SideMenuState();
@@ -36,24 +30,37 @@ class SideMenu extends StatefulWidget {
 class _SideMenuState extends State<SideMenu> {
   int _selectedDrawerIndex = 0;
 
-    changePages(int index, List<ProjectItem>projects) async{
-      switch(index){
-        case 0:
-          Navigator.push(
-              context, CustomRoute(builder: (context) => ProfilePage(projects)));
-          break;
-        case 1:
-          Navigator.push(context, CustomRoute(builder: (context) => ConfigPage()));
-          break;
-        case 2:
-          await FirebaseAuth.instance.signOut();
-          Navigator.pushReplacement(context, new CustomRoute(builder: (context) => MyApp()));
-      }
-      setState((){
-        _selectedDrawerIndex = index;
-      });
-
+  changePages(int index) async{
+    switch(index){
+      case 0:
+        Navigator.push(
+            context, CustomRoute(builder: (context) => ProfilePage()));
+        break;
+      case 1:
+        Navigator.push(context, CustomRoute(builder: (context) => ConfigPage()));
+        break;
+      case 2:
+        await FirebaseAuth.instance.signOut();
+        Navigator.pushReplacement(context, new CustomRoute(builder: (context) => MyApp()));
     }
+    setState((){
+      _selectedDrawerIndex = index;
+    });
+
+  }
+
+  Widget getProjectsText(List<ProjectItem> projects){
+    String textProjsInscritos;
+    String numberProjsInscritos = projects.length.toString();
+    if (projects.length <= 1) {
+      textProjsInscritos = "projeto inscrito";
+      if (projects.length == 0) numberProjsInscritos = "nenhum";
+    } else {
+      textProjsInscritos = "projetos inscritos";
+    }
+
+    return Text(numberProjsInscritos + " " + textProjsInscritos, style: TextStyle(fontSize: 14));
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -63,18 +70,8 @@ class _SideMenuState extends State<SideMenu> {
       drawerOptions.add(new ListTile(
         title: new Text(d.nome),
         selected: i == _selectedDrawerIndex,
-        onTap: () => changePages(i, widget.projects),
+        onTap: () => changePages(i),
       ));
-    }
-
-    String textProjsInscritos;
-    String numberProjsInscritos = widget.projects.length.toString();
-    if(widget.projects.length <= 1){
-      textProjsInscritos = "projeto inscrito";
-      if(widget.projects.length == 0) numberProjsInscritos = "nenhum";
-    }
-    else{
-      textProjsInscritos = "projetos inscritos";
     }
     
     return ScopedModelDescendant<UserModel>(
@@ -94,7 +91,7 @@ class _SideMenuState extends State<SideMenu> {
                             children: <Widget>[
                               Text(user.username),
                               Padding(padding: EdgeInsets.only(bottom: 8.0)),
-                              Text(numberProjsInscritos + " " + textProjsInscritos, style: TextStyle(fontSize: 14)),
+                              getProjectsText(user.projList),//,
                             ],
                           ),
                         ),

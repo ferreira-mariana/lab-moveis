@@ -85,7 +85,7 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
     return ScopedModelDescendant<DataModel>(
       builder: (context, child, data) => ScopedModelDescendant<UserModel>(
             builder: (context, child, user) => Scaffold(
-                  drawer: SideMenu(user.projList),
+                  drawer: SideMenu(),
                   appBar: AppBar(
                     actions: actionBarWidgets,
                     bottom: TabBar(

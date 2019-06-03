@@ -6,12 +6,6 @@ import 'models.dart';
 import 'package:scoped_model/scoped_model.dart';
 
 class ProfilePage extends StatefulWidget {
-  List<ProjectItem> projects; //atributo
-
-  ProfilePage(List<ProjectItem> p) {
-    //construtor
-    this.projects = p;
-  }
 
   @override
   State<StatefulWidget> createState(){
@@ -21,17 +15,24 @@ class ProfilePage extends StatefulWidget {
 
 class _ProfilePageState extends State<ProfilePage>{
 
-  @override
-  Widget build(BuildContext context) {
+  Widget getProjectsText(List<ProjectItem> projects){
     String textProjsInscritos;
-    String numberProjsInscritos = widget.projects.length.toString();
-    if (widget.projects.length <= 1) {
+    String numberProjsInscritos = projects.length.toString();
+    if (projects.length <= 1) {
       textProjsInscritos = "projeto inscrito";
-      if (widget.projects.length == 0) numberProjsInscritos = "nenhum";
+      if (projects.length == 0) numberProjsInscritos = "nenhum";
     } else {
       textProjsInscritos = "projetos inscritos";
     }
 
+    return Text(numberProjsInscritos + " " + textProjsInscritos,
+      style: TextStyle(
+          color: Colors.grey[700], fontSize: 16),
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
     return ScopedModelDescendant<UserModel>(
       builder: (context, child, user) => Scaffold(
           appBar: AppBar(
@@ -53,11 +54,7 @@ class _ProfilePageState extends State<ProfilePage>{
                           ),
                           Padding(
                             padding: EdgeInsets.symmetric(vertical: 10.0),
-                            child: Text(
-                              numberProjsInscritos + " " + textProjsInscritos,
-                              style: TextStyle(
-                                  color: Colors.grey[700], fontSize: 16),
-                              )
+                            child: getProjectsText(user.projList),
                           ),
                         ],
                       ),
