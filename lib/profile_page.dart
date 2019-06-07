@@ -1,21 +1,19 @@
 import 'dart:io';
-
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:lpdm_proj/project_item.dart';
 import 'models.dart';
 import 'package:scoped_model/scoped_model.dart';
 
 class ProfilePage extends StatefulWidget {
-
   @override
-  State<StatefulWidget> createState(){
+  State<StatefulWidget> createState() {
     return new _ProfilePageState();
   }
 }
 
-class _ProfilePageState extends State<ProfilePage>{
-
-  Widget getProjectsText(List<ProjectItem> projects){
+class _ProfilePageState extends State<ProfilePage> {
+  Widget getProjectsText(List<ProjectItem> projects) {
     String textProjsInscritos;
     String numberProjsInscritos = projects.length.toString();
     if (projects.length <= 1) {
@@ -25,9 +23,9 @@ class _ProfilePageState extends State<ProfilePage>{
       textProjsInscritos = "projetos inscritos";
     }
 
-    return Text(numberProjsInscritos + " " + textProjsInscritos,
-      style: TextStyle(
-          color: Colors.grey[700], fontSize: 16),
+    return Text(
+      numberProjsInscritos + " " + textProjsInscritos,
+      style: TextStyle(color: Colors.grey[700], fontSize: 16),
     );
   }
 
@@ -83,13 +81,13 @@ class _ProfilePageState extends State<ProfilePage>{
                 ),
               ),
               ListTile(
-                  leading:
-                      Text('Email', style: TextStyle(color: Colors.grey[600])),
-                  title: Text(user.email)),
+                leading:
+                  Text('Email', style: TextStyle(color: Colors.grey[600])),
+                title: Text(user.email)),
               ListTile(
-                  leading:
-                      Text('Bio', style: TextStyle(color: Colors.grey[600])),
-                  title: Text('ola, eu sou fulana')),
+                leading:
+                  Text('Bio', style: TextStyle(color: Colors.grey[600])),
+                title: Text(user.bio)),
             ],
           )),
     );

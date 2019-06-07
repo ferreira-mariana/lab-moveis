@@ -45,7 +45,7 @@ class _LoginPageState extends State<LoginPage> {
 
   _signIn() async {
     GoogleSignInAccount googleSignInAccount = await googleSignIn.signIn();
-    if(googleSignInAccount == null) return;
+    if (googleSignInAccount == null) return;
 
     setState(() {
       loading = true;

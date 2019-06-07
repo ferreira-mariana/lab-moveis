@@ -10,6 +10,7 @@ import 'package:google_maps_webservice/places.dart';
 class UserModel extends Model {
   String _username;
   String _email;
+  String _bio;
   String _uid;
   String _sort = 'Nome';
   String _imgUrl;
@@ -30,6 +31,13 @@ class UserModel extends Model {
     notifyListeners();
   }
 
+  String get bio => _bio;
+
+  set bio(String b) {
+    _bio = b;
+    notifyListeners();
+  }
+
 
   String get uid => _uid;
 
@@ -37,7 +45,6 @@ class UserModel extends Model {
     _uid = uid;
     notifyListeners();
   }
-
 
   String get imgUrl => _imgUrl;
 
@@ -50,15 +57,17 @@ class UserModel extends Model {
 
   List<ProjectItem> get projList => _projList;
 
-  createUserDocument() async{
+  createUserDocument() async {
     _updated = false;
     notifyListeners();
 
-    DocumentReference userProjects = Firestore.instance.collection("users").document(_uid);
-    await userProjects.get().then((onValue) async{
-      if(!onValue.exists) {
-        await userProjects.setData(<String, dynamic> {
-          "projects" : new List<String>(),
+    DocumentReference userDocument =
+        Firestore.instance.collection("users").document(_uid);
+    await userDocument.get().then((onValue) async {
+      if (!onValue.exists) {
+        await userDocument.setData(<String, dynamic>{
+          "projects": new List<String>(),
+          "bio": String,
         });
       }
     });
@@ -71,12 +80,15 @@ class UserModel extends Model {
     notifyListeners();
 
     List<String> projects;
-    DocumentReference userDocument = Firestore.instance.collection("users").document(_uid);
+    DocumentReference userDocument =
+        Firestore.instance.collection("users").document(_uid);
     await userDocument.get().then((onValue) async {
+      _bio = onValue['bio'];
       projects = List.from(onValue['projects']);
       projList.clear();
       for (String i in projects) {
-        CollectionReference projectCollection = Firestore.instance.collection("projects");
+        CollectionReference projectCollection =
+            Firestore.instance.collection("projects");
         Future<QuerySnapshot> query = projectCollection.getDocuments();
 
         await query.then((value) {
@@ -105,12 +117,26 @@ class UserModel extends Model {
                 if (k == "placeid") placeid = v;
                 if (k == "description") description = v;
                 if (k == "imageUrl") {
-                  if(v==null) thumbRef = null;
-                  else thumbRef = v.toString();
+                  if (v == null)
+                    thumbRef = null;
+                  else
+                    thumbRef = v.toString();
                 }
                 if (k == "detailImageUrls") imgRefs = List<String>.from(v);
               });
-              projList.add(ProjectItem(placeid, name, description, numero, rua, bairro, cidade, estado, pais,  item.documentID, imgRefs, thumbRef));
+              projList.add(ProjectItem(
+                  placeid,
+                  name,
+                  description,
+                  numero,
+                  rua,
+                  bairro,
+                  cidade,
+                  estado,
+                  pais,
+                  item.documentID,
+                  imgRefs,
+                  thumbRef));
             }
           }
         });
@@ -121,7 +147,8 @@ class UserModel extends Model {
   }
 
   Future<void> subscribeToProject(String proj) async {
-    DocumentReference userProjects = Firestore.instance.collection("users").document(_uid);
+    DocumentReference userProjects =
+        Firestore.instance.collection("users").document(_uid);
     List<String> temp = new List<String>();
     temp.add(proj);
     await userProjects.updateData({'projects': FieldValue.arrayUnion(temp)});
@@ -129,18 +156,20 @@ class UserModel extends Model {
   }
 
   Future<void> unsubscribeToProjects(List<String> proj) async {
-    DocumentReference userProjects = Firestore.instance.collection("users").document(_uid);
+    DocumentReference userProjects =
+        Firestore.instance.collection("users").document(_uid);
     await userProjects.updateData({'projects': FieldValue.arrayRemove(proj)});
     updateUserProjects();
   }
 
-  Future<bool> checkSubscription(String proj) async{
+  Future<bool> checkSubscription(String proj) async {
     List<String> projects;
-    DocumentReference userDocument = Firestore.instance.collection("users").document(_uid);
+    DocumentReference userDocument =
+        Firestore.instance.collection("users").document(_uid);
     return await userDocument.get().then((onValue) async {
       projects = List.from(onValue['projects']);
       for (String i in projects) {
-        if(i == proj) return Future.value(true);
+        if (i == proj) return Future.value(true);
       }
       return Future.value(false);
     });
@@ -172,7 +201,7 @@ class UserModel extends Model {
     }
   }
 
-  void updateList(){
+  void updateList() {
     notifyListeners();
   }
 }
@@ -191,12 +220,13 @@ class DataModel extends Model {
 
   bool get isUpdated => _updated;
 
-  void updateProjects() async{
+  void updateProjects() async {
     _updated = false;
     notifyListeners();
 
     _projList = new List<ProjectItem>();
-    CollectionReference projectCollection = Firestore.instance.collection("projects");
+    CollectionReference projectCollection =
+        Firestore.instance.collection("projects");
     Future<QuerySnapshot> query = projectCollection.getDocuments();
 
     await query.then((value) {
@@ -223,21 +253,24 @@ class DataModel extends Model {
           if (k == "pais") pais = v;
           if (k == 'placeid') placeid = v;
           if (k == "description") description = v;
-          if (k == "imageUrl"){
-            if(v==null) thumbRef = null;
-            else thumbRef = v.toString();
-          } 
+          if (k == "imageUrl") {
+            if (v == null)
+              thumbRef = null;
+            else
+              thumbRef = v.toString();
+          }
           if (k == "detailImageUrls") imgRefs = List<String>.from(v);
-    
         });
-        projList.add(ProjectItem(placeid, name, description, numero, rua, bairro, cidade, estado, pais,  item.documentID, imgRefs, thumbRef));
+        projList.add(ProjectItem(placeid, name, description, numero, rua,
+            bairro, cidade, estado, pais, item.documentID, imgRefs, thumbRef));
       }
     });
     _updated = true;
     notifyListeners();
   }
 
-  void addProject(String name, PlacesDetailsResponse detail, String description, File imgMini, List<DisplayImage> imgs) async{
+  void addProject(String name, PlacesDetailsResponse detail, String description,
+      File imgMini, List<DisplayImage> imgs) async {
     String numero = "";
     String rua = "";
     String bairro = "";
@@ -247,46 +280,53 @@ class DataModel extends Model {
     _updated = false;
     notifyListeners();
 
-    for(AddressComponent c in detail.result.addressComponents){
-      if(c.types.contains('street_number')) numero = c.longName;
-      else if(c.types.contains('route')) rua = c.longName;
-      else if(c.types.contains('sublocality_level_1')) bairro = c.longName;
-      else if(c.types.contains('administrative_area_level_2')) cidade = c.longName;
-      else if(c.types.contains('administrative_area_level_1')) estado = c.longName;
-      else if(c.types.contains('country')) pais = c.longName;
+    for (AddressComponent c in detail.result.addressComponents) {
+      if (c.types.contains('street_number'))
+        numero = c.longName;
+      else if (c.types.contains('route'))
+        rua = c.longName;
+      else if (c.types.contains('sublocality_level_1'))
+        bairro = c.longName;
+      else if (c.types.contains('administrative_area_level_2'))
+        cidade = c.longName;
+      else if (c.types.contains('administrative_area_level_1'))
+        estado = c.longName;
+      else if (c.types.contains('country')) pais = c.longName;
     }
 
-    CollectionReference projectCollection = Firestore.instance.collection("projects");
+    CollectionReference projectCollection =
+        Firestore.instance.collection("projects");
 
     StorageReference storageRef;
     StorageTaskSnapshot downloadUrl;
     String urlMini;
 
-    if(imgMini!=null){
+    if (imgMini != null) {
       storageRef = FirebaseStorage.instance.ref().child(imgMini.toString());
       downloadUrl = await storageRef.putFile(imgMini).onComplete;
       urlMini = await downloadUrl.ref.getDownloadURL();
-    }else urlMini = null;
-    
+    } else
+      urlMini = null;
+
     List<String> imgUrls = new List<String>();
 
-    for(DisplayImage img in imgs){
+    for (DisplayImage img in imgs) {
       storageRef = FirebaseStorage.instance.ref().child(img.image.toString());
       downloadUrl = await storageRef.putFile(img.image).onComplete;
       imgUrls.add(await downloadUrl.ref.getDownloadURL());
     }
-    await projectCollection.add(<String, dynamic> {
-      "name" : name,
-      "numero" : numero,
-      "rua" : rua,
-      "bairro" : bairro,
-      "cidade" : cidade,
-      "estado" : estado,
-      "pais" : pais,
-      "placeid" : detail.result.placeId,
-      "description" : description,
-      "imageUrl" : urlMini,
-      "detailImageUrls" : imgUrls
+    await projectCollection.add(<String, dynamic>{
+      "name": name,
+      "numero": numero,
+      "rua": rua,
+      "bairro": bairro,
+      "cidade": cidade,
+      "estado": estado,
+      "pais": pais,
+      "placeid": detail.result.placeId,
+      "description": description,
+      "imageUrl": urlMini,
+      "detailImageUrls": imgUrls
     });
     updateProjects();
   }
