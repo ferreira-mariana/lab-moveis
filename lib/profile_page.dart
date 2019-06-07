@@ -85,7 +85,7 @@ class _ProfilePageState extends State<ProfilePage>{
               ListTile(
                   leading:
                       Text('Email', style: TextStyle(color: Colors.grey[600])),
-                  title: Text(user.username)),
+                  title: Text(user.email)),
               ListTile(
                   leading:
                       Text('Bio', style: TextStyle(color: Colors.grey[600])),

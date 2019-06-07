@@ -30,6 +30,7 @@ class _LoginPageState extends State<LoginPage> {
     FirebaseUser user = await FirebaseAuth.instance.currentUser();
     if (user != null) {
       widget.user.username = user.displayName;
+      widget.user.email = user.email;
       widget.user.uid = user.uid;
       widget.user.imgUrl = user.photoUrl;
       await widget.user.createUserDocument();
@@ -60,6 +61,7 @@ class _LoginPageState extends State<LoginPage> {
     final FirebaseUser user = await _auth.signInWithCredential(credential);
 
     widget.user.username = user.displayName;
+    widget.user.email = user.email;
     widget.user.uid = user.uid;
     widget.user.imgUrl = user.photoUrl;
     widget.user.createUserDocument();

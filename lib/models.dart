@@ -9,6 +9,7 @@ import 'package:google_maps_webservice/places.dart';
 
 class UserModel extends Model {
   String _username;
+  String _email;
   String _uid;
   String _sort = 'Nome';
   String _imgUrl;
@@ -21,6 +22,14 @@ class UserModel extends Model {
     _username = name;
     notifyListeners();
   }
+
+  String get email => _email;
+
+  set email(String e) {
+    _email = e;
+    notifyListeners();
+  }
+
 
   String get uid => _uid;
 
