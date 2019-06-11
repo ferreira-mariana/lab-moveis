@@ -174,10 +174,23 @@ class UserModel extends Model {
       return Future.value(false);
     });
   }
+  
+  void organizeUserProjects() async{
+    DocumentReference userProjects =
+    Firestore.instance.collection("users").document(_uid);
+    List<String> temp = new List<String>();
+    for(ProjectItem item in projList)
+      temp.add(item.projectId);
+    await userProjects.updateData({'projects': FieldValue.arrayRemove(temp)}).
+      then((onValue) {
+        userProjects.updateData({'projects': FieldValue.arrayUnion(temp)});
+      });
+  }
 
   void sort(String sort) {
     _sort = sort;
     _sortList();
+    organizeUserProjects();
     notifyListeners();
   }
 

@@ -138,6 +138,7 @@ class _UserProjectsState extends State<UserProjectsPage>
                             ProjectItem item = user.projList[before];
                             user.projList.removeAt(before);
                             user.projList.insert(after, item);
+                            user.organizeUserProjects();
                           },
                           canBeDraggedTo: (one, two) {
                             return two != user.projList.length - 1;
