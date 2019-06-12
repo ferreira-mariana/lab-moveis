@@ -23,6 +23,9 @@ class _CreateProjectPageState extends State<CreateProjectPage> {
   File _image;
   List<DisplayImage> _imageList = new List<DisplayImage>();
 
+  DateTime _date = new DateTime.now();
+  TimeOfDay _time = new TimeOfDay.now();
+
   @override
   void initState() {
     addressDetail = null;
@@ -191,6 +194,36 @@ class _CreateProjectPageState extends State<CreateProjectPage> {
     );
   }
 
+  Future<Null> _selectDate(BuildContext context) async{
+    final DateTime picked = await showDatePicker(
+      context: context,
+      initialDate: _date,
+      firstDate: new DateTime(_date.year, _date.month, _date.day),
+      lastDate: new DateTime(_date.year+10)
+    );
+
+    if(picked != null){
+      print('Date selected: ${_date.toString()}');
+      setState((){
+        _date = picked;
+      });
+    }
+  }
+
+  Future<Null> _selectTime(BuildContext context) async{
+    final TimeOfDay picked = await showTimePicker(
+        context: context,
+        initialTime: _time
+    );
+
+    if(picked != null && ((_date.day != DateTime.now().day || _date.month != DateTime.now().month || _date.year != DateTime.now().year) || (picked.hour > TimeOfDay.now().hour || ((picked.hour == TimeOfDay.now().hour) && (picked.minute > TimeOfDay.now().minute))))){
+      print('Time selected: ${_time.toString()}');
+      setState((){
+        _time = picked;
+      });
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return ScopedModelDescendant<DataModel>(
@@ -314,6 +347,26 @@ class _CreateProjectPageState extends State<CreateProjectPage> {
                         CustomRoute(
                             builder: (context) => GoogleMapsViewer()),
                       );
+                    },
+                  ),
+                  RaisedButton(
+                    color: Colors.deepPurple,
+                    child: Text(
+                      "DATA: ${_date.day.toString()}/${_date.month.toString()}/${_date.year.toString()}",
+                      style: TextStyle(color: Colors.white),
+                    ),
+                    onPressed: () {
+                      _selectDate(context);
+                    },
+                  ),
+                  RaisedButton(
+                    color: Colors.deepPurple,
+                    child: Text(
+                      "HORÁRIO: ${_time.hour.toString()}:${_time.minute.toString()}",
+                      style: TextStyle(color: Colors.white),
+                    ),
+                    onPressed: () {
+                      _selectTime(context);
                     },
                   ),
                   addressResults,
