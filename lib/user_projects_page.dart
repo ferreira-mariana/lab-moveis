@@ -72,13 +72,26 @@ class _UserProjectsState extends State<UserProjectsPage>
   }
 
   bool searchItemInList(ProjectItem item) {
-    return (item.name
+    return (
+        item.name
             .toLowerCase()
             .contains(_searchController.text.toLowerCase()) ||
         item.cidade
             .toLowerCase()
             .contains(_searchController.text.toLowerCase()) ||
         item.estado
+            .toLowerCase()
+            .contains(_searchController.text.toLowerCase()) ||
+        item.rua
+            .toLowerCase()
+            .contains(_searchController.text.toLowerCase()) ||
+        item.numero
+            .toLowerCase()
+            .contains(_searchController.text.toLowerCase()) ||
+        item.pais
+            .toLowerCase()
+            .contains(_searchController.text.toLowerCase()) ||
+        item.bairro
             .toLowerCase()
             .contains(_searchController.text.toLowerCase()));
   }
