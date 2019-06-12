@@ -190,7 +190,6 @@ class UserModel extends Model {
   void sort(String sort) {
     _sort = sort;
     _sortList();
-    organizeUserProjects();
     notifyListeners();
   }
 
@@ -212,6 +211,7 @@ class UserModel extends Model {
         });
         break;
     }
+    organizeUserProjects();
   }
 
   void updateList() {
